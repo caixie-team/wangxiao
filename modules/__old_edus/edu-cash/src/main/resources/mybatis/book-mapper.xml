@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.wangxiao.bookstore.dao.BookDao">
+	<resultMap type="io.wangxiao.bookstore.entity.Book" id="BookResult">
+ 	   <result property="bookId" column="BOOK_ID"/>
+       <result property="price" column="PRICE"/>
+       <result property="nowPrice" column="NOW_PRICE"/>
+       <result property="rebatePrice" column="REBATE_PRICE"/>
+       <result property="bookName" column="BOOK_NAME"/>
+       <result property="bookSubjectid" column="BOOK_SUBJECTID"/>
+       <result property="bookImg" column="BOOK_IMG"/>
+       <result property="bookSmallimg" column="BOOK_SMALLIMG"/>
+       <result property="stockNum" column="STOCK_NUM"/>
+       <result property="author" column="AUTHOR"/>
+       <result property="press" column="PRESS"/>
+       <result property="publishTime" column="PUBLISH_TIME"/>
+       <result property="revision" column="REVISION"/>
+       <result property="printNum" column="PRINT_NUM"/>
+       <result property="pageNum" column="PAGE_NUM"/>
+       <result property="wordNum" column="WORD_NUM"/>
+       <result property="bookPackage" column="BOOK_PACKAGE"/>
+       <result property="pager" column="PAGER"/>
+       <result property="weight" column="WEIGHT"/>
+       <result property="isbn" column="ISBN"/>
+       <result property="remarks" column="REMARKS"/>
+       <result property="bookInfo" column="BOOK_INFO"/>
+       <result property="directory" column="DIRECTORY"/>
+       <result property="status" column="STATUS"/>
+       <result property="addTime" column="ADD_TIME"/>
+       <result property="shopState" column="SHOP_STATE"/>
+       <result property="dropTime" column="DROP_TIME"/>
+       <result property="upTime" column="UP_TIME"/>
+       <result property="validityTime" column="VALIDITY_TIME"/>
+       <result property="updateTime" column="UPDATE_TIME"/>
+       <result property="updateUser" column="UPDATE_USER"/>
+       <result property="bookType" column="BOOK_TYPE"/>
+       <result property="bookSize" column="BOOK_SIZE"/>
+       <result property="disProperty" column="disProperty"/>
+       <result property="payUrl" column="book_pay_url"/>
+	</resultMap>
+	
+	 <resultMap type="io.wangxiao.bookstore.entity.Book" id="BookAndOtherResult" extends="BookResult">
+        <result property="subjectName" column="SUBJECT_NAME"/>
+     </resultMap>
+      
+      <sql id="edu_book_columns">
+            edu_book.BOOK_ID,
+            edu_book.PRICE,
+            edu_book.NOW_PRICE,
+            edu_book.REBATE_PRICE,
+            edu_book.BOOK_NAME,
+            edu_book.BOOK_SUBJECTID,
+            edu_book.BOOK_IMG,
+            edu_book.BOOK_SMALLIMG,
+            edu_book.STOCK_NUM,
+            edu_book.AUTHOR,
+            edu_book.PRESS,
+            edu_book.PUBLISH_TIME,
+            edu_book.REVISION,
+            edu_book.PRINT_NUM,
+            edu_book.PAGE_NUM,
+            edu_book.WORD_NUM,
+            edu_book.BOOK_PACKAGE,
+            edu_book.PAGER,
+            edu_book.WEIGHT,
+            edu_book.ISBN,
+            edu_book.REMARKS,
+            edu_book.BOOK_INFO,
+            edu_book.DIRECTORY,
+            edu_book.STATUS,
+            edu_book.ADD_TIME,
+            edu_book.SHOP_STATE,
+            edu_book.DROP_TIME,
+            edu_book.UP_TIME,
+            edu_book.VALIDITY_TIME,
+            edu_book.UPDATE_TIME,
+            edu_book.UPDATE_USER,
+            edu_book.BOOK_TYPE,
+            edu_book.BOOK_SIZE,
+            edu_book.disProperty,
+            edu_book.book_pay_url
+        </sql>
+
+        <sql id="edu_book_properties">
+            #{bookId},
+            #{price},
+            #{nowPrice},
+            #{rebatePrice},
+            #{bookName},
+            #{bookSubjectid},
+            #{bookImg},
+            #{bookSmallimg},
+            #{stockNum},
+            #{author},
+            #{press},
+            #{publishTime},
+            #{revision},
+            #{printNum},
+            #{pageNum},
+            #{wordNum},
+            #{bookPackage},
+            #{pager},
+            #{weight},
+            #{isbn},
+            #{remarks},
+            #{bookInfo},
+            #{directory},
+            #{status},
+            #{addTime},
+            #{shopState},
+            #{dropTime},
+            #{upTime},
+            #{validityTime},
+            #{updateTime},
+            #{updateUser},
+            #{bookType},
+            #{bookSize},
+            #{disProperty},
+            #{payUrl}
+        </sql>
+        
+
+
+
+       <!-- 前台查询图书列表 -->
+       <select id="findBookDTOList" parameterType="Map" resultMap="BookAndOtherResult">
+			select
+			<include refid="edu_book_columns" />,
+			sys_subject.SUBJECT_NAME
+			from edu_book
+			left join sys_subject
+			on edu_book.book_subjectid = sys_subject.SUBJECT_ID
+			where edu_book.status=1
+			<if test="e.bookSubjectid !=null and e.bookSubjectid>0">
+			and edu_book.book_subjectid=#{e.bookSubjectid}
+			</if>
+			<if test="e.sujectIds !=null and e.sujectIds !=''">
+			and edu_book.book_subjectid in (${e.sujectIds})
+			</if>
+			 <if test="e.bookName !=null and e.bookName !=''">
+			and	book_name like CONCAT('%',#{bookName},'%')
+			</if>
+			<if test="e.disProperty !=null and e.disProperty !=''">
+			and	( disProperty like ('%$disProperty$%'))
+			</if>
+			<if test="e.orderNum==1">
+			order by book_id DESC
+			</if>
+			<if test="e.orderNum==3">
+			order by now_price ASC
+			</if>
+			<if test="e.orderNum==4">
+			order by now_price desc
+			</if>
+			<if test="e.orderNum==5 or e.orderNum==null">
+			order by ADD_TIME desc
+			</if>
+        </select>
+
+</mapper>
+
+     

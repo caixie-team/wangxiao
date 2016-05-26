@@ -1,0 +1,664 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BlogBlogMapper">
+
+	<resultMap id="BlogBlogResult" type="BlogBlog">
+		<result property="id" column="id" />
+		<result property="cusId" column="cus_id" />
+		<result property="title" column="title" />
+		<result property="content" column="content" />
+		<result property="type" column="type" />
+		<result property="status" column="status" />
+		<result property="viewCount" column="viewcount" />
+		<result property="replyCount" column="replycount" />
+		<result property="isBest" column="isbest" />
+		<result property="activity" column="activity" />
+		<result property="addTime" column="addtime" />
+		<result property="updateTime" column="updateTime" />
+		<result property="top" column="top" />
+		<result property="showName" column="showname"/>
+		<result property="flag" column="flag"/>
+		<result property="summary" column="summary"/>
+	</resultMap>
+	<resultMap type="QueryBlogAndReply" id="QueryBlogAndReplyResult" extends="BlogBlogResult">
+		<result property="blogId" column="id" />
+		<result property="cusId" column="cus_id" />
+		<result property="content" column="content"/>
+		<result property="showName" column="showname"/>
+		<result property="title" column="title" />
+		<result property="viewCount" column="viewcount" />
+		<result property="replyCount" column="replycount" />
+		<result property="addTime" column="addtime" />
+		<result property="updateTime" column="updateTime"/>
+		<result property="replyName" column="replyname"/>
+		<result property="blognum" column="blognum" />
+	</resultMap>
+
+	<resultMap type="Artclassify" id="ArtclassifyResult">
+		<result property="artId" column="id" />
+		<result property="name" column="name" />
+	</resultMap>
+
+	<resultMap type="BlogBlog" id="BlogBlogTypeResult" extends="BlogBlogResult">
+		<result property="articleName" column="articleName" />
+	</resultMap>
+
+	<resultMap type="BlogBlog" id="QueryBlogBlogResult" extends="BlogBlogResult">
+		<result property="lineNum" column="lineNum" />
+		<result property="maxId" column="maxId" />
+	</resultMap>
+	<sql id="sns_blog_columns">
+		sns_blog.id,
+		sns_blog.cus_id,
+		sns_blog.title,
+		sns_blog.content,
+		sns_blog.type,
+		sns_blog.status,
+		sns_blog.viewcount,
+		sns_blog.replycount,
+		sns_blog.isbest,
+		sns_blog.activity,
+		sns_blog.addtime,
+		sns_blog.updateTime,
+		sns_blog.top,
+		sns_blog.showname,
+		sns_blog.flag,
+		sns_blog.selType,
+		sns_blog.summary
+	</sql>
+
+	<sql id="sns_blog_properties">
+		#{id},
+		#{cusId},
+		#{title},
+		#{content},
+		#{type},
+		#{status},
+		#{viewCount},
+		#{replyCount},
+		#{isBest},
+		#{activity},
+		#{addTime},
+		#{updateTime},
+		#{top},
+		#{showName},
+		#{flag},
+		#{selType},
+		#{summary}
+	</sql>
+	<!-- 创建博客 -->
+	<insert id="createBlogBlog" parameterType="BlogBlog" keyColumn="id" useGeneratedKeys="true"
+		keyProperty="id">
+		insert INTO sns_blog (
+		<include refid="sns_blog_columns" />
+		) VALUES (
+		<include refid="sns_blog_properties" />
+		)
+	</insert>
+	<!-- 根据id删除博客 -->
+	<delete id="deleteBlogBlogById" parameterType="long">
+		delete from
+		sns_blog
+		where
+		id = #{value}
+	</delete>
+	<!-- 根据id更新博客内容 -->
+	<update id="updateBlogBlog" parameterType="BlogBlog">
+		update sns_blog SET
+		title=#{title},
+		content = #{content},
+		updateTime=#{updateTime},
+		selType=#{selType},
+		summary=#{summary}
+		where
+		sns_blog.id=#{id}
+	</update>
+	<!-- 根据id查询博客信息 -->
+	<select id="getBlogBlogById" resultMap="BlogBlogMapper.BlogBlogTypeResult"
+		parameterType="long">
+		(select
+		<include refid="sns_blog_columns" />
+		,
+		sns_dis_article_classify.name articleName
+		from sns_blog
+		left join
+		sns_dis_article_classify on sns_blog.type=sns_dis_article_classify.id
+		where
+		<![CDATA[sns_blog.id < #{id} order by sns_blog.id desc limit 1]]>)
+		union all
+		(select
+		<include refid="sns_blog_columns" />
+		,
+		sns_dis_article_classify.name articleName
+		from sns_blog
+		left join
+		sns_dis_article_classify on sns_blog.type=sns_dis_article_classify.id
+		where
+		sns_blog.id = #{id})
+		union all
+		(select
+		<include refid="sns_blog_columns" />
+		,
+		sns_dis_article_classify.name articleName
+		from sns_blog
+		left join
+		sns_dis_article_classify on sns_blog.type=sns_dis_article_classify.id
+		where
+		sns_blog.id > #{id} limit 1)
+	</select>
+	<select id="getBlogBlogList" resultMap="BlogBlogResult"
+		parameterType="BlogBlog">
+		select
+		<include refid="sns_blog_columns" />
+		from sns_blog
+	</select>
+	<!-- 后台修改博文 -->
+	<select id="getAdminBlogBlogById" resultMap="BlogBlogMapper.BlogBlogTypeResult"
+		parameterType="long">
+		select
+		<include refid="sns_blog_columns" />
+		,
+		sns_dis_article_classify.name articleName
+		from sns_blog
+		left join
+		sns_dis_article_classify on sns_blog.type=sns_dis_article_classify.id
+		where
+		sns_blog.id = #{id}
+	</select>
+	<!-- 查寻全站博文 -->
+	<select id="getBlogBlogAllList" resultMap="QueryBlogAndReplyResult"
+		parameterType="java.util.HashMap">
+		select
+		sns_blog.id,
+		sns_blog.cus_id,
+		sns_blog.showname,
+		sns_blog.title,
+		sns_blog.summary,
+		sns_blog.viewcount,
+		sns_blog.replycount,
+		sns_blog.addTime,
+		sns_blog.updateTime,
+		sns_blog.replyname,
+		sns_blog.selType
+		from
+		sns_blog
+		left join sns_dis_article_classify on sns_blog.type=sns_dis_article_classify.id
+		where sns_dis_article_classify.status=0
+		order by
+		sns_blog.top desc,
+		sns_blog.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getBlogBlogAllListCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select count(1)
+		from sns_blog
+		left join sns_dis_article_classify on sns_blog.type=sns_dis_article_classify.id
+		where sns_dis_article_classify.status=0
+	</select>
+	<!-- 查询热门博文 默认排行规则 -->
+	<select id="getHotBlogBlogList" resultMap="BlogBlogMapper.QueryBlogAndReplyResult"
+		parameterType="java.util.HashMap">
+		select
+		sns_blog.id,
+		sns_blog.cus_id,
+		sns_blog.showname,
+		sns_blog.title,
+		sns_blog.summary,
+		sns_blog.viewcount,
+		sns_blog.replycount,
+		sns_blog.addTime,
+		sns_blog.updateTime,
+		sns_blog.replyname,
+		sns_blog.selType
+		from sns_blog
+		left join sns_dis_article_classify on sns_blog.type=sns_dis_article_classify.id
+		where sns_dis_article_classify.status=0
+		order by
+		sns_blog.activity desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getHotBlogBlogListCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select count(1)
+		from sns_blog
+		left join sns_dis_article_classify on sns_blog.type=sns_dis_article_classify.id
+		where sns_dis_article_classify.status=0
+	</select>
+	<!-- 查询财经文章排行 -->
+	<select id="getCaijingBlogBlogList" resultMap="BlogBlogResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="sns_blog_columns" />
+		from sns_blog
+		where sns_blog.type = 2
+		order by
+		sns_blog.activity desc
+		limit #{num}
+	</select>
+	
+	<!--  查询博主排行（根据发博客的数量） -->
+	<select id="getBozhuListByBolgNum" resultMap="QueryBlogAndReplyResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="sns_blog_columns" />,
+		count(sns_blog.cus_id) blognum
+		from sns_blog
+		group by sns_blog.cus_id
+		order by
+		blognum desc
+		limit #{num}
+	</select>
+	<!-- 根据评论数查询排行 -->
+	<select id="getBlogBlogListByReply" resultMap="BlogBlogMapper.QueryBlogAndReplyResult"
+		parameterType="java.util.HashMap">
+		select
+		sns_blog.id,
+		sns_blog.cus_id,
+		sns_blog.showname,
+		sns_blog.title,
+		sns_blog.summary,
+		sns_blog.viewcount,
+		sns_blog.replycount,
+		sns_blog.addTime,
+		sns_blog.updateTime,
+		sns_blog.replyname,
+		sns_blog.selType
+		from
+		sns_blog
+		left join sns_dis_article_classify on sns_blog.type=sns_dis_article_classify.id
+		where sns_dis_article_classify.status=0
+		order by sns_blog.replycount desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getBlogBlogListByReplyCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select count(1)
+		from sns_blog
+		left join sns_dis_article_classify on sns_blog.type=sns_dis_article_classify.id
+		where sns_dis_article_classify.status=0
+	</select>
+	<!-- 根据浏览数查询排行 -->
+	<select id="getBlogBlogListByView" resultMap="BlogBlogMapper.QueryBlogAndReplyResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="sns_blog_columns" />
+		from sns_blog
+		order by sns_blog.viewcount desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getBlogBlogListByViewCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select count(1)
+		from sns_blog
+	</select>
+	<!-- 查询我发表的博文 -->
+	<select id="getMyBlogBlogList" resultMap="BlogBlogMapper.QueryBlogAndReplyResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="sns_blog_columns" />
+		from sns_blog
+		left join sns_dis_article_classify on sns_blog.type=sns_dis_article_classify.id
+		<where>
+			sns_blog.cus_id=#{e} and sns_dis_article_classify.status=0
+		</where>
+		order by sns_blog.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getMyBlogBlogListCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select count(1)
+		from sns_blog
+		left join sns_dis_article_classify on sns_blog.type=sns_dis_article_classify.id
+		<where>
+			sns_blog.cus_id=#{e} and sns_dis_article_classify.status=0
+		</where>
+	</select>
+	<!-- 查询君子汇（好友文章） -->
+	<select id="getFriendBlogBlogList" resultMap="BlogBlogMapper.QueryBlogAndReplyResult"
+		parameterType="java.util.HashMap">
+	select
+		sns_blog.id,
+		sns_blog.cus_id,
+		sns_blog.showname,
+		sns_blog.title,
+		sns_blog.summary,
+		sns_blog.viewcount,
+		sns_blog.replycount,
+		sns_blog.addTime,
+		sns_blog.updateTime,
+		sns_blog.replyname,
+		sns_blog.selType,
+		sns_cus_friend.cus_friend_id
+		from sns_blog
+		left join sns_dis_article_classify on sns_blog.type=sns_dis_article_classify.id
+		left join sns_cus_friend on
+		sns_cus_friend.cus_id=#{e}
+		<where>
+			sns_blog.cus_id=sns_cus_friend.cus_friend_id  and sns_dis_article_classify.status=0
+		</where>
+		order by sns_blog.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getFriendBlogBlogListCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select count(1)
+		from sns_blog
+		left join sns_dis_article_classify on sns_blog.type=sns_dis_article_classify.id
+		left join sns_cus_friend on
+		sns_cus_friend.cus_id=#{e}
+		<where>
+			sns_blog.cus_id=sns_cus_friend.cus_friend_id and sns_dis_article_classify.status=0
+		</where>
+	</select>
+	<!-- 一周内博文排行 -->
+	<select id="getOneWeekBlogBlogList" resultMap="BlogBlogMapper.BlogBlogResult">
+		select
+		<include refid="sns_blog_columns" />
+		from sns_blog
+		left join sns_dis_article_classify on sns_blog.type=sns_dis_article_classify.id
+		where
+		 <![CDATA[DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(sns_blog.addTime) ]]>
+		 and sns_dis_article_classify.status=0
+		<!-- YEARWEEK (date_format(addTime,'%Y-%m-%d')) = YEARWEEK(now()) -->
+		order by sns_blog.replycount desc
+		limit 10
+	</select>
+	<!-- 后台博文列表管理 -->
+	<select id="getAdminBlogBlogList" resultMap="BlogBlogMapper.BlogBlogTypeResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="sns_blog_columns" />
+		,
+		sns_dis_article_classify.name articleName
+		from sns_blog
+		left join
+		sns_dis_article_classify on sns_blog.type=sns_dis_article_classify.id
+		<where>
+		sns_dis_article_classify.status=0
+		<if test="e.id!=null and e.id!=''">
+				and sns_blog.id=#{e.id}
+			</if>
+			<if test="e.title!=null and e.title!=''">
+				and sns_blog.title like CONCAT('%',#{e.title},'%')
+			</if>
+			<if test="e.type!=null and e.type!=''">
+				and sns_blog.type=#{e.type}
+			</if>
+			<if test="e.showName!=null and e.showName!=''">
+				and sns_blog.showname=#{e.showName}
+			</if>
+			<if test="e.strTime!=null and e.strTime!=''">
+				and substring(sns_blog.addTime,1,10)=#{e.strTime}
+			</if>
+		</where>
+		order by sns_blog.top DESC ,sns_blog.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getAdminBlogBlogListCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select count(1)
+		from sns_blog
+		left join
+		sns_dis_article_classify on sns_blog.type=sns_dis_article_classify.id
+		<where>
+		sns_dis_article_classify.status=0
+		<if test="e.id!=null and e.id!=''">
+				and sns_blog.id=#{e.id}
+			</if>
+			<if test="e.title!=null and e.title!=''">
+				and sns_blog.title like CONCAT('%',#{e.title},'%')
+			</if>
+			<if test="e.type!=null and e.type!=''">
+				and sns_blog.type=#{e.type}
+			</if>
+				<if test="e.showName!=null and e.showName!=''">
+				and sns_blog.showname=#{e.showName}
+			</if>
+				<if test="e.strTime!=null and e.strTime!=''">
+				and substring(sns_blog.addTime,1,10)=#{e.strTime}
+			</if>
+		</where>
+	</select>
+	<!-- 后台置顶博文 -->
+	<select id="updateBlogBlogByTop" parameterType="long">
+		update sns_blog
+		set sns_blog.top=1
+		where sns_blog.id=#{id}
+	</select>
+	<!-- 取消置顶博文 -->
+	<select id="updateCancelBlogBlogByTop" parameterType="long">
+		update
+		sns_blog
+		set sns_blog.top=0
+		where sns_blog.id=#{id}
+	</select>
+	<!-- 添加文章分类 -->
+	<insert id="addArticleClassify" parameterType="Artclassify"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="artId">
+		insert into
+		sns_dis_article_classify
+		(id,name,addTime)values(#{artId},#{name},#{addTime})
+	</insert>
+	<!-- 根据id删除文章分类 -->
+	<delete id="deleteArticleClassifyById" parameterType="long">
+		delete from
+		sns_dis_article_classify
+		where sns_dis_article_classify.id=#{artId}
+	</delete>
+	<update id="updateArticleClassifyById" parameterType="java.lang.Long">
+		update sns_dis_article_classify
+		set sns_dis_article_classify.status=1
+		where sns_dis_article_classify.id=#{artId}
+	</update>
+	<!-- 根据id获得文章分类 -->
+	<select id="getArticleClassifyById" parameterType="Artclassify" resultMap="BlogBlogMapper.ArtclassifyResult">
+		select
+		sns_dis_article_classify.id,
+		sns_dis_article_classify.name,
+		sns_dis_article_classify.addTime,
+		sns_dis_article_classify.sort
+		from
+		sns_dis_article_classify
+		where
+		sns_dis_article_classify.id=#{artId}
+	</select>
+	<!-- 更新文章 -->
+	<update id="updateArticleClassify" parameterType="Artclassify">
+		update
+		sns_dis_article_classify
+		set
+		sns_dis_article_classify.name=#{name},
+		sns_dis_article_classify.sort=#{sort},
+		sns_dis_article_classify.addTime=#{addTime}
+		where sns_dis_article_classify.id=#{artId}
+	</update>
+	<!-- 搜索文章 -->
+	<select id="getBlogBlogResult" resultMap="BlogBlogMapper.QueryBlogAndReplyResult"
+		parameterType="java.util.HashMap">
+		select
+		sns_blog.id,
+		sns_blog.cus_id,
+		sns_blog.showname,
+		sns_blog.title,
+		sns_blog.content,
+		sns_blog.viewcount,
+		sns_blog.replycount,
+		sns_blog.addTime,
+		sns_blog.updateTime,
+		sns_blog.replyname,
+		sns_blog.selType
+		from sns_blog
+		<where>
+			<if test="e.title!=null and e.title!=''">
+				and sns_blog.title like CONCAT('%',#{e.title},'%')
+			</if>
+			<if test="e.title!=null and e.title!=''">
+				or sns_blog.cus_id like CONCAT('%',#{e.title},'%')
+			</if>
+		</where>
+		order by sns_blog.id desc
+	</select>
+	<select id="getBlogBlogResultCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select count(1)
+		from sns_blog
+		<where>
+			<if test="e.title!=null and e.title!=''">
+				and sns_blog.title like CONCAT('%',#{e.title},'%')
+			</if>
+			<if test="e.title!=null and e.title!=''">
+				or sns_blog.cus_id like CONCAT('%',#{e.title},'%')
+			</if>
+		</where>
+	</select>
+	<!-- 查看数+1 -->
+	<select id="updateBlogViewCount" parameterType="java.util.HashMap">
+		update sns_blog
+		set
+		sns_blog.viewcount=sns_blog.viewcount+#{count}
+		where sns_blog.id=#{id}
+	</select>
+	<!-- 更新活跃度 -->
+	<select id="updateBlogActivity" parameterType="BlogBlog">
+		update sns_blog
+		set sns_blog.activity=sns_blog.activity+#{activity}
+		where
+		sns_blog.id=#{id}
+	</select>
+	<!-- 根据分类id查询博文列表 -->
+	<select id="getArticleListByClassifyId" resultMap="BlogBlogMapper.QueryBlogAndReplyResult"
+		parameterType="java.util.HashMap">
+		select
+		sns_blog.id,
+		sns_blog.cus_id,
+		sns_blog.showname,
+		sns_blog.title,
+		sns_blog.summary,
+		sns_blog.viewcount,
+		sns_blog.replycount,
+		sns_blog.addTime,
+		sns_blog.updateTime,
+		sns_blog.replyname,
+		sns_blog.selType
+		from sns_blog
+		where
+		sns_blog.type=#{e}
+		order by id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getArticleListByClassifyIdCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select count(1)
+		from sns_blog
+		where
+		sns_blog.type=#{e}
+	</select>
+	<!-- 查询单个博文详情，根据博文 -->
+	<select id="getBlogBlogDetailById" resultMap="BlogBlogMapper.BlogBlogTypeResult"
+		parameterType="long">
+		select
+		<include refid="sns_blog_columns" />
+		,
+		sns_dis_article_classify.name articleName
+		from sns_blog
+		left join
+		sns_dis_article_classify on sns_blog.type=sns_dis_article_classify.id
+		where
+		sns_blog.id=#{id}
+	</select>
+	<!-- 每删除回复则-1 -->
+	<update id="delBlogReplycount" parameterType="long">
+		update sns_blog
+		set sns_blog.replyCount=sns_blog.replyCount-1
+		where
+		sns_blog.id=#{id}
+	</update>
+	<!-- 判断删除博文是否是本人 -->
+	<select id="getBlogIsMine" parameterType="BlogBlog" resultType="int">
+		select count(1)
+		from sns_blog
+		where sns_blog.id=#{id} and
+		sns_blog.cus_id=#{cusId}
+	</select>
+	<!-- 被财经选中更改状态博文 -->
+	<update id="updateBlogBlogIsBest" parameterType="java.util.HashMap">
+		update sns_blog
+		set sns_blog.isBest=#{isBest},
+		sns_blog.activity=sns_blog.activity+#{activity}
+		where
+		sns_blog.id=#{id}
+	</update>
+	<!-- 查出这个博文id之后的博文行数和最大博文id -->
+	<select id="getBlogBlogCountAfterId" parameterType="java.util.HashMap"
+		resultMap="QueryBlogBlogResult">
+		select count(1) lineNum,IFNULL(max(id),0) maxId
+		from sns_blog
+		where 
+		<![CDATA[sns_blog.id >= #{id} ]]>
+
+	</select>
+
+	<select id="getBlogBlogByPageQuery" parameterType="java.util.HashMap"
+		resultMap="BlogBlogResult">
+		select
+		<include refid="sns_blog_columns" />
+		from sns_blog
+		where <![CDATA[ sns_blog.id between #{minBlogBlogId} and   #{maxBlogBlogId} ]]>
+		limit #{beginRow},#{pageSize}
+	</select>
+	<select id="getLuceneBlogBlogByIds" parameterType="java.util.HashMap" resultMap="QueryBlogAndReplyResult">
+		select
+			sns_blog.id,
+			sns_blog.cus_id,
+			sns_blog.title,
+			sns_blog.showname,
+			sns_blog.summary,
+			sns_blog.viewcount,
+			sns_blog.replycount,
+			sns_blog.addTime,
+			sns_blog.updateTime,
+			sns_blog.replyname,
+			sns_blog.selType
+		from sns_blog
+		where sns_blog.id in
+		<foreach collection="list" separator="," item="blogIds" open="("
+			close=")">
+			#{blogIds}
+		</foreach>
+		
+		order by sns_blog.id desc
+	</select>
+	<update id="updateBlogBlogLastReply" parameterType="BlogBlog">
+		update
+		sns_blog set
+		sns_blog.updateTime=#{updateTime},
+		sns_blog.replyname=#{replyName}
+		where sns_blog.id=#{id}
+	</update>
+	<!-- 他人首页查询 -->
+	<select id="getPersonMyArticleList" parameterType="java.util.HashMap" resultMap="BlogBlogResult">
+		select
+			sns_blog.id,
+			sns_blog.cus_id,
+			sns_blog.title,
+			sns_blog.viewcount,
+			sns_blog.replycount,
+			sns_blog.addTime,
+			sns_blog.updateTime,
+			sns_blog.replyname,
+			sns_blog.showname,
+			sns_blog.selType
+			from sns_blog
+			left join sns_dis_article_classify on sns_blog.type=sns_dis_article_classify.id
+			where sns_blog.cus_id=#{cusId} and  sns_dis_article_classify.status=0
+			order by sns_blog.id desc
+			limit #{num}
+	</select>
+	<select id="updateFinBlogFlagByBlogId" parameterType="java.lang.Long">
+		update sns_blog
+		set sns_blog.flag=1
+		where sns_blog.id=#{id}
+	</select>
+</mapper>

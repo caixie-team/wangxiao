@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CardCourseMapper">
+
+        <resultMap id="CardCourseResult" type="CardCourse">
+            <result property="id" column="id"/>
+            <result property="cardId" column="card_id"/>
+            <result property="courseId" column="course_id"/>
+        </resultMap>
+
+        <sql id="edu_card_course_columns">
+            edu_card_course.id,
+            edu_card_course.card_id,
+            edu_card_course.course_id
+        </sql>
+
+        <sql id="edu_card_course_properties">
+            #{id},
+            #{cardId},
+            #{courseId}
+        </sql>
+
+        <insert id="createCardCourse" parameterType="list" >
+            insert INTO edu_card_course (<include refid="edu_card_course_columns"/>) VALUES
+			<foreach collection="list" item="item" index="index"  separator=",">
+				(#{item.id},
+				#{item.cardId},
+				#{item.courseId}
+				)
+			</foreach>
+        </insert>
+
+        <delete id="deleteCardCourseById" parameterType="Long">
+            delete from edu_card_course
+            where
+                id = #{value}
+        </delete>
+
+        <update id="updateCardCourse" parameterType="CardCourse">
+            update edu_card_course SET
+                id = #{id},
+                card_id = #{cardId},
+                course_id = #{courseId}
+            where
+                id = #{id}
+
+
+        </update>
+
+        <select id="getCardCourseById" resultMap="CardCourseResult" parameterType="Long">
+            select
+            <include refid="edu_card_course_columns"/>
+            from edu_card_course
+            where
+                id = #{value}
+
+
+        </select>
+		
+        <select id="getCardCourseList" resultMap="CardCourseResult" parameterType="CardCourse">
+            select
+            <include refid="edu_card_course_columns"/>
+            from edu_card_course
+            where card_id =#{cardId}
+        </select>
+        
+</mapper>

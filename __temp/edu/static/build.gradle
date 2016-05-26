@@ -1,0 +1,90 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+apply plugin: 'war'
+apply from: 'provided.gradle'
+
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.bmuschko:gradle-cargo-plugin:2.2.1'
+    }
+}
+
+apply plugin: "com.bmuschko.cargo"
+apply plugin: 'com.bmuschko.cargo-base'
+
+dependencies {
+    compile(
+            project(':edu:core'),
+    )
+
+    compile(
+            libraries.'spring-core',
+            libraries.'spring-beans',
+            libraries.'spring-context',
+            libraries.'spring-context-support',
+            libraries.'spring-web',
+            libraries.'spring-webmvc',
+            libraries.'spring-aop',
+            libraries.'commons-lang3',
+            libraries.'commons-io',
+            libraries.'commons-codec',
+            libraries.'commons-fileupload',
+            libraries.'commons-lang',
+            libraries.'commons-beanutils',
+            libraries.'commons-logging',
+            libraries.'commons-configuration',
+//            libraries.'log4j',
+//            libraries.'slf4j-api',
+//            libraries.'slf4j-log4j12',
+            libraries.'im4java',
+            libraries.'gson',
+            libraries.'jstl'
+
+    )
+    compile group: 'com.artofsolving', name: 'jodconverter', version: '2.2.1'
+    provided libraries.'servlet-api'
+}
+
+cargo {
+    containerId = 'tomcat8x'
+    port = 10082 //服务器tomcat端口号
+
+    deployable {
+        context = '/'
+    }
+}
+
+
+task deploy(type: com.bmuschko.gradle.cargo.tasks.remote.CargoRedeployRemote) {
+    dependsOn clean, war
+
+    hostname = "upload.ihoubo.cn"//服务器地址
+    username = "admin" //来源于tomcat-users.xml
+    password = "abcd1234"
+    logger.lifecycle("CargoDeployRemote war package!")
+}
+
+def loadConfiguration() {
+    def environment = hasProperty('env') ? env : 'dev'
+    project.ext.envrionment = environment
+    println "Environment is set to $environment"
+
+    def configFile = file('environment.groovy')
+    def config = new ConfigSlurper("$environment").parse(configFile.toURL())
+    project.ext.config = config
+    config.toProperties()
+}
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        filter(ReplaceTokens,
+                tokens: loadConfiguration()
+        )
+    }
+}
+

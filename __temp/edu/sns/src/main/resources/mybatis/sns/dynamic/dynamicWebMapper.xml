@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DynamicWebMapper">
+	<resultMap type="DynamicWeb" id="DynamicWebResult">
+		<result property="id" column="id" />
+		<result property="cusId" column="cus_id" />
+		<result property="cusName" column="cus_Name" />
+		<result property="type" column="type" />
+		<result property="bizId" column="bizId" />
+		<result property="addTime" column="add_time" />
+		<result property="description" column="description" />
+		<result property="content" column="content" />
+		<result property="title" column="title" />
+		<result property="assistId" column="assistId" />
+		<result property="url" column="url"/>
+	</resultMap>
+
+
+	<sql id="sns_dynamic_web_columns">
+		sns_dynamic_web.id,
+		sns_dynamic_web.cus_id,
+		sns_dynamic_web.cus_Name,
+		sns_dynamic_web.type,
+		sns_dynamic_web.bizId,
+		sns_dynamic_web.add_time,
+		sns_dynamic_web.title,
+		sns_dynamic_web.description,
+		sns_dynamic_web.content,
+		sns_dynamic_web.assistId,
+		sns_dynamic_web.url
+	</sql>
+	<!-- 添加动态记录 -->
+	<insert id="addDynamicWeb" parameterType="DynamicWeb"
+		useGeneratedKeys="true" keyProperty="id" keyColumn="Id">
+		INSERT INTO
+		sns_dynamic_web
+		(Id,
+		cus_id,
+		type,
+		bizId,
+		cus_Name,
+		description,
+		content,
+		title,
+		add_time,
+		assistId,
+		url
+		)VALUES(
+		#{id},
+		#{cusId},
+		#{type},
+		#{bizId},
+		#{cusName},
+		#{description},
+		#{content},
+		#{title},
+		#{addTime},
+		#{assistId},
+		#{url}
+		)
+	</insert>
+	<!-- 查找全站动态 -->
+	<select id="queryDynamicWebList" resultMap="DynamicWebMapper.DynamicWebResult"
+		parameterType="java.util.HashMap">
+		SELECT
+		<include refid="sns_dynamic_web_columns" />
+		FROM sns_dynamic_web
+		<where>
+		<if test="e!=null and e!=''" >
+		sns_dynamic_web.cus_id=#{e}
+		</if>
+		</where>
+		ORDER BY sns_dynamic_web.id DESC
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryDynamicWebListCount" resultType="int"
+		parameterType="java.util.HashMap">
+		SELECT COUNT(1)
+		FROM sns_dynamic_web
+		<where>
+		<if test="e!=null and e!=''" >
+		sns_dynamic_web.cus_id=#{e}
+		</if>
+		</where>
+	</select>
+	<!-- 查找群组动态 1发表群文章 2回复群文章 3加入群 -->
+	<select id="queryDynamicWebDisGroup" resultMap="DynamicWebMapper.DynamicWebResult"
+		parameterType="java.util.HashMap">
+		SELECT
+		sns_dynamic_web.id,
+		sns_dynamic_web.cus_id,
+		sns_dynamic_web.cus_Name,
+		sns_dynamic_web.type,
+		sns_dynamic_web.bizId,
+		sns_dynamic_web.add_time,
+		sns_dynamic_web.title,
+		sns_dynamic_web.description,
+		sns_dynamic_web.content,
+		sns_dynamic_web.assistId,
+		sns_dynamic_web.url
+		FROM sns_dynamic_web
+		where sns_dynamic_web.type in(0,3,4,6) and sns_dynamic_web.assistId in
+		<foreach collection="e" item="item" separator="," index="index" open="(" close=")">
+		#{item}
+		</foreach>
+		ORDER BY sns_dynamic_web.id
+		DESC
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryDynamicWebDisGroupCount" resultType="int"
+		parameterType="java.util.HashMap">
+		SELECT COUNT(1)
+		FROM sns_dynamic_web
+		where sns_dynamic_web.type in(0,3,4,6) and sns_dynamic_web.assistId in
+		<foreach collection="e" item="item" separator="," index="index" open="(" close=")">
+		#{item}
+		</foreach>
+	</select>
+	<!-- 查找微博关注动态 君子汇，好友的动态 1.发微博 2.回复微博 3.加关注 -->
+	<select id="queryDynamicWebJunZiHui" resultMap="DynamicWebMapper.DynamicWebResult" parameterType="java.util.HashMap">
+		SELECT
+		sns_dynamic_web.id,
+		sns_dynamic_web.cus_id,
+		sns_dynamic_web.cus_Name,
+		sns_dynamic_web.type,
+		sns_dynamic_web.bizId,
+		sns_dynamic_web.add_time,
+		sns_dynamic_web.title,
+		sns_dynamic_web.description,
+		sns_dynamic_web.content,
+		sns_dynamic_web.assistId,
+		sns_dynamic_web.url
+		FROM sns_dynamic_web
+		where sns_dynamic_web.cus_id in
+		<foreach collection="e" item="item" separator="," open="(" close=")">
+		#{item}
+		</foreach>
+		order by sns_dynamic_web.id desc
+		<include refid="publicMapper.pageEnd" />
+		
+	</select>
+	<!-- Count查找微博关注动态 君子汇，好友的动态  -->
+	<select id="queryDynamicWebJunZiHuiCount" resultType="int" parameterType="java.util.HashMap">
+		SELECT COUNT(1)
+		FROM sns_dynamic_web
+		where sns_dynamic_web.cus_id in
+		<foreach collection="e" item="item" separator="," open="(" close=")">
+		#{item}
+		</foreach>
+	</select>
+	<!-- 加好友时动态 -->
+	<select id="queryDynamicWebFriend" parameterType="java.util.HashMap"
+		resultMap="DynamicWebMapper.DynamicWebResult">
+		SELECT
+		sns_dynamic_web.Id,
+		sns_dynamic_web.cus_id,
+		sns_dynamic_web.cus_Name,
+		sns_dynamic_web.type,
+		sns_dynamic_web.bizId,
+		sns_dynamic_web.add_time,
+		sns_dynamic_web.title,
+		sns_dynamic_web.description,
+		sns_dynamic_web.content,
+		sns_dynamic_web.assistId,
+		sns_cus_friend.cus_id
+		FROM sns_dynamic_web
+		LEFT JOIN
+		sns_cus_friend ON
+		sns_dynamic_web.bizId=sns_cus_friend.cus_friend_id
+		WHERE
+		sns_dynamic_web.type=1 and sns_dynamic_web.cus_id =#{cusId} and
+		sns_cus_friend.cus_id is not
+		null
+		ORDER BY
+		sns_dynamic_web.add_time DESC
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryDynamicWebFriendCount" resultType="int"
+		parameterType="java.util.HashMap">
+		SELECT COUNT(1)
+		FROM sns_dynamic_web
+		LEFT
+		JOIN sns_cus_friend
+		ON
+		sns_dynamic_web.bizId=sns_cus_friend.cus_friend_id
+		WHERE
+		sns_dynamic_web.type=1 and sns_dynamic_web.cus_id =#{cusId} and
+		sns_cus_friend.cus_id is not
+		null
+	</select>
+	<select id="queryDynamicWebFinanceArticleCount" resultType="int">
+		select count(1) 
+		from sns_dynamic_web
+			where sns_dynamic_web.type in(11,12)
+	</select>
+	<select id="queryDynamicWebStudy" resultMap="DynamicWebMapper.DynamicWebResult">
+	SELECT
+		sns_dynamic_web.id,
+		sns_dynamic_web.cus_id,
+		sns_dynamic_web.cus_Name,
+		sns_dynamic_web.type,
+		sns_dynamic_web.bizId,
+		sns_dynamic_web.add_time,
+		sns_dynamic_web.title,
+		sns_dynamic_web.description,
+		sns_dynamic_web.content,
+		sns_dynamic_web.assistId,
+		sns_dynamic_web.url
+		FROM sns_dynamic_web
+		where sns_dynamic_web.type=13
+		order by sns_dynamic_web.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryDynamicWebStudyCount" resultType="int">
+		select count(1) 
+		from sns_dynamic_web
+			where sns_dynamic_web.type=13
+	</select>
+	<!-- 删除动态 -->
+	<delete id="deleteDynamicWebByCondition" parameterType="DynamicWeb">
+		delete from sns_dynamic_web
+		where sns_dynamic_web.bizId=#{bizId} 
+		and sns_dynamic_web.type=#{type}
+	</delete>
+	<!-- 删除回复动态 -->
+	<delete id="deleteReplyDynamicByCondition" parameterType="DynamicWeb">
+		delete from sns_dynamic_web
+		where sns_dynamic_web.bizId=#{bizId}
+		and sns_dynamic_web.assistId=#{assistId} and sns_dynamic_web.cus_id=#{cusId}
+	</delete>
+	
+	<select id="queryDynamicWebByTP" resultMap="DynamicWebMapper.DynamicWebResult" parameterType="java.util.HashMap">
+	SELECT
+		<include refid="sns_dynamic_web_columns" />
+		FROM sns_dynamic_web
+		where sns_dynamic_web.type in (${e})
+		order by sns_dynamic_web.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryDynamicWebByTPCount" resultType="int" parameterType="java.util.HashMap">
+	SELECT
+		count(1)
+		FROM sns_dynamic_web
+		where sns_dynamic_web.type in (${e})
+	</select>
+</mapper>

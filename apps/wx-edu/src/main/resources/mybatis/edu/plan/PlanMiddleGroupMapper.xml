@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PlanMiddleGroupMapper">
+
+	<resultMap id="PlanMiddleGroupResult" type="PlanMiddleGroup">
+		<result property="id" column="id" />
+		<result property="userGroupId" column="user_group_id" />
+		<result property="planId" column="plan_id" />
+	</resultMap>
+
+	<resultMap id="PlanMiddleGroupDTOResult" type="PlanMiddleGroupDTO" extends="PlanMiddleGroupResult">
+		<result property="groupName" column="groupName"/>
+		<result property="peopleNum" column="peopleNum"/>
+	</resultMap>
+
+	<sql id="edu_plan_middle_group_columns">
+		edu_plan_middle_group.id,
+		edu_plan_middle_group.user_group_id,
+		edu_plan_middle_group.plan_id
+	</sql>
+
+	<sql id="edu_plan_middle_group_properties">
+		#{id},
+		#{userGroupId},
+		#{planId}
+	</sql>
+
+	<insert id="createPlanMiddleGroup" parameterType="PlanMiddleGroup"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_plan_middle_group (
+		<include refid="edu_plan_middle_group_columns" />
+		) VALUES (
+		<include refid="edu_plan_middle_group_properties" />
+		)
+	</insert>
+	<!-- 批量添加部门 -->
+	<insert id="batchAddPlanMiddleGroup" parameterType="list">
+		insert INTO edu_plan_middle_group (
+		<include refid="edu_plan_middle_group_columns" />
+		) VALUES
+		<foreach collection="list" item="itme" index="index"
+			separator=",">
+			(#{itme.id},#{itme.userGroupId},#{itme.planId})
+		</foreach>
+	</insert>
+	<delete id="deletePlanMiddleGroupById" parameterType="Long">
+		delete from edu_plan_middle_group
+		where edu_plan_middle_group.plan_id=#{planId}
+	</delete>
+
+	<update id="updatePlanMiddleGroup" parameterType="PlanMiddleGroup">
+		update edu_plan_middle_group SET
+		id = #{id},
+		user_group_id = #{userGroupId},
+		plan_id = #{planId}
+	</update>
+
+	<select id="getPlanMiddleGroupById" resultMap="PlanMiddleGroupResult"
+		parameterType="Long">
+		select
+		<include refid="edu_plan_middle_group_columns" />
+		from edu_plan_middle_group
+	</select>
+
+	<select id="getPlanMiddleGroupList" resultMap="PlanMiddleGroupResult"
+		parameterType="PlanMiddleGroup">
+		select
+		<include refid="edu_plan_middle_group_columns" />
+		from edu_plan_middle_group
+	</select>
+	<!-- 任务下的部门 -->
+	<select id="getPlanGroupList" parameterType="PlanMiddleGroup"
+		resultMap="PlanMiddleGroupResult">
+		select
+		<include refid="edu_plan_middle_group_columns" />
+		from edu_plan_middle_group
+		<where>
+			<if test="planId!=null and planId!=0">
+				edu_plan_middle_group.`plan_id`=#{planId}
+			</if>
+		</where>
+	</select>
+
+
+	<select id="getPlanGroupDTOList" parameterType="java.util.HashMap" resultMap="PlanMiddleGroupDTOResult">
+		SELECT
+		<include refid="edu_plan_middle_group_columns" />,
+		user_group.name as groupName,
+		COUNT(DISTINCT group_middle_user.user_id) AS peopleNum
+		FROM edu_plan_middle_group
+		LEFT JOIN user_group ON edu_plan_middle_group.user_group_id = user_group.id
+		LEFT JOIN group_middle_user ON user_group.id = group_middle_user.`group_id`
+		WHERE edu_plan_middle_group.`plan_id` = #{e.planId}
+		GROUP BY user_group.id
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getPlanGroupDTOListCount" parameterType="java.util.HashMap" resultType="int">
+		SELECT
+		count(1)
+		FROM edu_plan_middle_group
+		WHERE edu_plan_middle_group.`plan_id` = #{e.planId}
+	</select>
+
+	<select id="getPlanGroupUserId" parameterType="Long" resultType="Long">
+		SELECT group_middle_user.user_id FROM group_middle_user
+		LEFT JOIN edu_plan_middle_group ON group_middle_user.group_id = edu_plan_middle_group.user_group_id
+		WHERE edu_plan_middle_group.plan_id = #{value}
+	</select>
+</mapper>

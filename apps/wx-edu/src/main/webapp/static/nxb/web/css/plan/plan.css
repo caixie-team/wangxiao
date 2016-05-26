@@ -1,0 +1,39 @@
+.iconaddcourse {
+    display: inline-block;
+    width: 34px;
+    height: 33px;
+    background: url('/static/nxb/web/img/icons/btn-add.png') no-repeat left -34px;
+    margin: 0 5px;
+}
+
+.iconupdisable {
+    display: inline-block;
+    width: 34px;
+    height: 33px;
+    background: url('/static/nxb/web/img/icons/btn-up.png') no-repeat left -66px;
+    margin: 0 5px;
+}
+
+.icondowndisable {
+    display: inline-block;
+    width: 34px;
+    height: 33px;
+    background: url('/static/nxb/web/img/icons/btn-down.png') no-repeat left -66px;
+    margin: 0 5px;
+}
+
+.icondelete {
+    cursor: pointer;
+    display: inline-block;
+    width: 34px;
+    height: 33px;
+    background: url('/static/nxb/web/img/icons/btn-delete.png') no-repeat left top;
+    margin: 0 5px;
+    padding: 0;
+}
+
+.linkbuttondefault {
+    color: #5577AE;
+    cursor: pointer;
+    white-space: nowrap;
+}

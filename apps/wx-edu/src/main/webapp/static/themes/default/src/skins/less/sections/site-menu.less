@@ -1,0 +1,158 @@
+.site-menu {
+  &-sub {
+    background-color: @site-menubar-bg;
+    border: 1px solid @site-menu-has-sub-border-color;
+  }
+
+  //Status Color
+  &-item {
+    > a {
+      color: inherit;
+
+      &:hover {
+        color: @site-menu-top-hover-color;
+        background-color: @site-menu-top-hover-bg;
+      }
+    }
+
+    &:hover {
+      > a {
+        color: @site-menu-top-hover-color;
+        background-color: @site-menu-top-hover-bg;
+      }
+    }
+
+    &.active {
+      > a {
+        color: @site-menu-top-active-color;
+        background-color: @site-menu-sub-active-bg;
+      }
+    }
+  }
+}
+
+.site-menubar-dark {
+  .site-menu {
+    &-item {
+      > a {
+        color: inherit;
+
+        &:hover {
+          color: @site-menu-dark-top-hover-color;
+          background-color: @site-menu-dark-top-hover-bg;
+        }
+      }
+
+      &:hover {
+        > a {
+          color: @site-menu-dark-top-hover-color;
+          background-color: @site-menu-dark-top-hover-bg;
+        }
+      }
+
+      &.active {
+        > a {
+          color: @site-menu-dark-top-active-color;
+          background-color: @site-menu-dark-sub-active-bg;
+        }
+      }
+    }
+
+    &-sub {
+      background-color: @site-menu-dark-top-active-bg;
+    }
+  }
+}
+
+@media screen and (max-width: @screen-xs-max) {
+  .site-menu {
+    &-sub {
+      background-color: transparent;
+      border: none;
+    }
+
+    //Status Color
+    &-item {
+      > a {
+        color: inherit;
+
+        &:hover {
+          color: @site-menu-top-hover-color;
+          background-color: @site-menu-top-hover-bg;
+        }
+      }
+
+      &.open {
+        background-color: @site-menu-sub-open-bg;
+
+        > a {
+          color: @site-menu-sub-open-color;
+          background-color: transparent;
+
+          &:hover {
+            background-color: transparent;
+          }
+        }
+      }
+
+      &.active {
+        > a {
+          color: @site-menu-top-active-color;
+          background-color: @site-menu-sub-active-bg;
+        }
+
+        &.open {
+          > a {
+            background-color: transparent;
+          }
+        }
+      }
+    }
+  }
+
+  .site-menubar-dark {
+    .site-menu {
+      &-sub {
+        background-color: transparent;
+      }
+
+      //Status Color
+      &-item {
+        > a {
+          color: inherit;
+
+          &:hover {
+            color: @site-menu-dark-top-hover-color;
+            background-color: @site-menu-dark-top-hover-bg;
+          }
+        }
+
+        &.open {
+          background-color: @site-menu-dark-sub-open-bg;
+
+          > a {
+            color: @site-menu-dark-sub-open-color;
+            background-color: transparent;
+
+            &:hover {
+              background-color: transparent;
+            }
+          }
+        }
+
+        &.active {
+          > a {
+            color: @site-menu-dark-top-active-color;
+            background-color: @site-menu-dark-sub-active-bg;
+          }
+
+          &.open {
+            > a {
+              background-color: transparent;
+            }
+          }
+        }
+      }
+    }
+  }
+}

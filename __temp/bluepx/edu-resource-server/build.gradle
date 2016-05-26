@@ -1,0 +1,195 @@
+buildscript {
+    repositories {
+        maven { url "http://maven.oschina.net/content/groups/public/" }
+        maven { url 'http://repo.spring.io/plugins-release' }
+        jcenter()
+    }
+
+    dependencies {
+        classpath(
+                "org.springframework.boot:spring-boot-gradle-plugin:1.3.1.RELEASE",
+                // tag::build[]
+                classpath('se.transmode.gradle:gradle-docker:1.2')
+//              classpath('com.bmuschko:gradle-docker-plugin:2.6.4')
+                // end::build[]
+        )
+//        classpath('com.bmuschko:gradle-docker-plugin:2.6.4')
+    }
+}
+version = 'latest'
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+apply plugin: 'spring-boot'
+//apply plugin: "com.bmuschko.docker-remote-api"
+// tag::plugin[]
+apply plugin: 'docker'
+//apply plugin: 'com.bmuschko.docker-remote-api'
+// end::plugin[]
+//import com.bmuschko.gradle.docker.tasks.image.Dockerfile
+jar {
+    baseName = 'edu-api'
+}
+// This is used as the docker image prefix (org)
+group = 'dora.how:5000/bluepx'
+def registryUrl = 'dora.how:5000'
+
+
+//docker {
+//    url = 'unix:///var/run/docker.sock'
+//    registryCredentials {
+//        url = 'http://' + registryUrl + '/v2'
+//    }
+//}
+docker {
+//    useApi true
+//    hostUrl 'http://dora.how:5000'
+    registry registryUrl
+//    apiUsername 'user'
+//    apiPassword 'password'
+//    apiEmail 'me@mycompany.com'
+}
+// tag::task[]
+
+task buildDocker(type: Docker, dependsOn: build) {
+    push = true
+    applicationName = jar.baseName
+    dockerfile = file('src/main/docker/Dockerfile')
+    doFirst {
+        copy {
+            from jar
+            into stageDir
+        }
+    }
+}
+//task createDockerfile(type: Dockerfile, dependsOn: build) {
+//    destFile = project.file('build/dockerfile/Dockerfile')
+//    instruction { 'FROM java:8' }
+//    instruction { 'VOLUME /tmp' }
+//    instruction { 'ADD bluepx-edu-api-0.1.0.jar app.jar ' }
+//    instruction { 'RUN bash -c "touch /app.jar" ' }
+//    instruction { 'ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]' }
+//    doFirst {
+//        copy {
+//            from jar
+//            into destFile.parentFile
+//        }
+//    }
+//}
+//
+//task buildImage(type: DockerBuildImage) {
+//    dependsOn createDockerfile
+//    inputDir = createDockerfile.destFile.parentFile
+//    tag = 'dora.how:5000/bluepx'
+//}
+//
+//task pushImage(type: DockerPushImage) {
+//    imageId
+//}
+// end::task[]
+
+configurations {
+    provided.all*.exclude group: 'javax.servlet'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+    compile(
+            project(':bluepx-oauth2:jwt-public-config'),
+
+    )
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-security")
+    compile("org.springframework.security.oauth:spring-security-oauth2")
+    compile("org.springframework.security:spring-security-jwt")
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+
+    compile(
+            project(':bluepx:core'),
+            project(':bluepx:edu-resources'),
+            project(':bluepx:edu-course'),
+            project(':bluepx:edu-website'),
+//            project(':bluepx:edu-user'),
+
+
+    )
+
+    provided libraries.'servlet-api'
+    provided libraries.'jsp-api'
+
+
+
+    compile("org.springframework.boot:spring-boot-starter-web:1.3.1.RELEASE")
+    compile("org.springframework.boot:spring-boot-starter-security")
+//    provided("org.spring.framework.boot:spring-boot-starter-tomcat:1.3.1.RELEASE")
+//    compile("org.springframework.boot:spring-boot-starter-groovy-templates:1.3.1.RELEASE")
+//    compile("org.mybatis.spring.boot:mybatis-spring-boot-starter:1.0.0")
+    compile("com.zaxxer:HikariCP:2.4.3")
+//    compile('com.auth0:java-jwt:2.1.0')
+    compile("io.jsonwebtoken:jjwt:0.6.0")
+    compile(
+//            libraries.'aspectjrt',
+//            libraries.'aspectjweaver',
+//            libraries.'spring-tx',
+//            libraries.'spring-orm',
+//            libraries.'spring-jdbc',
+//            libraries.'spring-jms',
+//            libraries.'spring-boot',
+            libraries.'swagger',
+            libraries.'swagger-ui',
+            libraries.'mybatis',
+            libraries.'mybatis-spring',
+//            libraries.'ibatis-core',
+            libraries.'druid',
+            libraries.'mail',
+            libraries.'mysql',
+            libraries.'spymemcached',
+            libraries.'commons-fileupload',
+            libraries.'aopalliance',
+            libraries.'commons-lang',
+            libraries.'commons-io',
+            libraries.'commons-net',
+            libraries.'commons-httpclient',
+            libraries.'commons-codec',
+            libraries.'commons-validator',
+            libraries.'commons-beanutils',
+            libraries.'commons-digester',
+            libraries.'commons-collections',
+            libraries.'commons-logging',
+            libraries.'commons-configuration',
+            libraries.'guava',
+            libraries.'dom4j',
+            libraries.'urlrewritefilter',
+            libraries.'ezmorph',
+            libraries.'jrobin',
+            libraries.'json-lib',
+            libraries.'ant',
+            libraries.'sitemesh',
+            libraries.'quartz',
+            libraries.'htmlcompressor',
+            libraries.'yuicompressor',
+            libraries.'hessian',
+            libraries.'ognl',
+            libraries.'gson',
+            libraries.'velocity',
+            libraries.'velocity-tools',
+            libraries.'urlrewritefilter',
+            libraries.'jrobin',
+            libraries.'json-lib',
+            libraries.'ehcache-core',
+            libraries.'commons-net',
+            libraries.'UserAgentUtils',
+            libraries.'javamelody-core',
+            libraries.'jackson',
+            libraries.'jackson-annotations',
+            libraries.'jackson-databind',
+            libraries.'lombok',
+            libraries.'cors-filter'
+//            libraries.'jstl-api',
+//            libraries.'jstl'
+
+    )
+}

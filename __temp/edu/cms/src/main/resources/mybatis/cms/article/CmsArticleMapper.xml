@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CmsArticleMapper">
+
+	<resultMap id="CmsArticleResult" type="CmsArticle">
+		<result property="articleId" column="ARTICLE_ID" />
+		<result property="title" column="TITLE" />
+		<result property="summary" column="SUMMARY" />
+		<result property="source" column="SOURCE" />
+		<result property="author" column="AUTHOR" />
+		<result property="addTime" column="ADD_TIME" />
+		<result property="updateTime" column="UPDATE_TIME" />
+		<result property="pushTime" column="PUSH_TIME" />
+		<result property="typeId" column="TYPE_ID" />
+		<result property="typeLink" column="TYPE_LINK" />
+		<result property="pushStates" column="PUSH_STATES" />
+		<result property="imageUrl" column="IMAGE_URL" />
+		<result property="lookNum" column="LOOK_NUM" />
+		<result property="property" column="PROPERTY" />
+		<result property="linkUrl" column="LINK_URL" />
+	</resultMap>
+	<resultMap id="CmsArticleResultDto" type="CmsArticle">
+		<result property="articleId" column="ARTICLE_ID" />
+		<result property="title" column="TITLE" />
+		<result property="summary" column="SUMMARY" />
+		<result property="typeName" column="TYPE_NAME" />
+		<result property="source" column="SOURCE" />
+		<result property="author" column="AUTHOR" />
+		<result property="addTime" column="ADD_TIME" />
+		<result property="updateTime" column="UPDATE_TIME" />
+		<result property="pushTime" column="PUSH_TIME" />
+		<result property="typeId" column="TYPE_ID" />
+		<result property="typeLink" column="TYPE_LINK" />
+		<result property="pushStates" column="PUSH_STATES" />
+		<result property="imageUrl" column="IMAGE_URL" />
+		<result property="lookNum" column="LOOK_NUM" />
+		<result property="property" column="PROPERTY" />
+		<result property="content" column="CONTENT" />
+		<result property="linkUrl" column="LINK_URL" />
+	</resultMap>
+
+	<sql id="LINE_ARTICLE_column">
+		LINE_ARTICLE.ARTICLE_ID,
+		LINE_ARTICLE.TITLE,
+		LINE_ARTICLE.SUMMARY,
+		LINE_ARTICLE.SOURCE,
+		LINE_ARTICLE.AUTHOR,
+		LINE_ARTICLE.ADD_TIME,
+		LINE_ARTICLE.UPDATE_TIME,
+		LINE_ARTICLE.PUSH_TIME,
+		LINE_ARTICLE.TYPE_ID,
+		LINE_ARTICLE.TYPE_LINK,
+		LINE_ARTICLE.PUSH_STATES,
+		LINE_ARTICLE.IMAGE_URL,
+		LINE_ARTICLE.LOOK_NUM,
+		LINE_ARTICLE.PROPERTY,
+		LINE_ARTICLE.LINK_URL
+	</sql>
+	<sql id="LINE_ARTICLE_columnDto">
+		LINE_ARTICLE.ARTICLE_ID,
+		LINE_ARTICLE.TITLE,
+		LINE_ARTICLE.SUMMARY,
+		LiNE_ARTICLE_TYPE.TYPE_NAME,
+		LINE_ARTICLE.SOURCE,
+		LINE_ARTICLE.AUTHOR,
+		LINE_ARTICLE.ADD_TIME,
+		LINE_ARTICLE.UPDATE_TIME,
+		LINE_ARTICLE.PUSH_TIME,
+		LINE_ARTICLE.TYPE_ID,
+		LINE_ARTICLE.TYPE_LINK,
+		LINE_ARTICLE.PUSH_STATES,
+		LINE_ARTICLE.IMAGE_URL,
+		LINE_ARTICLE.LOOK_NUM,
+		LINE_ARTICLE.PROPERTY,
+		LINE_ARTICLE_CONTENT.CONTENT,
+		LINE_ARTICLE.LINK_URL
+	</sql>
+
+	<sql id="LINE_ARTICLE_properties">
+		#{articleId},
+		#{title},
+		#{summary},
+		#{source},
+		#{author},
+		#{addTime},
+		#{updateTime},
+		#{pushTime},
+		#{typeId},
+		#{typeLink},
+		#{pushStates},
+		#{imageUrl},
+		#{lookNum},
+		#{property},
+		#{linkUrl}
+	</sql>
+
+	<insert id="createArticle" parameterType="CmsArticle" keyColumn="ARTICLE_ID"
+		keyProperty="articleId" useGeneratedKeys="true">
+		INSERT INTO LINE_ARTICLE (
+		<include refid="LINE_ARTICLE_column" />
+		) VALUES (
+		<include refid="LINE_ARTICLE_properties" />
+		)
+	</insert>
+
+	<!--文章更新  -->
+	<update id="updateArticle" parameterType="CmsArticle">
+		update LINE_ARTICLE SET
+		LINE_ARTICLE.ARTICLE_ID=#{articleId},
+		LINE_ARTICLE.TITLE=#{title},
+		LINE_ARTICLE.SUMMARY=#{summary},
+		LINE_ARTICLE.AUTHOR=#{author},
+		LINE_ARTICLE.UPDATE_TIME=#{updateTime},
+		LINE_ARTICLE.TYPE_ID=#{typeId},
+		LINE_ARTICLE.TYPE_LINK=#{typeLink},
+		LINE_ARTICLE.SOURCE=#{source},
+		LINE_ARTICLE.PUSH_STATES=#{pushStates},
+		LINE_ARTICLE.IMAGE_URL=#{imageUrl},
+		LINE_ARTICLE.LOOK_NUM=#{lookNum},
+		LINE_ARTICLE.PROPERTY=#{property},
+		LINE_ARTICLE.LINK_URL=#{linkUrl},
+		LINE_ARTICLE.PUSH_TIME=#{pushTime}
+		where
+		ARTICLE_ID = #{articleId}
+	</update>
+
+	
+	<select id="getArticleByType" resultMap="CmsArticleResult" parameterType="java.util.HashMap">
+		SELECT  <include refid="LINE_ARTICLE_column" />
+		FROM LINE_ARTICLE
+		WHERE LINE_ARTICLE.PUSH_STATES='PUBLISH'
+		<if test="typeId>0">
+			AND TYPE_LiNK LIKE CONCAT('%,',#{typeId},',%')
+		</if>
+		<if test="property!=null and property!=''">
+			AND LINE_ARTICLE.PROPERTY LIKE CONCAT('%',#{property},'%')
+		</if>
+		<if test="lookNum!=0">
+			ORDER BY LOOK_NUM DESC,LINE_ARTICLE.PUSH_TIME DESC
+		</if>
+		<if test="lookNum==0">
+			ORDER BY ARTICLE_ID DESC,LINE_ARTICLE.PUSH_TIME DESC
+		</if>
+		<if test="showNum>0">
+			LIMIT #{showNum}
+		</if>
+	</select>
+	<select id="getArticleByCondition" resultMap="CmsArticleResult" parameterType="java.util.HashMap">
+		SELECT  <include refid="LINE_ARTICLE_column" />
+		FROM LINE_ARTICLE
+		WHERE 1=1 AND LINE_ARTICLE.PUSH_STATES='PUBLISH' 
+		<if test="typeId>0">
+			AND TYPE_LiNK LIKE CONCAT('%,',#{typeId},',%')
+		</if>
+		<if test="property!=null and property!=''">
+			AND LINE_ARTICLE.PROPERTY LIKE CONCAT('%',#{property},'%') AND IMAGE_URL!=''
+		</if>
+			ORDER BY LINE_ARTICLE.PUSH_TIME DESC
+		<if test="showNum>0">
+			LIMIT #{showNum}
+		</if>
+	</select>
+	
+	<!-- 获取热门资讯 -->
+	<select id="getHotArticle" resultMap="CmsArticleResult" parameterType="int">
+		SELECT <include refid="LINE_ARTICLE_column" /> FROM LINE_ARTICLE
+		ORDER BY LOOK_NUM DESC
+		LIMIT #{showNum}
+	</select>
+	
+	<!--获取最新添加的一条文章  -->
+	<select id="getArticleId" resultMap="CmsArticleResult">
+		SELECT  <include refid="LINE_ARTICLE_column" />
+		FROM LINE_ARTICLE
+		ORDER BY ARTICLE_ID DESC LIMIT 1
+	</select>
+	
+	<!-- 通过文章id获取文章 -->
+	<select id="getArticleById" resultMap="CmsArticleResultDto"
+		parameterType="Long">
+		SELECT
+		<include refid="LINE_ARTICLE_columnDto" />
+		FROM LINE_ARTICLE
+		LEFT JOIN LINE_ARTICLE_TYPE ON LINE_ARTICLE.TYPE_ID=LINE_ARTICLE_TYPE.TYPE_ID 
+		LEFT JOIN LiNE_ARTICLE_CONTENT  ON LINE_ARTICLE.ARTICLE_ID=LiNE_ARTICLE_CONTENT.ARTICLE_ID
+		WHERE
+		LINE_ARTICLE.ARTICLE_ID = #{value}
+	</select>
+	
+	<!-- 通过文章id获取上一篇文章和下一篇 -->
+	<select id="getUpOrDownArticle" resultMap="CmsArticleResultDto"
+		parameterType="java.util.HashMap">
+		SELECT
+		<include refid="LINE_ARTICLE_columnDto" />
+		FROM LINE_ARTICLE
+		LEFT JOIN LINE_ARTICLE_TYPE ON LINE_ARTICLE.TYPE_ID=LINE_ARTICLE_TYPE.TYPE_ID 
+		LEFT JOIN LiNE_ARTICLE_CONTENT  ON LINE_ARTICLE.ARTICLE_ID=LiNE_ARTICLE_CONTENT.ARTICLE_ID
+		<where>
+			<if test="type==1">
+				<![CDATA[LINE_ARTICLE.ARTICLE_ID < #{articleId}  ]]>
+					order by LINE_ARTICLE.ARTICLE_ID desc
+			</if>
+			<if test="type==2">
+				<![CDATA[LINE_ARTICLE.ARTICLE_ID > #{articleId}   ]]>
+					order by LINE_ARTICLE.ARTICLE_ID asc
+			</if>
+		</where>
+		limit 1
+	</select>
+	
+	<!-- 根据查询条件查询  分页 -->
+	<select id="getArticleListPage" resultMap="CmsArticleResultDto" parameterType="java.util.HashMap">
+		SELECT
+		<include refid="LINE_ARTICLE_columnDto" />
+		FROM LINE_ARTICLE
+		LEFT JOIN LiNE_ARTICLE_TYPE  ON LINE_ARTICLE.TYPE_ID=LINE_ARTICLE_TYPE.TYPE_ID
+		LEFT JOIN LiNE_ARTICLE_CONTENT  ON LINE_ARTICLE.ARTICLE_ID=LiNE_ARTICLE_CONTENT.ARTICLE_ID
+		<where>
+			<if test="e.articleId!=null and e.articleId!=0">
+				AND LINE_ARTICLE.BRANCH_ID=#{e.articleId}
+			</if>
+			<if test="e.pushStates!=null and e.pushStates!=''">
+				AND LINE_ARTICLE.PUSH_STATES =#{e.pushStates}
+			</if>
+			<if test="e.typeId!=null and e.typeId!=0">
+				AND LINE_ARTICLE.TYPE_LiNK  LIKE CONCAT('%,',#{e.typeId},',%')
+			</if>
+			<if test="e.title!=null and e.title!=''">
+				and LINE_ARTICLE.TITLE LIKE CONCAT('%',#{e.title},'%')
+			</if>
+		</where>
+		ORDER BY LINE_ARTICLE.ARTICLE_ID DESC
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getArticleListPageCount" resultType="int" parameterType="java.util.Map">
+		SELECT
+		COUNT(1)
+		FROM LINE_ARTICLE
+		LEFT JOIN LiNE_ARTICLE_TYPE  ON LINE_ARTICLE.TYPE_ID=LINE_ARTICLE_TYPE.TYPE_ID
+		LEFT JOIN LiNE_ARTICLE_CONTENT  ON LINE_ARTICLE.ARTICLE_ID=LiNE_ARTICLE_CONTENT.ARTICLE_ID
+		<where>
+			<if test="e.articleId!=null and e.articleId!=0">
+				AND LINE_ARTICLE.BRANCH_ID=#{e.articleId}
+			</if>
+			<if test="e.pushStates!=null and e.pushStates!=''">
+				AND LINE_ARTICLE.PUSH_STATES=#{e.pushStates}
+			</if>
+			<if test="e.typeId!=null and e.typeId!=0">
+			AND LINE_ARTICLE.TYPE_LiNK  LIKE CONCAT('%,',#{e.typeId},',%')
+			</if>
+			<if test="e.title!=null and e.title!=''">
+				and LINE_ARTICLE.TITLE LIKE CONCAT('%',#{e.title},'%')
+			</if>
+		</where>
+		ORDER BY LINE_ARTICLE.ARTICLE_ID DESC
+	</select>
+	
+	<!-- 批量刪除 -->
+	<delete id="delArticleByIds" parameterType="String">
+		DELETE FROM LINE_ARTICLE
+		WHERE LINE_ARTICLE.ARTICLE_ID IN (${value})
+	</delete>
+	
+	<!-- 更新浏览次数和更新时间 -->
+	<update id="updateLookNum" parameterType="Long">
+		update LINE_ARTICLE 
+		set LINE_ARTICLE.LOOK_NUM= LINE_ARTICLE.LOOK_NUM+1
+		where LINE_ARTICLE.ARTICLE_ID=#{articleId}
+	</update>
+</mapper>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CoursepackageMapper">
+
+	<resultMap id="CoursePackageResult" type="Coursepackage">
+		<result property="id" column="id" />
+		<result property="mainCourseId" column="main_course_id" />
+		<result property="courseId" column="course_id" />
+		<result property="orderNum" column="order_num"/>
+	</resultMap>
+
+	<sql id="edu_course_package_columns">
+		edu_course_package.id,
+		edu_course_package.main_course_id,
+		edu_course_package.course_id,
+		edu_course_package.order_num
+	</sql>
+
+	<sql id="edu_course_package_properties">
+		#{id},
+		#{mainCourseId},
+		#{courseId},
+		#{orderNum}
+	</sql>
+
+	<insert id="addCoursePackageBatch" parameterType="list">
+		insert INTO edu_course_package (
+		<include refid="edu_course_package_columns" />
+		) VALUES
+		<foreach collection="list" item="item" index="index" separator=",">
+			(
+			#{item.id},
+			#{item.mainCourseId},
+			#{item.courseId},
+			#{item.orderNum}
+			)
+		</foreach>
+	</insert>
+	<select id="queryCoursePackageById" resultMap="CoursePackageResult" parameterType="Map">
+		select
+		<include refid="edu_course_package_columns" />
+		from edu_course_package
+		where
+        edu_course_package.main_course_id = #{mainCourseId}
+        and edu_course_package.course_id = #{courseId}
+	</select>
+
+	<delete id="delCoursePackage" parameterType="CoursePackage">
+		delete from
+		edu_course_package
+		<where>
+			main_course_id = #{mainCourseId}
+		<if test="courseId!=null and courseId!=0">
+			and course_id = #{courseId}
+		</if>
+		</where>
+	</delete>
+	
+	<!-- 修改排序 -->
+	<update id="updateCoursePackageOrderNum" parameterType="CoursePackage">
+		 update edu_course_package SET
+		 edu_course_package.order_num = #{orderNum}
+		 where edu_course_package.course_id = #{courseId}
+	</update>
+	<delete id="deleteCoursePackageByCourseId" parameterType="Long">
+		DELETE FROM edu_course_package where main_course_id=#{value} or course_id=#{value}
+	</delete>
+	<select id="getCoursePackageList" parameterType="CoursePackage" resultMap="CoursePackageResult">
+		select 
+		<include refid="edu_course_package_columns" />
+		from edu_course_package
+		<where>
+			<if test="mainCourseId!=null and mainCourseId>0">
+				edu_course_package.main_course_id = #{mainCourseId}
+			</if>
+		</where>
+	</select>
+
+	<!-- 获取套餐下课程数量 -->
+	<select id="getCoursePackageCount" parameterType="Long" resultType="int">
+		SELECT count(1) FROM edu_course_package WHERE edu_course_package.main_course_id = #{value}
+	</select>
+</mapper>

@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" default-autowire="byName">
+   
+    <!-- 全站定时生成排行数据 -->
+     <bean id="queryHotDataJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="targetObject">
+					<ref bean="snsDataTimingService" />
+				</property>
+				<property name="targetMethod">
+					<value>queryHotData</value>
+				</property>
+				<property name="concurrent">
+					<value>false</value>
+				</property>
+			</bean>
+		</property>
+		<property name="cronExpression">
+			<value>0 0/30 * * * ?</value><!-- 半小时间隔 -->
+		</property>
+	</bean>
+
+ 
+    <!-- lucene索引定时生成 -->
+    <bean id="luceneIndexJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean" lazy-init="false">
+		<property name="jobDetail">
+			<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="targetObject">
+					<ref bean="snsDataTimingService" />
+				</property>
+				<property name="targetMethod">
+					<value>initLucenIndex</value>
+				</property>
+				<property name="concurrent">
+					<value>false</value>
+				</property>
+			</bean>
+		</property>
+		<property name="cronExpression">
+			<value>0 0/10 * * * ?</value><!-- 10分钟间隔 -->
+		</property>
+	</bean>
+	<!-- 计数器定时 -->
+    <bean id="VisitStatJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean" lazy-init="false">
+		<property name="jobDetail">
+			<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="targetObject">
+					<ref bean="snsDataTimingService" />
+				</property>
+				<property name="targetMethod">
+					<value>visitStat</value>
+				</property>
+				<property name="concurrent">
+					<value>true</value>
+				</property>
+			</bean>
+		</property>
+		<property name="cronExpression">
+			<value>0 0/2 * * * ?</value><!-- 1分钟间隔 -->
+		</property>
+	 </bean>
+
+	<!-- 站内信过期消息删除 每天执行一次 -->
+	<bean id="delMsgJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="targetObject">
+					<ref bean="msgSystemService" />
+				</property>
+				<property name="targetMethod">
+					<value>updatePast</value>
+				</property>
+				<property name="concurrent">
+					<value>false</value>
+				</property>
+			</bean>
+		</property>
+		<property name="cronExpression">
+			<value>0 40 0 * * ?</value><!--  每天凌晨0点40触发  -->
+		</property>
+	</bean>
+
+	<!-- 定时器配置 lazy-init='false'-->
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean"  lazy-init="false" autowire="no"> 
+		<property name="triggers"> 
+			<list> 
+			   <!-- 全站排行数据定时 （多应用只启动一台） -->
+			   <ref bean="queryHotDataJob"/>
+			   <!-- 定时生成lucene索引 （多应用只启动一台,路径生成文件要同步到其他的应用）-->
+			   <ref bean="luceneIndexJob"/>
+			   <!-- 计数器定时 (每台应用都需启动)-->
+			   <ref bean="VisitStatJob"/>
+			   <!-- 站内信过期消息删除 每天执行一次 -->
+			   <ref bean="delMsgJob"/>
+             
+			</list> 
+		</property> 
+	</bean>
+	
+	
+</beans>

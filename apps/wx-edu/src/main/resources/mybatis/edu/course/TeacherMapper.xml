@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TeacherMapper">
+
+	<resultMap id="TeacherResult" type="Teacher">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="education" column="education" />
+		<result property="career" column="career" />
+		<result property="isStar" column="is_star" />
+		<result property="picPath" column="pic_path" />
+		<result property="status" column="status" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+	</resultMap>
+	<resultMap id="TeacherCourseResult" type="QueryTeacher">
+		<id property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="education" column="education" />
+		<result property="career" column="career" />
+		<result property="isStar" column="is_star" />
+		<result property="picPath" column="pic_path" />
+		<result property="status" column="status" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<collection property="courseList" column="id" ofType="Course" select="CourseMapper.getCourseByTeacherId"/> 
+	</resultMap>
+	<sql id="edu_teacher_columns">
+		edu_teacher.id,
+		edu_teacher.name,
+		edu_teacher.education,
+		edu_teacher.career,
+		edu_teacher.is_star,
+		edu_teacher.pic_path,
+		edu_teacher.status,
+		edu_teacher.create_time,
+		edu_teacher.update_time
+	</sql>
+
+	<sql id="edu_teacher_properties">
+		#{id},
+		#{name},
+		#{education},
+		#{career},
+		#{isStar},
+		#{picPath},
+		#{status},
+		#{createTime},
+		#{updateTime}
+	</sql>
+
+	<insert id="createTeacher" parameterType="Teacher" keyColumn="id"
+		keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_teacher (
+		<include refid="edu_teacher_columns" />
+		) VALUES (
+		<include refid="edu_teacher_properties" />
+		)
+	</insert>
+
+	<delete id="deleteTeacherById" parameterType="Long">
+		delete from
+		edu_teacher
+		where
+		id = #{value}
+	</delete>
+
+	<update id="updateTeacher" parameterType="Teacher">
+		update edu_teacher SET
+		id = #{id},
+		name = #{name},
+		education = #{education},
+		career = #{career},
+		is_star = #{isStar},
+		pic_path = #{picPath},
+		status = #{status},
+		update_time = #{updateTime}
+		where
+		id = #{id}
+	</update>
+
+	<select id="getTeacherById" resultMap="TeacherResult" parameterType="Long">
+		select
+		<include refid="edu_teacher_columns" />
+		from edu_teacher
+		where
+		<if test="value!=0">
+		id = #{value}
+		</if>
+		
+	</select>
+
+	<select id="getQueryTeachers" resultMap="TeacherResult">
+		select
+		edu_teacher.id,
+		edu_teacher.name
+		from edu_teacher
+		where edu_teacher.status=0
+	</select>
+
+	<select id="getTeacherList" resultMap="TeacherResult" parameterType="Teacher">
+		select
+		<include refid="edu_teacher_columns" />
+		from edu_teacher
+		where edu_teacher.status=0
+	</select>
+	
+	<select id="queryTeacherAndCourseListPage" resultMap="TeacherCourseResult" parameterType="java.util.Map">
+		select
+		<include refid="edu_teacher_columns" />,
+		edu_course.name as courseName,
+		edu_course.id as courseId ,
+		edu_course.logo 
+		from edu_teacher		
+		left join edu_course_teacher
+		on edu_course_teacher.teacher_id = edu_teacher.id
+		left join edu_course on
+		edu_course.id = edu_course_teacher.course_id
+		<where>
+		edu_teacher.status=0
+		<if test="e.name!=null and e.name!=''">
+		and	<![CDATA[  edu_teacher.name LIKE CONCAT('%',#{e.name},'%')  ]]>
+		</if>
+		<if test="e.isStar !=null and e.isStar!=-1">
+		and edu_teacher.IS_STAR=#{e.isStar}
+		</if>
+		</where>
+		 group by edu_teacher.id
+		order by edu_teacher.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryTeacherAndCourseListPageCount" resultType="int" parameterType="java.util.Map">
+		select
+		count(1)
+		from edu_teacher
+		<where>
+		edu_teacher.status=0
+		<if test="e.name!=null and e.name!=''">
+		and	<![CDATA[  edu_teacher.name LIKE CONCAT('%',#{e.name},'%')  ]]>
+		</if>
+		<if test="e.isStar !=null and e.isStar!=-1">
+		and edu_teacher.IS_STAR=#{e.isStar}
+		</if>
+		</where>
+	</select>
+	
+	<select id="queryTeacherListPage" resultMap="TeacherResult" parameterType="java.util.Map">
+		select
+		<include refid="edu_teacher_columns" />
+		from edu_teacher
+		<where>
+		edu_teacher.status=0
+		<if test="e.name!=null and e.name!=''">
+		and	<![CDATA[  edu_teacher.name LIKE CONCAT('%',#{e.name},'%')  ]]>
+		</if>
+		<if test="e.isStar !=null and e.isStar!=-1">
+		and edu_teacher.IS_STAR=#{e.isStar}
+		</if>
+		</where>
+		order by edu_teacher.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryTeacherListPageCount" resultType="int" parameterType="java.util.Map">
+		select
+		count(1)
+		from edu_teacher
+		<where>
+		edu_teacher.status=0
+		<if test="e.name!=null and e.name!=''">
+		and	<![CDATA[  edu_teacher.name LIKE CONCAT('%',#{e.name},'%')  ]]>
+		</if>
+		<if test="e.isStar !=null and e.isStar!=-1">
+		and edu_teacher.IS_STAR=#{e.isStar}
+		</if>
+		</where>
+	</select>
+	
+	<select id="queryTeacherInIds" resultMap="TeacherResult" parameterType="String">
+		select
+		<include refid="edu_teacher_columns" />
+		from edu_teacher
+		<where>
+			edu_teacher.id in (${value})
+		</where>
+	</select>
+	
+	<!-- 查询讲相同课程的讲师，讲师详情页面用 -->
+	<select id="getTeachersByCourse" resultMap="TeacherResult" parameterType="map">
+		SELECT 
+		DISTINCT
+		<include refid="edu_teacher_columns" /> 
+		FROM  edu_teacher 
+		LEFT JOIN edu_course_teacher ON  edu_teacher.id= edu_course_teacher.teacher_id
+		WHERE edu_course_teacher.course_id IN
+		<foreach collection="courseIds" item="item"  open="(" close=")" separator=","> 
+		#{item}
+		</foreach>
+		AND edu_teacher.id !=#{teacherId} <!-- 排除当前讲师id -->
+		limit 6
+	</select>
+	<!-- 删除讲师 软删除 更新操作 -->
+	<update id="delTeacherByStatus" parameterType="Long">
+		update edu_teacher
+		set edu_teacher.status=1
+		where edu_teacher.id=#{teacherId}
+	</update>
+	
+	<!-- 用于App -->
+	<select id="queryTeahcerNameByCourseId" parameterType="int" resultType="String">
+		SELECT EDU_TEACHER.NAME FROM EDU_TEACHER
+		LEFT JOIN EDU_COURSE_TEACHER ON EDU_COURSE_TEACHER.TEACHER_ID = EDU_TEACHER.ID
+		WHERE EDU_COURSE_TEACHER.COURSE_ID=#{value}
+	</select>
+	
+	<!-- 查询讲师下的课程数量 -->
+	<select id="queryTeacherCourseNum" parameterType="Long" resultType="Long">
+		SELECT COUNT(1) FROM `EDU_COURSE_TEACHER` WHERE EDU_COURSE_TEACHER.`TEACHER_ID`=#{value}
+	</select>
+</mapper>

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserGroupMiddleMapper">
+	<resultMap type="UserGroupMiddle" id="UserGroupMiddleResult">
+		<result column="id" property="id" />
+		<result column="user_id" property="userId" />
+		<result column="group_id" property="groupId" />
+	</resultMap>
+
+
+	<resultMap type="GroupMiddleCourse" id="CourseGroupMiddleResult">
+		<result column="id" property="id" />
+		<result column="course_id" property="courseId" />
+		<result column="group_id" property="groupId" />
+	</resultMap>
+	<resultMap type="User" id="UserResult">
+		<result column="" />
+	</resultMap>
+
+
+	<sql id="user_group_middle_columns">
+		group_middle_user.id,
+		group_middle_user.user_id,
+		group_middle_user.group_id
+	</sql>
+
+	<sql id="user_group_middle_properties">
+		id,
+		userId,
+		groupId
+	</sql>
+
+
+
+	<sql id="group_middle_course_columns">
+		group_middle_course.`id`,
+		group_middle_course.`course_id`,
+		group_middle_course.`group_id`
+
+	</sql>
+
+
+	<sql id="group_middle_course_properties">
+		id,
+		courseId,
+		groupId
+	</sql>
+
+	<insert id="batchGroupMiddleCourse" parameterType="Map">
+		insert INTO group_middle_course (
+		<include refid="group_middle_course_columns" />
+		) VALUES
+			<foreach collection="list" item="item" separator="," index="index">
+				(null,#{courseId},#{item})
+			</foreach>
+	</insert>
+
+
+	<insert id="addUserGroupMiddle" parameterType="java.util.List">
+		insert INTO group_middle_user (
+		<include refid="user_group_middle_columns" />
+		) VALUES
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.id},#{item.userId},#{item.groupId})
+		</foreach>
+	</insert>
+
+	<delete id="deleteUserGroupMiddle" parameterType="UserGroupMiddle">
+		delete
+		from
+		group_middle_user
+		where user_id = #{userId} and group_id = #{groupId}
+	</delete>
+
+
+	<delete id="deleteGroupCourse" parameterType="GroupMiddleCourse">
+
+		delete
+		from
+		group_middle_course
+		where
+		course_id =#{courseId} and
+		group_id =
+		#{groupId}
+
+	</delete>
+
+	<delete id="deleteGroupCourseByCourseId" parameterType="Map">
+
+		delete
+		from
+		group_middle_course
+		where
+		course_id in (
+		<foreach collection="ids" item="item" separator=",">
+			#{item}
+		</foreach>
+		) and
+		group_id = #{groupId}
+
+	</delete>
+
+
+	<delete id="delteUserGroupMiddleByUserId" parameterType="UserGroupMiddle">
+		delete
+		from
+		group_middle_user
+		where user_id = #{userId}
+	</delete>
+
+	<delete id="deleteCourseGroupMiddle" parameterType="Long">
+		delete
+		from
+		group_middle_course
+		where course_id = #{value}
+	</delete>
+	
+	
+	<delete id="deleteCourseGroupMiddles">
+		delete
+		from
+		group_middle_course
+		where group_middle_course.id in
+		<foreach collection="array" item="item" separator="," open="(" close=")"> 
+		#{item}
+		</foreach> 
+	</delete>
+	
+
+	<insert id="createUserGroupCourse" parameterType="java.util.List">
+		insert INTO group_middle_course (
+		<include refid="group_middle_course_columns" />
+		) VALUES
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.id},#{item.courseId},#{item.groupId})
+		</foreach>
+	</insert>
+
+	<select id="getUserGroupCourse" parameterType="GroupMiddleCourse"
+		resultMap="CourseGroupMiddleResult">
+		select
+		<include refid="group_middle_course_columns" />
+		from group_middle_course
+		where
+		group_middle_course.`course_id` =
+		#{courseId}
+	</select>
+
+	<select id="getUserGroupByUserId" parameterType="Long"
+		resultMap="UserGroupMiddleResult">
+		select
+		<include refid="user_group_middle_columns" />
+		from group_middle_user
+		where
+		group_middle_user.`user_id` = #{value}
+	</select>
+	
+	<select id="getUserGroupCount" parameterType="Long"
+		resultType="Long">
+		SELECT COUNT(*)
+		FROM 
+		group_middle_user
+		WHERE
+		group_middle_user.`group_id` = #{value}
+	</select>
+	<select id="getUserGroupByGourpId" parameterType="long" resultMap="UserGroupMiddleResult">
+		select 
+		<include refid="user_group_middle_columns" />
+		from group_middle_user
+		where
+		group_middle_user.group_id=#{value}
+	</select>
+
+	<!-- 根据用户id获取小组课程id -->
+	<select id="getCourseIdList" parameterType="Long" resultType="Long">
+		SELECT group_middle_course.course_id FROM group_middle_course
+		LEFT JOIN group_middle_user ON group_middle_course.group_id = group_middle_user.group_id
+		WHERE group_middle_user.user_id = #{value}
+	</select>
+</mapper>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="StatisticsDayMapper">
+		<resultMap type="SnsStatisticsDay" id="SnsResult">
+			<result column="countStr" property="countStr"/>
+			<result column="add_time" property="statisticsTime"/>
+		</resultMap>
+		
+        <!-- 发表观点数 -->
+		<sql id="sns_statistics_weiboNum">
+			select COUNT(1) as count,DATE_FORMAT(#{value},'%Y-%m-%d') as add_time from sns_weibo as sw WHERE DATE_FORMAT(sw.add_time,'%Y-%m-%d')=DATE_FORMAT(#{value},'%Y-%m-%d')
+		</sql>
+		<!-- 博文数 -->
+		<sql id="sns_statistics_blogNum">
+			select COUNT(1) as count,DATE_FORMAT(#{value},'%Y-%m-%d') as add_time from sns_blog as sb WHERE DATE_FORMAT(sb.addTime,'%Y-%m-%d')=DATE_FORMAT(#{value},'%Y-%m-%d')
+		</sql>
+		<!-- 问题数 -->
+		<sql id="sns_statistics_quesNum">
+			select COUNT(1) as count,DATE_FORMAT(#{value},'%Y-%m-%d') as add_time from sns_sug_suggest as ss WHERE DATE_FORMAT(ss.addTime,'%Y-%m-%d')=DATE_FORMAT(#{value},'%Y-%m-%d')
+		</sql>
+		
+		<!-- 添加网站统计web（天） -->
+		<select id="querySnsStatisticsDay" resultMap="SnsResult">
+			select a.add_time,group_concat(a.count separator ',') as countStr from (
+	            (<include refid="sns_statistics_weiboNum"/>)
+				union all
+				(<include refid="sns_statistics_blogNum"/>)
+				union all
+				(<include refid="sns_statistics_quesNum"/>)
+			)as a group by add_time;
+        </select>
+       
+</mapper>

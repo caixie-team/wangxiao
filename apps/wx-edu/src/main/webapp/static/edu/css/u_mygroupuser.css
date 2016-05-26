@@ -1,0 +1,63 @@
+
+ .pull-left {
+    float: left;
+ }
+
+.depart-msg-bar .depart-details {
+    position: relative;
+    width: 255px;
+}
+
+.pt5 {
+    padding-top: 5px;
+}
+
+.cc{
+	border:3px solid #000	
+}
+
+.text-grey {
+    color: #999;
+}
+
+.font-size-18 {
+    font-size: 18px;
+}
+
+.text-normal {
+    color: #333;
+}
+
+.lh24 {
+    line-height: 24px;
+}
+
+.depart-msg-bar {
+    background-color: #fff;
+    box-shadow: 0 0 5px rgba(153, 153, 153, 0.1);
+    padding: 15px 15px 15px 30px;
+    position: relative;
+}
+
+.clearfix::before, .form-group::before, .form-row::before, .box-part::before, .page-menu::before, .row::before {
+    content: "";
+    display: table;
+}
+
+.study-index-page .card-title {
+    border-bottom: 1px solid #e4e4e4;
+    color: #333;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 44px;
+    padding: 0 15px;
+}
+
+.data-poly-pics .poly-body {
+    height: 318px;
+}
+
+.depart-box-list {
+    padding: 0 15px;
+}
+

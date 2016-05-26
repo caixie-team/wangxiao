@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CourseTagMapper">
+
+        <resultMap id="CourseTagResult" type="CourseTag">
+            <result property="id" column="id"/>
+            <result property="couartId" column="couart_id"/>
+            <result property="type" column="type"/>
+            <result property="name" column="name"/>
+        </resultMap>
+
+        <sql id="edu_course_tag_columns">
+            edu_course_tag.id,
+            edu_course_tag.couart_id,
+            edu_course_tag.type,
+            edu_course_tag.name
+        </sql>
+
+        <sql id="edu_course_tag_properties">
+            #{id},
+            #{couartId},
+            #{type},
+            #{name}
+        </sql>
+
+        <insert id="createCourseTag" parameterType="CourseTag" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_course_tag (<include refid="edu_course_tag_columns"/>) VALUES (<include refid="edu_course_tag_properties"/>)
+        </insert>
+
+        <delete id="deleteCourseTagById" parameterType="Long">
+            delete from edu_course_tag
+            where
+                id = #{value}
+
+
+
+        </delete>
+
+        <update id="updateCourseTag" parameterType="CourseTag">
+            update edu_course_tag SET
+                id = #{id},
+                couart_id = #{couartId},
+                type = #{type},
+                name = #{name}
+            where
+                id = #{id}
+
+
+
+        </update>
+
+        <select id="getCourseTagById" resultMap="CourseTagResult" parameterType="Long">
+            select
+            <include refid="edu_course_tag_columns"/>
+            from edu_course_tag
+            where
+                id = #{value}
+
+
+
+        </select>
+		
+        <select id="getCourseTagList" resultMap="CourseTagResult" parameterType="CourseTag">
+            select
+            <include refid="edu_course_tag_columns"/>
+            from edu_course_tag
+        </select>
+        
+</mapper>

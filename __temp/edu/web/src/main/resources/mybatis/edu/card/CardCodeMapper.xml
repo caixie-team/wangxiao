@@ -1,0 +1,477 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CardCodeMapper">
+
+	<resultMap id="CardCodeResult" type="CardCode">
+		<result property="id" column="id" />
+		<result property="cardId" column="card_id" />
+		<result property="cardCode" column="card_code" />
+		<result property="cardCodePassword" column="card_code_password" />
+		<result property="status" column="status" />
+		<result property="userEmail" column="user_email" />
+		<result property="userId" column="user_id" />
+		<result property="trxorderId" column="trxorder_id" />
+		<result property="requestId" column="request_id" />
+		<result property="createTime" column="create_time" />
+		<result property="useTime" column="use_time" />
+	</resultMap>
+
+	<resultMap type="CardCode" id="CardCodeAllResult" extends="CardCodeResult">
+		<result property="type" column="type" />
+	</resultMap>
+
+	<resultMap type="CourseCardDTO" id="CourseCardResult">
+		<result column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="card_code" property="cardCode" />
+		<result column="card_code_password" property="cardCodePassword" />
+		<result column="request_id" property="requestId"/>
+		<result column="trxorder_id" property="orderId" />
+		<result column="use_time" property="useTime" />
+		<result column="money" property="money" />
+		<result column="end_time" property="endTime" />
+		<result column="begin_time" property="beginTime" />
+		<result column="type" property="type" />
+		<result column="create_user" property="createUser" />
+		<result column="course_name" property="courseName" />
+		<result column="create_time" property="createTime" />
+		<result column="status" property="status" />
+		<result column="user_email" property="email"/>
+	</resultMap>
+
+
+	<resultMap type="MainCardDTO" id="MainCardReuslt">
+		<result column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="money" property="money" />
+		<result column="type" property="type" />
+		<result column="num" property="num" />
+		<result column="create_time" property="createTime" />
+		<result column="begin_time" property="beginTime" />
+		<result column="end_time" property="endTime" />
+		<result column="create_user" property="createUser" />
+		<result column="course_name" property="courseName" />
+	</resultMap>
+
+
+
+
+	<resultMap type="CourseCardDTO" id="CourseCardStatus">
+		<result column="end_time" property="endTime" />
+		<result column="id" property="id" />
+	</resultMap>
+
+	<sql id="edu_card_code_columns">
+		edu_card_code.id,
+		edu_card_code.card_id,
+		edu_card_code.card_code,
+		edu_card_code.card_code_password,
+		edu_card_code.status,
+		edu_card_code.user_email,
+		edu_card_code.user_id,
+		edu_card_code.trxorder_id,
+		edu_card_code.request_id,
+		edu_card_code.create_time,
+		edu_card_code.use_time
+	</sql>
+
+	<sql id="edu_card_code_properties">
+		#{id},
+		#{cardId},
+		#{cardCode},
+		#{cardCodePassword},
+		#{status},
+		#{userEmail},
+		#{userId},
+		#{trxorderId},
+		#{requestId},
+		#{createTime},
+		#{useTime}
+	</sql>
+
+	<insert id="createCardCode" parameterType="CardCode" keyColumn="id"
+		keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_card_code (
+		<include refid="edu_card_code_columns" />
+		) VALUES (
+		<include refid="edu_card_code_properties" />
+		)
+	</insert>
+
+	<delete id="deleteCardCodeById" parameterType="Long">
+		delete from
+		edu_card_code
+		where
+		id = #{value}
+
+	</delete>
+
+	<insert id="addCardCodeList">
+		insert INTO edu_card_code (
+		<include refid="edu_card_code_columns" />
+		) VALUES
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(
+			#{item.id},
+			#{item.cardId},
+			#{item.cardCode},
+			#{item.cardCodePassword},
+			#{item.status},
+			#{item.userEmail},
+			#{item.userId},
+			#{item.trxorderId},
+			#{item.requestId},
+			#{item.createTime},
+			#{item.useTime}
+			)
+		</foreach>
+	</insert>
+
+
+
+
+	<update id="updateCardCode" parameterType="CardCode">
+		update edu_card_code
+		SET
+		id = #{id},
+		card_id = #{cardId},
+		card_code = #{cardCode},
+		card_code_password = #{cardCodePassword},
+		status = #{status},
+		user_email = #{userEmail},
+		user_id = #{userId},
+		trxorder_id =
+		#{trxorderId},
+		request_id = #{requestId},
+		create_time = #{createTime},
+		use_time = #{useTime}
+		where
+		id = #{id}
+	</update>
+	
+	<update id="updateCardStatusByCode" parameterType="string">
+		update edu_card_code
+		SET
+		status = 'USED'
+		where
+		edu_card_code.status = 'INIT' and edu_card_code.card_code = #{value}
+	</update>
+
+
+	<select id="getCardCodeLastId" resultType="Long">
+		SELECT
+		IFNULL(MAX(edu_card_code.`id`),0) FROM edu_card_code
+	</select>
+	<select id="getCardCodeById" resultMap="CardCodeResult"
+		parameterType="Long">
+		select
+		<include refid="edu_card_code_columns" />
+		from edu_card_code
+		where
+		id = #{value}
+	</select>
+
+	<select id="getCardCodeList" resultMap="CardCodeAllResult"
+		parameterType="CardCode">
+		select
+		<include refid="edu_card_code_columns" />
+		,
+		edu_card.type
+		from edu_card_code left join
+		`edu_card` on edu_card.id =
+		edu_card_code.card_id
+		<where>
+			<if test="cardCode!=null and cardCode!=''">
+				and edu_card_code.card_code =#{cardCode}
+			</if>
+			<if test="cardCodePassword!=null and cardCodePassword!=''">
+				and edu_card_code.card_code_password =#{cardCodePassword}
+			</if>
+			<if test="cardId!='' and cardId>0">
+				and edu_card_code.card_id = #{cardId}
+			</if>
+        </where>
+	</select>
+
+
+	<select id="getCardHistory" resultType="QueryCardCode"
+		parameterType="QueryCardCode">
+		SELECT edu_card_code.id,
+		edu_card_code.`card_code`,
+		edu_card_code.`card_code_password`,
+		edu_card_code.`user_email`,
+		edu_card_code.`create_time`,
+		edu_card_code.`use_time`,
+		edu_card.`type`,
+		edu_card.`remark`
+		FROM
+		`edu_card_code` LEFT JOIN `edu_card`
+		ON
+		edu_card_code.`card_id` = edu_card.`id`
+		<where>
+			<if test="e.type!='' and e.type!=''">
+				and edu_card.type = #${e.type}
+			</if>
+			<if test="e.user_email!='' and e.user_email!=''">
+				and edu_card_code.user_email =#${e.user_email}
+			</if>
+			<if test="e.name!='' and e.name!=''">
+				and edu_card.name= #${e.name}
+			</if>
+			<if test="e.create_user!='' and e.create_user!=''">
+				and edu_card.create_user =#${e.create_user}
+			</if>
+
+			<if test="e.card_code!='' and e.card_code!=''">
+				and edu_card_code.card_code =#${e.card_code}
+			</if>
+		</where>
+	</select>
+
+	<select id="getCardHistoryCount" resultType="int" parameterType="QueryCardCode">
+		SELECT count(*)
+		FROM
+		`edu_card_code` LEFT JOIN `edu_card`
+		ON
+		edu_card_code.`card_id` = edu_card.`id`
+		<where>
+			<if test="e.type!='' and e.type!=''">
+			and 	edu_card.type = #${e.type}
+			</if>
+			<if test="e.user_email!='' and e.user_email!=''">
+				and edu_card_code.user_email =#${e.user_email}
+			</if>
+			<if test="e.name!='' and e.name!=''">
+				and edu_card.name= #${e.name}
+			</if>
+			<if test="e.create_user!='' and e.create_user!=''">
+				and edu_card.create_user =#${e.create_user}
+			</if>
+
+			<if test="e.card_code!='' and e.card_code!=''">
+				and edu_card_code.card_code =#${e.card_code}
+			</if>
+        </where>
+	</select>
+
+	<select id="getCardCodeStatus" resultMap="CourseCardStatus">
+		SELECT
+		edu_card_code.id,
+		edu_card.end_time
+		FROM edu_card_code
+		LEFT JOIN
+		edu_card
+		ON
+		edu_card.`id` =
+		edu_card_code.`card_id`
+		where
+		edu_card_code.status =
+		'init'
+	</select>
+
+
+	<update id="updateCardCodeStatus" parameterType="String">
+		update
+		edu_card_code
+		set edu_card_code.status = 'OVERDUE'
+		where
+		edu_card_code.id in (${value})
+	</update>
+	
+	<update id="closeCardCodeStatus" >
+		update
+		edu_card_code
+		set edu_card_code.status = 'CLOSE'
+		where 
+		edu_card_code.id in
+			(
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			#{item.id}
+		</foreach>
+		)
+	</update>
+	
+
+
+	<select id="getMainCardCondition" parameterType="java.util.HashMap"
+		resultMap="MainCardReuslt">
+		select
+		edu_card.id,
+		edu_card.name,
+		edu_card.money,
+		edu_card.type,
+		edu_card.num,
+		edu_card.begin_time,
+		edu_card.end_time,
+		edu_card.create_user,
+		edu_card.create_time,
+		edu_card.course_name
+		from edu_card 
+		<where>
+			<if test="e.type!=0 ">
+				and edu_card.type = #{e.type}
+			</if>
+			<if test="e.beginTime!=null">
+				and <![CDATA[ `edu_card`.create_time>=#{e.beginTime}]]>
+			</if>
+			<if test="e.endTime!=null">
+				and <![CDATA[ `edu_card`.create_time<=#{e.endTime}]]>
+			</if>
+			
+			<if test="e.courseName!='' and e.courseName!=null">
+				and edu_card.course_name like #{e.courseName}
+			</if>
+			<if test="e.createUser!='' and e.createUser!=null">
+				and edu_card.create_user like #{e.createUser}
+			</if>
+			<if test="e.cardName!='' and e.cardName!=null">
+				and edu_card.name like #{e.cardName}
+			</if>
+        </where>
+				order by edu_card.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="getMainCardConditionCount" parameterType="java.util.HashMap" resultType="int">
+		select 
+		count(1)
+		from edu_card
+		<where>
+			<if test="e.type!=0 ">
+				and edu_card.type = #{e.type}
+			</if>
+			
+			<if test="e.beginTime!=null">
+				and <![CDATA[ `edu_card`.create_time>=#{e.beginTime}]]>
+			</if>
+			<if test="e.endTime!=null">
+				and <![CDATA[ `edu_card`.create_time<=#{e.endTime}]]>
+			</if>
+			
+			<if test="e.courseName!='' and e.courseName!=null">
+				and edu_card.course_name like #{e.courseName}
+			</if>
+			<if test="e.createUser!='' and e.createUser!=null">
+				and edu_card.create_user like #{e.createUser}
+			</if>
+			<if test="e.cardName!='' and e.cardName!=null">
+				and edu_card.name like #{e.cardName}
+			</if>
+        </where>
+	</select>
+
+
+
+
+	<select id="getCardHistoryCondition" parameterType="java.util.HashMap"
+		resultMap="CourseCardResult">
+		SELECT
+		edu_card_code.user_email,
+		edu_card_code.id,
+		edu_card_code.trxorder_id,
+		edu_card_code.request_id,
+		edu_card_code.card_code,
+		edu_card_code.card_code_password,
+		edu_card_code.use_time,
+		edu_card_code.status,
+		ifnull(edu_card.money,0)
+		as money ,
+		edu_card.end_time,
+		edu_card.name,
+		edu_card.type,
+		edu_card.remark,
+		edu_card.create_user,
+		edu_card.begin_time,
+		edu_card.course_name,
+		edu_card.create_time
+		FROM edu_card_code
+		LEFT
+		JOIN
+		edu_card ON
+		edu_card.`id` =
+		edu_card_code.`card_id`
+		<where>
+			<if test="e.userId!='' and e.userId!=null">
+			    and edu_card_code.`user_id` = #{e.userId}
+			</if>
+			<if test="e.name!='' and e.name!=null">
+				and edu_card.name like #{e.name}
+			</if>
+			<if test="e.beginTime!=null">
+				and <![CDATA[ `edu_card`.create_time>=#{e.beginTime}]]>
+			</if>
+			<if test="e.endTime!=null">
+				and <![CDATA[ `edu_card`.create_time<=#{e.endTime}]]>
+			</if>
+			<if test="e.type!=null and e.type>0">
+				and <![CDATA[ `edu_card`.type=#{e.type}]]>
+			</if>
+			<if test="e.status!=null and e.status!='' ">
+				and <![CDATA[ `edu_card_code`.status=#{e.status}]]>
+			</if>
+			<if test="e.createUser!=null and e.createUser!=''">
+				and <![CDATA[ edu_card.create_user =#{e.createUser}]]>
+			</if>
+			
+			
+			<if test="e.cardNode!=null and e.cardNode!=''">
+				and <![CDATA[ edu_card_code.card_code like #{e.cardNode}]]>
+			</if>
+			<if test="e.email!=null and e.email!=''">
+				and <![CDATA[ edu_card_code.user_email like #{e.email}]]>
+			</if>
+			
+			<if test="e.cardId!=null and e.cardId!='' and e.cardId>0">
+				and	`edu_card_code`.card_id  =#{e.cardId}
+			</if>
+        </where>
+		order by edu_card_code.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="getCardHistoryConditionCount" parameterType="java.util.HashMap"
+		resultType="int">
+		SELECT
+		count(1)
+		from edu_card_code
+		LEFT JOIN edu_card ON
+		edu_card.`id` =
+		edu_card_code.`card_id`
+		<where>
+			<if test="e.userId!='' and e.userId!=null">
+				and  edu_card_code.`user_id` = #{e.userId}
+			</if>
+			<if test="e.name!='' and e.name!=null">
+				and edu_card.name like #{e.name}
+			</if>
+			<if test="e.beginTime!=null">
+				and <![CDATA[ `edu_card`.create_time>=#{e.beginTime}]]>
+			</if>
+			<if test="e.endTime!=null">
+				and <![CDATA[ `edu_card`.create_time<=#{e.endTime}]]>
+			</if>
+			<if test="e.type!=null and e.type>0">
+				and <![CDATA[ `edu_card`.type=#{e.type}]]>
+			</if>
+			<if test="e.status!=null and e.status!='' ">
+				and <![CDATA[ `edu_card_code`.status=#{e.status}]]>
+			</if>
+			<if test="e.createUser!=null and e.createUser!=''">
+				and <![CDATA[ edu_card.create_user =#{e.createUser}]]>
+			</if>
+			<if test="e.cardId!=null and e.cardId>0">
+				and	`edu_card_code`.card_id  =#{e.cardId}
+			</if>
+			
+			<if test="e.createUser!=null and e.createUser!=''">
+				and <![CDATA[ edu_card_code.card_code like #{e.cardNode}]]>
+			</if>
+			<if test="e.createUser!=null and e.createUser!=''">
+				and <![CDATA[ edu_card_code.user_email like #{e.email}]]>
+			</if>
+        </where>
+	</select>
+</mapper>

@@ -1,0 +1,146 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"%>
+<%@ include file="/base.jsp"%>
+<!DOCTYPE html>
+<html>
+<head>
+<title>充值金额</title>
+</head>
+<body>
+	<div id="aCoursesList" class="bg-fa of">
+		<div class="container">
+			<section class="path-wrap txtOf hLh30">
+				<a class="c-999 fsize14" title="" href="${ctx}">首页</a>
+				\<span class="c-333 fsize14">充值订单</span>
+			</section>
+			<!-- 内容区开始 -->
+			<article class="mt30" id="order_init">
+				<div  style="display: none;">
+					<!-- alipay参数 -->
+					<form action="${ctx }/cashorder/bank" name="orderForm" id="orderForm" method="post" target="_blank">
+						<input id="orderId" name="orderId" type="hidden" value=""/>
+						<input id="defaultbank" name="defaultbank" type="hidden" value=""/>
+						<input id="payType" name="payType" type="hidden" value="ALIPAY" />
+					</form>
+				</div>
+				<!-- 充值金额 -->
+				<div  style="display: none;">
+					<input id="payCashHidden" type="hidden" value="${payCash }"/>
+				</div>
+
+				<!--选择支付方式 start-->
+				<div class="mt30">
+					<header class=""><span class="fsize24 c-333">支付方式</span></header>
+					<div class="c-pay-method">
+						<div class="of">
+							<!--网上支付 -网银 支付开始 -->
+							<%-- <header class="c-p-title">网上银行</header>
+							<div class="buyB_payPlat">
+								<ul class="clearfix">
+									<c:if test="${keywordmap.keyword.yee=='ON' }">
+										<li><label><input type="radio" value="CEB-NET" name="defaultbank" onclick="checkbank('YEEPAY')" /> <img alt="广大银行" src="/static/edu/images/buy/bank_ZGGDYH.png" /></label></li>
+										<li><label><input type="radio" value="ICBC-NET" name="defaultbank" onclick="checkbank('YEEPAY')" /><img alt="中国工商银行" src="/static/edu/images/buy/bank_ZGGSYH.png" /></label></li>
+										<li><label><input type="radio" value="CCB-NET" name="defaultbank" onclick="checkbank('YEEPAY')" /><img alt="中国建设银行" src="/static/edu/images/buy/bank_ZGJSYH.png" /></label></li>
+										<li><label><input type="radio" value="ABC-NET" name="defaultbank" onclick="checkbank('YEEPAY')" /><img alt="中国农业银行" src="/static/edu/images/buy/bank_ZGNYYH.png" /></label></li>
+										<li><label><input type="radio" value="CMBCHINA-NET" name="defaultbank" onclick="checkbank('YEEPAY')" /><img alt="招商银行" src="/static/edu/images/buy/bank_ZSYH.png" /></label></li>
+										<li><label><input type="radio" value="BOC-NET" name="defaultbank" onclick="checkbank('YEEPAY')" /><img alt="中国银行" src="/static/edu/images/buy/bank_ZGYH.png" /></label></li>
+										<li><label><input type="radio" value="BOCO-NET" name="defaultbank" onclick="checkbank('YEEPAY')" /><img alt="中国交通银行" src="/static/edu/images/buy/bank_JTYH.png" /></label></li>
+										<li><label><input type="radio" value="POST-NET" name="defaultbank" onclick="checkbank('YEEPAY')" /><img alt="中国邮政储蓄银行" src="/static/edu/images/buy/bank_ZGYZCXYH.png" /></label></li>
+										<li class="buyB_payPlatNone"><label><input type="radio" value="CIB-NET" name="defaultbank" onclick="checkbank('YEEPAY')" /><img alt="兴业银行" src="/static/edu/images/buy/bank_XYYH.png" /></label></li>
+										<li class="buyB_payPlatNone"><label><input type="radio" value="CMBC-NET" name="defaultbank" onclick="checkbank('YEEPAY')" /><img alt="中国民生银行" src="/static/edu/images/buy/bank_ZGMSYH.png" /></label></li>
+										<li class="buyB_payPlatNone"><label><input type="radio" value="ECITIC-NET" name="defaultbank" onclick="checkbank('YEEPAY')" /><img alt="中兴银行" src="/static/edu/images/buy/bank_ZXYH.png" /></label></li>
+										<li class="buyB_payPlatNone"><label><input type="radio" value="PAB-NET" name="defaultbank" onclick="checkbank('YEEPAY')" /><img alt="平安银行" src="/static/edu/images/buy/bank_PAYH.png" /></label></li>
+										<li class="buyB_payPlatNone"><label><input type="radio" value="SDB-NET" name="defaultbank" onclick="checkbank('YEEPAY')" /><img alt="深圳发展银行" src="/static/edu/images/buy/bank_SZFZYH.png" /></label></li>
+										<li class="buyB_payPlatNone"><label><input type="radio" value="SHB-NET" name="defaultbank" onclick="checkbank('YEEPAY')" /><img alt="上海银行" src="/static/edu/images/buy/bank_SHYH.png" /></label></li>
+										<li class="buyB_payPlatNone"><label><input type="radio" value="BJRCB-NET" name="defaultbank" onclick="checkbank('YEEPAY')" /><img alt="北京农商银行" src="/static/edu/images/buy/bank_BJNSYH.png" /></label></li>
+									</c:if>
+									<c:if test="${keywordmap.keyword.yee=='OFF' }">
+										<li><label><input type="radio" value="ICBCB2C" name="alipaybank" onclick="checkbank('ALIPAY_BANK')" /> <img alt="工商" src="/static/edu/images/buy/wal_bank07_gongShang.jpg" /></label></li>
+										<li><label><input type="radio" value="CCB" name="alipaybank" onclick="checkbank('ALIPAY_BANK')" /><img alt="建设" src="/static/edu/images/buy/wal_bank08_jianshe.jpg" /></label></li>
+										<li><label><input type="radio" value="BOCB2C" name="alipaybank" onclick="checkbank('ALIPAY_BANK')" /><img alt="中国银行" src="/static/edu/images/buy/wal_bank10_zhongGuo.jpg" /></label></li>
+										<li><label><input type="radio" value="CMB" name="alipaybank" onclick="checkbank('ALIPAY_BANK')" /><img alt="招商" src="/static/edu/images/buy/wal_bank06_zhaoShang.jpg" /></label></li>
+										<li><label><input type="radio" value="COMM" name="alipaybank" onclick="checkbank('ALIPAY_BANK')" /><img alt="交通银行" src="/static/edu/images/buy/wal_bank05_jaotong.jpg" /></label></li>
+										<li><label><input type="radio" value="ABC" name="alipaybank" onclick="checkbank('ALIPAY_BANK')" /><img alt="农业" src="/static/edu/images/buy/wal_bank09_nongYe.jpg" /></label></li>
+										<li><label><input type="radio" value="CIB" name="alipaybank" onclick="checkbank('ALIPAY_BANK')" /><img alt="兴业" src="/static/edu/images/buy/wal_bank03_xingYe.jpg" /></label></li>
+										<li><label><input type="radio" value="CMBC" name="alipaybank" onclick="checkbank('ALIPAY_BANK')" /><img alt="民生" src="/static/edu/images/buy/wal_bank03_minSheng.jpg" /></label></li>
+										<li><label><input type="radio" value="CITIC" name="alipaybank" onclick="checkbank('ALIPAY_BANK')" /><img alt="中信" src="/static/edu/images/buy/wal_bank03_zhongXin.jpg" /></label></li>
+										<li class="buyB_payPlatNone"><label><input type="radio" value="GDB" name="alipaybank" onclick="checkbank('ALIPAY_BANK')" /><img alt="广发" src="/static/edu/images/buy/wal_bank03_guangFa.jpg" /></label></li>
+										<li class="buyB_payPlatNone"><label><input type="radio" value="CEBBANK" name="alipaybank" onclick="checkbank('ALIPAY_BANK')" /><img alt="光大" src="/static/edu/images/buy/wal_bank03_guangDa.jpg" /></label></li>
+										<li class="buyB_payPlatNone"><label><input type="radio" value="SPDB" name="alipaybank" onclick="checkbank('ALIPAY_BANK')" /><img alt="浦发" src="/static/edu/images/buy/wal_bank03_fuFa.jpg" /></label></li>
+										<li class="buyB_payPlatNone"><label><input type="radio" value="BJBANK" name="alipaybank" onclick="checkbank('ALIPAY_BANK')" /><img alt="北京农商" src="/static/edu/images/buy/wal_bank03_beiNongShang.jpg" /></label></li>
+										<li class="buyB_payPlatNone"><label><input type="radio" value="POSTGC" name="alipaybank" onclick="checkbank('ALIPAY_BANK')" /><img alt="邮政" src="/static/edu/images/buy/wal_bank04_youZheng.jpg" /></label></li>
+										<li class="buyB_payPlatNone"><label><input type="radio" value="SHBANK" name="alipaybank" onclick="checkbank('ALIPAY_BANK')" /><img alt="上海" src="/static/edu/images/buy/wal_bank03_shanghai.jpg" /></label></li>
+										<li class="buyB_payPlatNone"><label><input type="radio" value="GCB" name="alipaybank" onclick="checkbank('ALIPAY_BANK')" /><img alt="广州" src="/static/edu/images/buy/wal_bank03_guangZhou.jpg" /></label></li>
+									</c:if>
+								</ul>
+							</div> --%>
+							<!--网上支付 -网银 支付结束 -->
+							<!--网上支付 -第三方开始 -->
+							<header class="c-p-title">第三方支付平台</header>
+							<div class="buyB_payPlat">
+								<ul class="clearfix">
+									<c:if test="${keywordmap.keyword.yee=='ON' }">
+										<li><label>
+											<input type="radio" value="00" name="yeepay"  onclick="checkbank('YEEPAY')" style="margin-top:5px;" />
+											<img src="/static/edu/images/buy/buyB_pay_yibao.jpg" alt="易宝"  />
+										</label></li>
+									</c:if>
+									<li><label>
+										<input type="radio" value="" name="alipay" checked="checked" onclick="checkbank('ALIPAY')"  />
+										<img src="/static/edu/images/buy/buyB_pay_kuaiqian3.jpg"  alt="支付宝" />
+									</label></li>
+									<c:if test="${keywordmap.keyword.verifykq=='ON' }">
+										<li><label><input type="radio" value="00" name="kqBank" onclick="checkbank('KUAIQIAN')"   style="margin-top:5px;" />
+											<img src="/static/edu/images/buy/buyB_pay_kuaiqian1.jpg" alt="快钱"  />
+										</label></li>
+									</c:if>
+									<c:if test="${keywordmap.keyword.verifywx=='ON' }">
+										<li><label>
+											<input type="radio" value="" name="weixin" onclick="checkbank('WEIXIN')"  />
+											<img src="/static/edu/images/buy/buyB_pay_wx.jpg"  alt="微信" />
+										</label></li>
+									</c:if>
+								</ul>
+							</div>
+							<!--网上支付 -第三方结束 -->
+						</div>
+					</div>
+				</div>
+				<!--选择支付方式 end-->
+				<!--结算信息 start-->
+				<div class="mt30">
+					<header class=""><span class="fsize24 c-333">结算信息</span></header>
+					<div class="c-pay-method c-p-m">
+						<div>
+							<div class="fr tar p-mt15">
+								<p class="fsize24 c-333 mt20 hLh30">应付订单金额：<span id="payprice" class="c-master fsize36 f-fG">￥${payCash }</span></p>
+							</div>
+							<div class="clear"></div>
+						</div>
+						<div class="tar mt40"> <a class="order-btn" href="javascript:cashOrder()">提交订单</a> </div>
+					</div>
+				</div>
+				<!--结算信息 end-->
+			</article>
+			<!--提交成功 start-->
+			<article class="mt30" id="order_success" style="display: none" >
+				<div class="order-table pb20"  >
+					<section class="mt20 mr20 mb20 ml20">
+						<div class="orderSuccess pr ml20"  >
+							<ol>
+								<li><h2 class="hLh30 line3 pb10"><strong class="c-333 fsize20"><tt>订单号:</tt><font class="ml5 mr5 c-orange" id="orderId_success"></font>下单成功，订单总额<font class="ml5 c-orange" id="amount_success"></font></strong></h2></li>
+								<li class="mt10">
+									<span class="vam"><a class="order-submit" title="" href="javascript:void(0)" onclick="javascript:goToBank()">立即支付</a></span>
+								</li>
+								<li class="mt20"><span class="c-333 fsize14">您现在可以：<a class="c-333 mr10" title="重新选择支付方式" href="javascript:repayOrder()" id="repayA" ><u>重新选择支付方式</u></a> | <a class="c-4e ml10 mr10" title="进入学习中心" href="${ctx }/uc/home"><u>进入学习中心</u></a> | <a class="c-4e ml10" title="返回首页" href="${ctx }/"><u>返回首页</u></a></span></li>
+							</ol>
+							<span class="succIcon pa"></span>
+						</div>
+					</section>
+				</div>
+			</article>
+			<!--提交成功 end-->
+		</div>
+	</div>
+	<script type="text/javascript" src="${ctximg}/static/edu/js/front/cash/cash.js"></script>
+</body>
+</html>

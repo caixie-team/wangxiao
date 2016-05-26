@@ -1,0 +1,42 @@
+# Server settings
+server:
+    port:8080
+    address:localhost
+
+# DATASOURCE
+#jdbc:
+#    dataSourceClassName: com.mysql.jdb.Driver
+#    url: jdbc:mysql://rdsqbjjbe2evein.mysql.rds.aliyuncs.com:3306/edu?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
+#    databaseName: test
+#    serverName: aliyun
+#    username: grow
+#    password: Grow2015
+#    cachePrepStmts: true
+#    prepStmtsSize: 250
+#    prepStmtsCacheSqlLimit: 2048
+#    userServerPrepStmts: true
+
+# SPRING PROFILES
+spring:       
+    # HTTP ENCODING
+    http:
+        encoding.charset: UTF-8
+        encoding.enable: true
+        encoding.force: true
+    datasource:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.jdbc.Driver
+      # platform: mysql
+        url: jdbc:mysql://rdsqbjjbe2evein.mysql.rds.aliyuncs.com:3306/edu?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
+        username: grow
+        password: Grow2015
+
+# MyBatis
+mybatis:
+    typeAliasesPackage: com.atdld.os.entity,com.atdld.os.api.help.entity
+    mapperLocations: classpath:/mybatis/**/*Mapper.xml
+    configLocation: classpath:/SqlMapConfig.xml
+# LOGGING
+logging:
+    level:
+       com.ibatis:DEBUG

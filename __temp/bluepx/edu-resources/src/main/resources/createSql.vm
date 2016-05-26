@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="${daoClass}">
+	${cacheClass}  
+	<select id="findById" parameterType="Long" useCache="${cached}"
+		resultType="${entityClass}">
+        <![CDATA[
+            ${findById}
+        ]]>
+	</select>
+	
+	<insert id="add" useGeneratedKeys="true" keyProperty="id" flushCache="${cached}"
+		parameterType="${entityClass}">
+		
+		${insert}
+		
+	</insert>
+	<update id="update" parameterType="${entityClass}" flushCache="${cached}">		
+		
+			${update}
+		
+	</update>	
+
+	<update id="updateIncrement" parameterType="${entityClass}" flushCache="${cached}">		
+			${update}
+	</update>	
+	
+	<delete id="delete" parameterType="${entityClass}" flushCache="${cached}">
+		<![CDATA[
+			${delete}
+		]]>		
+	</delete>	 	 		 
+	
+	<delete id="deleteById" parameterType="Long" flushCache="${cached}">
+		<![CDATA[
+			${deleteById}
+		]]>		
+	</delete>	 
+	
+	<select id="find" resultType="${entityClass}" useCache="${cached}">
+		${findSql}
+            
+	</select>
+	
+	<delete id="deleteByIds" parameterType="list" flushCache="${cached}">		
+		${deleteByIdsSql}
+	
+	</delete>	 
+	
+	<delete id="updateBatch" flushCache="${cached}">		
+		${updateBatchSql}
+	</delete>	 			 		 	
+	
+</mapper>	 		 

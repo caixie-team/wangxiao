@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ArrangeExamMapper">
+
+	<resultMap id="ArrangeExamResult" type="ArrangeExam">
+		<result property="id" column="id" />
+		<result property="arrangeId" column="exampaper_id" />
+		<result property="exampaperId" column="exampaper_id" />
+		<result property="exampaperName" column="exampaper_name" />
+		<result property="replyTime" column="reply_time" />
+		<result property="exampaperLevel" column="exampaper_level" />
+		<result property="joinNum" column="join_num" />
+		<result property="avgscore" column="avgscore" />
+	</resultMap>
+
+	<sql id="edu_arrange_exam_columns">
+		edu_arrange_exam.id,
+		edu_arrange_exam.arrange_id,
+		edu_arrange_exam.exampaper_id,
+		edu_arrange_exam.exampaper_name
+		<!-- edu_arrange_exam.reply_time, edu_arrange_exam.exampaper_level, edu_arrange_exam.join_num, 
+			edu_arrange_exam.avgscore -->
+	</sql>
+
+	<sql id="edu_arrange_exam_properties">
+		#{id},
+		#{arrangeId},
+		#{exampaperId},
+		#{exampaperName}
+		<!-- #{replyTime}, #{exampaperLevel}, #{joinNum}, #{avgscore} -->
+	</sql>
+
+	<insert id="createArrangeExam" parameterType="ArrangeExam" keyColumn="id"
+		keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_arrange_exam (
+		<include refid="edu_arrange_exam_columns" />
+		) VALUES (
+		<include refid="edu_arrange_exam_properties" />
+		)
+	</insert>
+	<!-- 批量添加试卷 -->
+	<insert id="batchAddArrangeExam" parameterType="list">
+		insert into edu_arrange_exam(
+		<include refid="edu_arrange_exam_columns" />
+		) values
+		<foreach item="item" index="index" collection="list"
+			separator=",">
+			(
+			#{item.id},
+			#{item.arrangeId},
+			#{item.exampaperId},
+			#{item.exampaperName}
+			)
+		</foreach>
+
+	</insert>
+	<!-- 删除任务下的试卷 -->
+	<delete id="deleteArrangeExamById" parameterType="Long">
+		delete from
+		edu_arrange_exam
+		where edu_arrange_exam.arrange_id=#{value}
+	</delete>
+
+	<select id="getArrangeExamById" resultMap="ArrangeExamResult"
+		parameterType="Long">
+		select
+		<include refid="edu_arrange_exam_columns" />
+		from edu_arrange_exam
+	</select>
+
+	<select id="getArrangeExamList" resultMap="ArrangeExamResult"
+		parameterType="ArrangeExam">
+		select
+		<include refid="edu_arrange_exam_columns" />
+		from edu_arrange_exam
+		<where>
+			<if test="arrangeId!=null and arrangeId>0">
+				edu_arrange_exam.arrange_id=#{arrangeId}
+			</if>
+		</where>
+	</select>
+	<!-- 任务下的试卷 -->
+	<select id="getArrangeExamByIds" resultMap="ArrangeExamResult"
+		parameterType="ArrangeExam">
+		SELECT
+		<include refid="edu_arrange_exam_columns" />
+		FROM `edu_arrange_exam` 
+		<where>
+			<if test="arrangeId!=null and arrangeId!=0">
+				edu_arrange_exam.`arrange_id`=#{arrangeId}
+			</if>
+		</where>
+	</select>
+</mapper>

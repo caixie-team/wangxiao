@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MemberOrderOptRecordMapper">
+
+        <sql id="edu_member_order_opt_record_columns">
+            edu_member_order_opt_record.id,
+            edu_member_order_opt_record.user_id,
+            edu_member_order_opt_record.optuser,
+            edu_member_order_opt_record.type,
+            edu_member_order_opt_record.description,
+            edu_member_order_opt_record.create_time,
+            edu_member_order_opt_record.optusername,
+            edu_member_order_opt_record.member_record_id
+           
+        </sql>
+
+        <sql id="edu_member_order_opt_record_properties">
+            #{id},
+            #{userId},
+            #{optuser},
+            #{type},
+            #{description},
+            #{createTime},
+            #{optusername},
+            #{memberRecordId}
+        </sql>
+
+        <insert id="addMemberOrderOptRecord" parameterType="MemberOrderOptRecord" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_member_order_opt_record (<include refid="edu_member_order_opt_record_columns"/>) VALUES (<include refid="edu_member_order_opt_record_properties"/>)
+        </insert>
+</mapper>

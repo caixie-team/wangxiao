@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="NoteMapper">
+	<resultMap id="NoteResult" type="examnote">
+		<result property="id" column="ID"/>
+		<result property="noteContent" column="NOTE_CONTENT"/>
+		<result property="qstId" column="QST_ID"/>
+		<result property="cusId" column="CUS_ID"/>
+		<result property="subjectId" column="SUBJECT_ID"/>
+		<result property="addTime" column="ADDTIME"/>
+	</resultMap>
+    <resultMap id="QueryNoteQuestionResult" type="QueryNoteQuestion" extends="NoteResult">
+
+    </resultMap>
+
+	<sql id="exam_note_columns">
+		exam_note.ID,
+		exam_note.NOTE_CONTENT,
+		exam_note.QST_ID,
+		exam_note.CUS_ID,
+		exam_note.SUBJECT_ID,
+		exam_note.ADDTIME
+	</sql>
+	
+	<sql id="exam_note_properties">
+		#{id},
+		#{noteContent},
+		#{qstId},
+		#{cusId},
+		#{subjectId},
+		#{addTime}
+	</sql>
+	
+	<insert id="insertNote" parameterType="examnote">
+		INSERT INTO exam_note (<include refid="exam_note_columns"/>)
+		value (<include refid="exam_note_properties"/>)
+	</insert>
+	
+	 <insert id="insertQueryNoteQuestionBatch" parameterType="java.util.HashMap">
+        INSERT INTO exam_note (<include refid="exam_note_columns"/>) VALUES 
+         <foreach collection="queryNoteQuestionList" index="index" item="item" separator="," >
+        	   (#{item.id},
+				#{item.noteContent},
+				#{item.qstId},
+				#{item.cusId},
+				#{item.subjectId},
+				#{item.addTime})
+        </foreach>
+    </insert>
+    
+	<update id="updatetNote" parameterType="examnote">
+		UPDATE exam_note SET NOTE_CONTENT=#{noteContent}, ADDTIME=#{addTime}
+		WHERE exam_note.QST_ID=#{qstId} AND exam_note.CUS_ID=#{cusId}
+	</update>
+
+    <select id="queryNote" resultMap="QueryNoteQuestionResult" parameterType="java.util.HashMap">
+        SELECT
+        <include refid="exam_note_columns"/>
+        FROM exam_note
+        WHERE exam_note.QST_ID=#{qstId} AND exam_note.CUS_ID=#{cusId}
+    </select>
+</mapper>

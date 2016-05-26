@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PlanMiddleUserMapper">
+
+	<resultMap id="PlanMiddleUserResult" type="PlanMiddleUser">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="planId" column="plan_id" />
+	</resultMap>
+
+	<resultMap id="PlanMiddleUserDTOResult" type="PlanMiddleUserDTO" extends="PlanMiddleUserResult">
+		<result property="complete" column="complete"/>
+		<result property="userName" column="userName"/>
+	</resultMap>
+	<sql id="edu_plan_middle_user_columns">
+		edu_plan_middle_user.id,
+		edu_plan_middle_user.user_id,
+		edu_plan_middle_user.plan_id
+	</sql>
+
+	<sql id="edu_plan_middle_user_properties">
+		#{id},
+		#{userId},
+		#{planId}
+	</sql>
+
+	<insert id="createPlanMiddleUser" parameterType="PlanMiddleUser"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_plan_middle_user (
+		<include refid="edu_plan_middle_user_columns" />
+		) VALUES (
+		<include refid="edu_plan_middle_user_properties" />
+		)
+	</insert>
+	<!-- 批量添加员工 -->
+	<insert id="batchAddPlanMiddleUser" parameterType="list">
+		insert INTO edu_plan_middle_user (
+		<include refid="edu_plan_middle_user_columns" />
+		) VALUES
+		<foreach collection="list" item="itme" index="index"
+			separator=",">
+			(#{itme.id},#{itme.userId},#{itme.planId})
+		</foreach>
+	</insert>
+	<!-- 删除任务下的员工 -->
+	<delete id="deletePlanMiddleUserById" parameterType="Long">
+		delete from
+		edu_plan_middle_user
+		where edu_plan_middle_user.plan_id=#{planId}
+	</delete>
+
+	<update id="updatePlanMiddleUser" parameterType="PlanMiddleUser">
+		update
+		edu_plan_middle_user SET
+		id = #{id},
+		user_id = #{userId},
+		plan_id =
+		#{planId}
+	</update>
+
+	<select id="getPlanMiddleUserById" resultMap="PlanMiddleUserResult"
+		parameterType="Long">
+		select
+		<include refid="edu_plan_middle_user_columns" />
+		from edu_plan_middle_user
+	</select>
+
+	<select id="getPlanMiddleUserList" resultMap="PlanMiddleUserResult"
+		parameterType="PlanMiddleUser">
+		select
+		<include refid="edu_plan_middle_user_columns" />
+		from edu_plan_middle_user
+		<where>
+			<if test="planId!=null and planId>0">
+				AND edu_plan_middle_user.plan_id = #{planId}
+			</if>
+		</where>
+	</select>
+	<!-- 查询任务下的员工 -->
+	<select id="getPlanUserById" parameterType="PlanMiddleUser" resultMap="PlanMiddleUserResult">
+		SELECT
+		<include refid="edu_plan_middle_user_columns" />
+		FROM edu_plan_middle_user
+		<where>
+			<if test="planId!=null and planId!=0">
+				edu_plan_middle_user.plan_id=#{planId}
+			</if>
+		</where>
+	</select>
+
+	<select id="getPlanUserDTOList" parameterType="java.util.HashMap" resultMap="PlanMiddleUserDTOResult">
+		SELECT
+		<include refid="edu_plan_middle_user_columns" />,
+		SUM(edu_plan_phase_detail_progress.`complete`) as complete,
+		user_user.nickname as userName
+		FROM edu_plan_middle_user
+		left join user_user on edu_plan_middle_user.user_id = user_user.id
+		left join edu_plan_phase_detail_progress on edu_plan_middle_user.user_id = edu_plan_phase_detail_progress.user_id
+		<where>
+			<if test="e.planId!=null and e.planId!=0">
+				edu_plan_middle_user.plan_id=#{e.planId}
+			</if>
+		</where>
+		GROUP BY edu_plan_middle_user.user_id
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getPlanUserDTOListCount" parameterType="java.util.HashMap" resultType="int">
+		SELECT
+		count(1)
+		FROM edu_plan_middle_user
+		<where>
+			<if test="e.planId!=null and e.planId!=0">
+				edu_plan_middle_user.plan_id=#{e.planId}
+			</if>
+		</where>
+	</select>
+
+	<select id="getPlanUserDTOListByGroupIdAndPlanId" parameterType="java.util.HashMap" resultMap="PlanMiddleUserDTOResult">
+		SELECT
+		group_middle_user.user_id as userId,
+		SUM(edu_plan_phase_detail_progress.`complete`) AS complete,
+		user_user.nickname AS userName
+		FROM edu_plan_middle_group
+		LEFT JOIN group_middle_user ON edu_plan_middle_group.`user_group_id` = group_middle_user.`group_id`
+		LEFT JOIN user_user ON group_middle_user.user_id = user_user.id
+		LEFT JOIN edu_plan_phase_detail_progress ON group_middle_user.user_id = edu_plan_phase_detail_progress.user_id
+		WHERE edu_plan_middle_group.`plan_id` = #{e.planId} AND group_middle_user.`group_id` = #{e.groupId}
+		GROUP BY group_middle_user.user_id
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getPlanUserDTOListByGroupIdAndPlanIdCount" parameterType="java.util.HashMap" resultType="int">
+		SELECT
+		count(1)
+		FROM edu_plan_middle_group
+		LEFT JOIN group_middle_user ON edu_plan_middle_group.`user_group_id` = group_middle_user.`group_id`
+		WHERE edu_plan_middle_group.`plan_id` = #{e.planId} AND group_middle_user.`group_id` = #{e.groupId}
+	</select>
+
+	<!-- 获取计划指派人员id -->
+	<select id="getPlanUserId" parameterType="Long" resultType="Long">
+		SELECT edu_plan_middle_user.user_id FROM edu_plan_middle_user WHERE edu_plan_middle_user.plan_id = #{value}
+	</select>
+</mapper>

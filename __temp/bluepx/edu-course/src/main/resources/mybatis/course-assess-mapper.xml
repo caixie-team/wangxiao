@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="co.bluepx.edu.course.dao.CourseAssessDao">
+
+	<resultMap id="CourseAssessResult" type="co.bluepx.edu.course.entity.CourseAssess">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="courseId" column="course_id" />
+		<result property="kpointId" column="kpoint_id" />
+		<result property="content" column="content" />
+		<result property="createTime" column="create_time" />
+	</resultMap>
+	<resultMap id="QueryCourseAssessResult" type="co.bluepx.edu.course.entity.QueryCourseAssess" extends="CourseAssessResult">
+          <result property="email" column="email"/>
+          <result property="emailIsavalible" column="email_isavalible"/>
+          <result property="mobile" column="mobile"/>
+          <result property="mobileIsavalible" column="mobile_isavalible"/>
+          <result property="password" column="password"/>
+          <result property="isavalible" column="isavalible"/>
+          <result property="customerkey" column="customerkey"/>
+          <result property="createdate" column="createdate"/>
+          <result property="userip" column="userip"/>
+           <result property="avatar" column="avatar"/>
+           <result property="nickname" column="nickname"/>
+	</resultMap>
+	
+	<resultMap type="co.bluepx.edu.course.entity.QueryCourseAssess" id="QueryAdminCourseAssess" extends="CourseAssessResult">
+		<result property="nickname" column="nickname" />
+		<result property="email" column="email" />
+		<result property="courseName" column="courseName" />
+		<result property="pointName" column="pointName" />
+	</resultMap>
+	<sql id="edu_course_assess_columns">
+		edu_course_assess.id,
+		edu_course_assess.user_id,
+		edu_course_assess.course_id,
+		edu_course_assess.kpoint_id,
+		edu_course_assess.content,
+		edu_course_assess.create_time,
+		edu_course_assess.status
+	</sql>
+
+	<sql id="edu_course_assess_properties">
+		#{id},
+		#{userId},
+		#{courseId},
+		#{kpointId},
+		#{content},
+		#{createTime},
+		#{status}
+	</sql>
+
+	<select id="findCourseAssessList" resultMap="QueryCourseAssessResult" parameterType="java.util.HashMap">
+		select
+		<include refid="edu_course_assess_columns" />,
+		user_user.nickname,
+		user_user.email,
+		user_user.email_isavalible,
+		user_user.mobile,
+		user_user.mobile_isavalible,
+		user_user.password,
+		user_user.isavalible,
+		user_user.customerkey,
+		user_user.createdate,
+		user_user.userip,
+		user_expand.avatar
+		from edu_course_assess
+		left join user_user
+		on edu_course_assess.user_id =
+		user_user.id
+		left join user_expand
+		on edu_course_assess.user_id = user_expand.user_id
+		<where>
+			edu_course_assess.status=0
+			<if test="e.courseId!=null and e.courseId!=0">
+				and edu_course_assess.course_id = #{e.courseId}
+			</if>
+			<if test="e.kpointId!=null">
+				and edu_course_assess.kpoint_id = #{e.kpointId}
+			</if>
+			<if test="e.kpointId==null">
+				and edu_course_assess.kpoint_id != 0
+			</if>
+		</where>
+		order by edu_course_assess.id desc
+	</select>
+	<!-- 如果课程是套餐课程，查询该套餐课程下所有课程的评论集合 -->
+	<select id="findPackageCourseAssessList" resultMap="QueryCourseAssessResult" parameterType="String">
+		select
+		<include refid="edu_course_assess_columns" />,
+		user_user.nickname,
+        user_user.email,
+        user_user.email_isavalible,
+        user_user.mobile,
+        user_user.mobile_isavalible,
+        user_user.password,
+        user_user.isavalible,
+        user_user.customerkey,
+        user_user.createdate,
+        user_user.userip,
+        user_expand.avatar
+		from 
+		edu_course_assess left join user_user on edu_course_assess.user_id = user_user.id
+		left join user_expand on edu_course_assess.user_id = user_expand.user_id
+		where
+		edu_course_assess.status=0
+		and edu_course_assess.course_id in (${courseIds})
+		order by edu_course_assess.id desc
+	</select>
+
+
+</mapper>

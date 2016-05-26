@@ -1,0 +1,103 @@
+@charset "utf-8";
+
+/* #p-l-n reset
+================================================== */
+html,body {height: 100%;width: 100%;overflow: hidden;}
+body {background: #313131;height: auto;min-height: 100%;}
+@media only screen and (max-width:300px){
+	body{font-size:8.33333px}
+}
+@media only screen and (max-width:310px) and (min-width:300px){
+	body{font-size:8.33333px}
+}
+@media only screen and (max-width:320px) and (min-width:310px){
+	body{font-size:8.61111px}
+}
+@media only screen and (max-width:350px) and (min-width:320px){
+	body{font-size:8.88889px}
+}
+@media only screen and (max-width:360px) and (min-width:350px){
+	body{font-size:9.72222px}
+}
+@media only screen and (max-width:400px) and (min-width:360px){
+	body{font-size:10px}
+}
+@media only screen and (max-width:470px) and (min-width:400px){
+	body{font-size:11.11111px}
+}
+@media only screen and (max-width:480px) and (min-width:470px){
+	body{font-size:13.05556px}
+}
+/* #course cbox box
+================================================== */
+.NXB-cbox {border-bottom: 1px solid #626262;border-top: 1px solid #666666;overflow: hidden;right: 320px;position: absolute;top: 0;right: 320px;bottom: 0;left: 0;}
+.NXB-pc-wrap {background: #313131;width: 100%;height: 100%;}
+.N-hiderightbtn {position: absolute;right: 0;top: 10px;z-index: 9;}
+.N-hiderightbtn a {background: #e2e2e2;border-radius: 3px 0 0 3px;display: block;width: 22px;height: 38px;line-height: 38px;text-align: center;}
+.N-hiderightbtn a:hover {background: #e0e0e0;text-decoration: none;}
+.lt-ie9.lt-ie8 .N-hiderightbtn a em {cursor: pointer;margin-top: 10px;}
+.N-pr-loading {background: #313131 url(../img/pr-loading.gif) no-repeat 50% 50%;display: block;width: 300px;height: 225px;position: absolute;top: 50%;left: 50%;margin: -112px 0 0 -150px;z-index: 1;}
+.cl-back {background: #bbb;border-radius: 0 3px 3px 0;box-shadow: 2px 2px 2px rgba(0,0,0,.1);display: block;text-align: center;height: 28px;left: 0;line-height: 26px;position: absolute;top: 13px;width: 106px;z-index: 77;}
+.cl-back:hover,.N-L-tt-up-dw a:hover {background: #aaa;text-decoration: none;}
+.N-l-title {padding: 60px 20px 15px;overflow: hidden;}
+.N-l-t-box {padding-right: 120px;position: relative;}
+.N-L-tt-up-dw {position: absolute;right: 0;top: 2px;}
+.N-L-tt-up-dw a {background: #bbb;color: #4e4e4e;display: block;float: left;width: 59px;text-align: center;height: 24px;line-height: 24px;font-size: 12px;}
+.nlt-up {border-radius: 3px 0 0 3px;border-right: 1px solid #c0c0c0;}
+.nlt-dw {border-radius: 0 3px 3px 0;}
+.N-l-t-title {height: 26px;overflow: hidden;white-space: nowrap;}
+.N-l-t-title span {height: 24px;line-height: 24px;font-size: 14px;vertical-align: middle;display: inline-block;}
+.N-l-tt-z small {font-size: 14px;margin: 0 3px;}
+.N-l-tt-z,.N-l-tt-j {background: #999;border-radius: 20px 0 0 20px;color: #333;padding: 0 15px;}
+.N-l-tt-j {background: #000;color: #999;margin-left: -15px;border-radius: 20px;}
+.N-l-tt-j big {background: #ff6600;border: 1px solid #000;color: #000;display: inline-block;text-align: center;width: 22px;height: 22px;line-height: 22px;font-size: 14px;border-radius: 50%;margin: 0 -15px 0 10px;}
+.N-l-tt-x {color: #ccc;margin-left: 5px;}
+.pl-flash-box {background: #000;bottom: 30px;box-shadow: 0 1px 5px #111;left: 20px;position: absolute;right: 20px;top: 105px;z-index: 55;}
+/* #course cTool box
+================================================== */
+.NXB-cTool {background: rgba(255, 255, 255, 0.9);bottom: 0;box-shadow: 0 1px 8px #333;overflow: visible;position: absolute;right: 0;top: 0;width: 320px;}
+.lt-ie9.lt-ie8 .NXB-cTool,.lt-ie9 .NXB-cTool,.lt-ie9.lt-ie8 .n-ctCont-menu .c-white-box,.lt-ie9 .n-ctCont-menu .c-white-box {background: #fbfbfb;}
+.nct-bo {position: absolute;width: 100%;left: 0;right: 0;top: 0;bottom: 0;height: 100%;}
+.n-ctInfo {background: #E2E2E2;padding: 15px 160px 15px 15px;clear: both;height: 75px;position: relative;}
+.n-c-attr-box {float: left;margin-right: 10px;width: 145px;}
+.n-c-pic img {display: inline-block;height: 75px;width: 134px;position: absolute;right: 15px;top: 15px;}
+.n-ctTabs {background: #f4f4f4;border: solid #ddd;border-width: 1px 0;padding: 0 10px;height: 39px;clear: both;}
+.n-ctTabs a {height: 38px;line-height: 38px;border-bottom: 2px solid transparent;display: block;float: left;text-align: center;font-size: 16px;color: #333;width: 25%;}
+.n-ctTabs a.current {border-color: #EA562E;color: #EA562E;}
+.n-ctTabs a:hover {text-decoration: none;color: #EA562E;}
+.n-ctCont-box {position: absolute;top: 146px;right: 0;bottom: 0;left: 0;overflow: hidden;}
+.n-ctCont-box>article {position: absolute;height: 100%;top: 0;right: 0;bottom: 0;left: 0;}
+.n-ctCont-box .n-ct-cont-menu .n-ct-of .c-white-box {display: none;}
+.n-ct-of {position: absolute;top: 0;right: 0;bottom: 0;left: 0;overflow-x: hidden;overflow-y: auto;}
+.n-ctCont-menu {margin-bottom: 5px;}
+.n-ctCont-menu .chapter-name {padding: 0 10px;}
+.n-ctCont-menu .chap-seclist {margin-left: 30px;}
+.n-ctCont-menu .chap-seclist ul li .c-p-wrap {height: 42px;overflow: hidden;padding: 0 85px 0 15px;text-overflow: ellipsis;white-space: nowrap;}
+.n-ctCont-menu .c-white-box {display: none;}
+.n-ct-cont-notice .n-reply-wrap textarea {background: #f8f8f8;width: 96%;}
+.n-ct-cont-notice .lh-reply-btn {height: 26px;line-height: 26px;font-family: 'Microsoft YaHei';}
+.n-ctcn-tit {border-bottom: 1px solid #d2d2d2;padding-bottom: 5px;}
+.n-ct-cont-notice-list {padding: 10px 10px 20px;overflow: hidden;}
+.n-ct-cont-notice-list .review-box ul li {border-bottom: 1px solid #ddd;padding: 15px 0 15px 50px;}
+.n-ct-cont-notice-list .review-box ul li:hover {background: #efefef;}
+.n-ct-cont-notice-list .review-box ul li .noter-pic img {width: 40px;height: 40px;}
+.n-ct-cont-notice-list .noter-txt a:hover {text-decoration: none;}
+.n-ctCont-box .n-reply-wrap textarea {width: 96%;}
+.n-ct-cont-notice .n-ct-of,.n-ct-cont-answer .n-ct-of,.n-ct-cont-comment .n-ct-of {top: 150px;}
+.n-ctCont-box .review-box ul li div.of span.fl {width: 50%;height: 20px;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;}
+@media (min-width: 320px) and (max-width: 480px) {
+	.NXB-cbox {right: 0;}
+	.NXB-cTool {width: 0;}
+	.N-l-title {padding-left: 15px;padding-right: 15px;}
+	.N-l-t-box {padding-right: 0;}
+	.pl-flash-box {left: 15px;right: 15px;}
+	.N-L-tt-up-dw {display: none;}
+	.fsize12,.N-L-tt-up-dw a,.N-l-t-title span,.N-l-tt-z small {font-size: .9rem;}
+	.fsize14,.n-ctTabs a {font-size: 1.0rem;}
+	/* .fsize16 {font-size: 1.333rem;}
+	.fsize18 {font-size: 1.5rem;}
+	.fsize20 {font-size: 1.667rem;}
+	.fsize24 {font-size: 2.0rem;}
+	.fsize28 {font-size: 2.333rem;}
+	.fsize34 {font-size: 2.833rem;} */
+}

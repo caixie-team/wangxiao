@@ -1,0 +1,69 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+dependencies {
+
+    compile(
+            project(':modules:edu-core'),
+            project(':modules:edu-resources'),
+            project(':modules:edu-user'),
+//            project(':bluepx:edu-member'),
+    )
+
+    compile('com.github.pagehelper:pagehelper:4.1.0')
+
+    compile(
+//            libraries.'servlet-api',
+            libraries.'spring-context',
+            libraries.'spring-test',
+            libraries.'spring-context-support',
+            libraries.'spring-web',
+            libraries.'spring-webmvc',
+            libraries.'spring-jdbc',
+            libraries.'commons-io',
+            libraries.'commons-fileupload',
+            libraries.'commons-codec',
+            libraries.'commons-configuration',
+            libraries.'commons-lang',
+            libraries.'commons-lang3',
+            libraries.'commons-beanutils',
+
+            libraries.'slf4j-api',
+            libraries.'logback',
+            libraries.'logback-core',
+
+            libraries.'hessian',
+            libraries.'mybatis',
+            libraries.'mybatis-spring',
+            libraries.'druid',
+            libraries.'mysql',
+            libraries.'mail',
+            libraries.'activation',
+            libraries.'commons-httpclient',
+            libraries.'lucene-spatial',
+            libraries.'lucene-queries',
+            libraries.'lucene-core',
+            libraries.'im4java',
+            libraries.'spymemcached',
+            libraries.'poi',
+            libraries.'poi-ooxml',
+            libraries.'validation-api',
+            libraries.'persistence-api',
+            libraries.'gson',
+            libraries.'guava',
+            libraries.'joda-time',
+            libraries.'velocity',
+            libraries.'jackson',
+            libraries.'jackson-databind',
+            libraries.'lombok'
+    )
+    compile(group: 'net.sf.proguard', name: 'proguard-base', version: '4.9')
+    compile(group: 'org.apache.velocity', name: 'velocity-tools', version: '2.0') {
+        exclude(module: 'struts-tiles')
+        exclude(module: 'struts-taglib')
+        exclude(module: 'struts-core')
+        exclude(module: 'sslext')
+        exclude(module: 'oro')
+    }
+
+}

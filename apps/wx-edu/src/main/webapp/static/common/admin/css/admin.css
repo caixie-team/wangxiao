@@ -1,0 +1,467 @@
+/**
+ * admin.css
+ */
+
+ul {
+  margin-top: 0;
+}
+
+.admin-icon-yellow {
+  color: #ffbe40;
+}
+
+.admin-header {
+  font-size: 1.4rem;
+  margin-bottom: 0;
+}
+
+.admin-header-list a:hover :after {
+  content: none;
+}
+
+.admin-main {
+  background: #f3f3f3;
+}
+
+.admin-menu {
+  position: fixed;
+  z-index: 10;
+  bottom: 30px;
+  right: 20px;
+}
+
+.admin-sidebar {
+  width: 260px;
+  min-height: 100%;
+  float: left;
+}
+
+.admin-sidebar-list {
+  margin-bottom: 0;
+}
+
+.admin-sidebar-list li a {
+  color: #5c5c5c;
+  padding-left: 24px;
+}
+
+.admin-sidebar-list li:first-child {
+  border-top: none;
+}
+
+.admin-sidebar-sub {
+  margin-top: 0;
+  margin-bottom: 0;
+  box-shadow: 0 16px 8px -15px #e2e2e2 inset;
+  background: #ececec;
+  padding-left: 24px;
+}
+
+.admin-sidebar-sub li:first-child {
+  border-top: 1px solid #dedede;
+}
+
+.admin-sidebar-panel {
+  margin: 10px;
+}
+
+.admin-content {
+  width: auto;
+  overflow: hidden;
+  height: 100%;
+  background: #fff;
+}
+
+.admin-content-list {
+  border: 1px solid #e9ecf1;
+  margin-top: 0;
+  padding: 0 0 20px 0;
+}
+
+.admin-content-list li {
+  border: 1px solid #e9ecf1;
+  border-width: 0 1px;
+  margin-left: -1px;
+}
+
+.admin-content-list li:first-child {
+  border-left: none;
+}
+
+.admin-content-list li:last-child {
+  border-right: none;
+}
+
+.admin-content-table a {
+  color: #535353;
+}
+.admin-content-file {
+  margin-bottom: 0;
+  color: #666;
+}
+
+.admin-content-file p {
+  margin: 0 0 5px 0;
+  font-size: 1.4rem;
+}
+
+.admin-content-file li {
+  padding: 10px 0;
+}
+
+.admin-content-file li:first-child {
+  border-top: none;
+}
+
+.admin-content-file li:last-child {
+  border-bottom: none;
+}
+
+.admin-content-file li .am-progress {
+  margin-bottom: 4px;
+}
+
+.admin-content-file li .am-progress-bar {
+  line-height: 14px;
+}
+
+.admin-content-task {
+  margin-bottom: 0;
+}
+
+.admin-content-task li {
+  padding: 5px 0;
+  border-color: #eee;
+}
+
+.admin-content-task li:first-child {
+  border-top: none;
+}
+
+.admin-content-task li:last-child {
+  border-bottom: none;
+}
+
+.admin-task-meta {
+  font-size: 1.2rem;
+  color: #999;
+}
+
+.admin-task-bd {
+  font-size: 1.4rem;
+  margin-bottom: 5px;
+}
+
+.admin-content-comment {
+  margin-bottom: 0;
+}
+
+.admin-content-comment .am-comment-bd {
+  font-size: 1.4rem;
+}
+
+.admin-content-pagination {
+  margin-bottom: 0;
+}
+.admin-content-pagination li a {
+  padding: 4px 8px;
+}
+        .dashBoradBox {
+    margin: 30px 0 30px 20px;
+}
+.dashBoradWrap ul li {
+    float: left;
+    width: 33.3%;
+ 
+}
+.dashBoradWrap ul li .dash-box {padding: 8px 12px; background: #fff none repeat scroll 0 0;
+    border: 1px solid #ddd; margin: 10px 10px 10px 0;}
+.dashBoradWrap ul li a {
+    display: block;
+    min-height: 60px;
+    overflow: hidden;
+    padding: 10px 82px 10px 10px;
+    position: relative;
+    transition: all 0.3s ease 0s;
+}
+.dashBoradWrap ul li a:hover {
+    box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.07);
+    text-decoration: none;
+}
+.dashBoradWrap ul li a .db-txt-1 {
+    color: #fff;
+    display: inline-block;
+    font: 16px/29px "Microsoft YaHei";
+    text-align: center;
+    vertical-align: middle;
+}
+.dashBoradWrap ul li a .db-txt-2,.dashBoradWrap ul li a .db-txt-3 {line-height: 20px;}
+.db-ico-1 {
+    background: #6dd4e3 none repeat scroll 0 0;
+}
+.db-ico-2 {
+    background: #f8a4c5 none repeat scroll 0 0;
+}
+.db-ico-3 {
+    background: #a0ccfe none repeat scroll 0 0;
+}
+.db-ico-4 {
+    background: #a9dd8e none repeat scroll 0 0;
+}
+.db-ico-5 {
+    background: #eabda0 none repeat scroll 0 0;
+}
+.db-ico-6 {
+    background: #dec3f4 none repeat scroll 0 0;
+}
+.db-ico {
+    background: rgba(0, 0, 0, 0) url("/static/common/admin/images/dashBoard.png") no-repeat scroll 0 0;
+    display: block;
+    height: 65px;
+    position: absolute;
+    right: 5px;
+    top: 10px;
+    width: 75px;
+}
+.db-ico-1 .db-ico {
+    background-position: -24px -5px;
+}
+.db-ico-2 .db-ico {
+    background-position: -134px -8px;
+}
+.db-ico-3 .db-ico {
+    background-position: -260px -8px;
+}
+.db-ico-4 .db-ico {
+    background-position: -382px -8px;
+}
+.db-ico-5 .db-ico {
+    background-position: -520px -12px;
+}
+.db-ico-6 .db-ico {
+    background-position: -655px -9px;
+}
+.dashBoradWrap ul li .db-txt-2 {
+    margin-top: 5px;
+}
+.dashBoradWrap ul li .db-txt-2 span, .dashBoradWrap ul li .db-txt-3 span {
+    color: #fff;
+    font: 12px/14px "Microsoft YaHei";
+}
+.dashBoradWrap ul li .db-txt-2 .db-num-big {
+    font: 14px/18px "Microsoft YaHei";
+}
+.dashBoradWrap ul li .db-txt-3 tt {
+    color: #fdff57;
+    font: 26px/34px "Microsoft YaHei";
+}
+
+@media only screen and (min-width: 641px) {
+  .admin-sidebar {
+    display: block;
+    position: static;
+    background: none;
+  }
+
+  .admin-offcanvas-bar {
+    position: static;
+    width: auto;
+    background: none;
+    -webkit-transform: translate3d(0, 0, 0);
+    -ms-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+  .admin-offcanvas-bar:after {
+    content: none;
+  }
+}
+
+@media only screen and (max-width: 640px) {
+  .admin-sidebar {
+    width: inherit;
+  }
+
+  .admin-offcanvas-bar {
+    background: #f3f3f3;
+  }
+
+  .admin-offcanvas-bar:after {
+    background: #BABABA;
+  }
+  .admin-sidebar-list a:hover, .admin-sidebar-list a:active{
+    -webkit-transition: background-color .3s ease;
+    -moz-transition: background-color .3s ease;
+    -ms-transition: background-color .3s ease;
+    -o-transition: background-color .3s ease;
+    transition: background-color .3s ease;
+    background: #E4E4E4;
+  }
+
+  .admin-content-list li {
+    padding: 10px;
+    border-width: 1px 0;
+    margin-top: -1px;
+  }
+
+  .admin-content-list li:first-child {
+    border-top: none;
+  }
+
+  .admin-content-list li:last-child {
+    border-bottom: none;
+  }
+
+  .admin-form-text {
+    text-align: left !important;
+  }
+
+}
+
+/*
+* user.html css
+*/
+.user-info {
+  margin-bottom: 15px;
+}
+
+.user-info .am-progress {
+  margin-bottom: 4px;
+}
+
+.user-info p {
+  margin: 5px;
+}
+
+.user-info-order {
+  font-size: 1.4rem;
+}
+
+/*
+* errorLog.html css
+*/
+
+.error-log .am-pre-scrollable {
+  max-height: 40rem;
+}
+
+/*
+* table.html css
+*/
+
+.table-main {
+  font-size: 1.4rem;
+  padding: .5rem;
+}
+
+.table-main button {
+  background: #fff;
+}
+
+.table-check {
+  width: 30px;
+}
+
+.table-id {
+  width: 50px;
+}
+
+@media only screen and (max-width: 640px) {
+  .table-select {
+    margin-top: 10px;
+    margin-left: 5px;
+  }
+ .dashBoradWrap ul li a .db-txt-1 {font-size: 14px;}
+}
+
+/*
+gallery.html css
+*/
+
+.gallery-list li {
+  padding: 10px;
+}
+
+.gallery-list a {
+  color: #666;
+}
+
+.gallery-list a:hover {
+  color: #3bb4f2;
+}
+
+.gallery-title {
+  margin-top: 6px;
+  font-size: 1.4rem;
+}
+
+.gallery-desc {
+  font-size: 1.2rem;
+  margin-top: 4px;
+}
+
+/*
+ 404.html css
+*/
+
+.page-404 {
+  background: #fff;
+  border: none;
+  width: 200px;
+  margin: 0 auto;
+}
+
+
+/*
+ fixed-layout 固定头部和边栏布局
+*/
+
+.fixed-layout,
+.fixed-layout body {
+  height: 100%;
+  overflow: hidden;
+}
+
+.fixed-layout .admin-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1500;
+}
+
+.fixed-layout .admin-main {
+  position: relative;
+  height: 100%;
+  padding-top: 51px;
+}
+
+.fixed-layout .admin-content,
+.fixed-layout .admin-sidebar {
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+.fixed-layout .admin-sidebar.am-active {
+  z-index: 1600;
+}
+.am-offcanvas-bar {
+	min-height: 650px;
+}
+.am-ucheck-icons {
+}
+.am-scrollable-vertical {
+	max-height: 840px;
+	height: inherit;
+	overflow-y: auto;
+}
+.adm-page-wrap {
+	padding: 0 15px;
+	background: #fbfbfb;
+	margin-top: 20px;
+}
+/*
+ztree根目录
+*/
+.menu-fir {width: 100%; margin: 10px 0;}
+.menu-fir a {padding: 0 12px;height: 22px;display: inline-block; line-height: 22px; border-radius: 3px;border: 1px solid #ccc;color: #555;font-size: 12px;font-family: "Microsoft YaHei";}

@@ -1,0 +1,605 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="QuestionMapper" >
+
+    <resultMap id="QuestionResult" type="Question">
+       <result property="id" column="id" />
+       <result property="qstContent" column="QST_CONTENT" />
+       <result property="isAsr" column="IS_ASR" />
+       <result property="qstType" column="QST_TYPE" />
+       <result property="level" column="LEVEL" />
+       <result property="addTime" column="ADDTIME" />
+       <result property="qstAnalyze" column="qst_analyze" />
+       <result property="updateTime" column="updateTime" />
+       <result property="subjectId" column="subject_id" />
+       <result property="status" column="STATUS" />
+       <result property="pointId" column="point_id" />
+       <result property="author" column="AUTHOR"/>
+       <result property="flag" column="flag"/>
+       <result property="complexFalg" column="complex_falg" />
+       <result property="noteContent" column="NOTE_CONTENT"/>
+    </resultMap>
+    
+     <resultMap id="QueryQuestionResult" type="QueryQuestion" extends="QuestionResult">
+       <result property="pointName" column="Name" />
+       <result property="parentId" column="parent_id" />
+       <result property="subjectName" column="SUBJECT_NAME" />
+       <!-- 用户答案 -->
+       <result property="answer" column="Answer"/>
+       <!-- 答案选项内容 -->
+       <result property="optContent" column="OPT_ANSWER"/>
+       <result property="optContent" column="OPT_CONTENT"/>
+       <result property="optOrder" column="OPT_ORDER"/>
+       <result property="name" column="Name"/>
+       <result property="qstRecordstatus" column="qstRecordstatus"/>
+       <result property="userAnswer" column="userAnswer"/>
+       <!-- 关联用户ID -->
+       <result property="cusId" column="CUS_ID"/>
+        <!-- 收藏ID -->
+       <result property="favoritesId" column="favoritesId"/>
+       <!-- 笔记内容 -->
+       <result property="noteContent" column="NOTE_CONTENT"/>
+       <!-- 笔记ID -->
+       <result property="noteId" column="noteId"/>
+       <result property="errorQuestionId" column="errorQuestionId"/>
+       <result property="pointName" column="pointName"/>
+        <result property="errorQuestionAddTime" column="errorQuestionAddTime"/>
+        <result property="placeNumber" column="PLACE_NUMBER"/>
+        <result property="paperRecordId" column="PAPER_RECORD_ID"/>
+        <result property="qstrdId" column="qstrdId"/>
+        <result property="userAnswer" column="userAnswer"/>
+        <result property="userscore" column="userscore"/>
+        <result property="state" column="state"/>
+        <result property="paperId" column="paper_id"/>
+        
+    </resultMap>
+    
+    <sql id="exam_question_columns">
+        exam_question.id,
+        exam_question.QST_CONTENT,
+        exam_question.IS_ASR,
+        exam_question.QST_TYPE,
+        exam_question.LEVEL,
+        exam_question.ADDTIME,
+        exam_question.qst_analyze,
+        exam_question.updateTime,
+        exam_question.subject_id,
+        exam_question.STATUS,
+        exam_question.point_id,
+        exam_question.author,
+        exam_question.flag,
+        exam_question.complex_falg,
+        exam_question.time,
+        exam_question.right_time,
+        exam_question.error_time,
+        exam_question.accuracy
+        
+    </sql>
+
+    <sql id="exam_question_properties">
+        #{id},
+        #{qstContent},
+        #{isAsr},
+        #{qstType},
+        #{level},
+        #{addTime},
+        #{qstAnalyze},
+        #{updateTime},
+        #{subjectId},
+        #{status},
+        #{pointId},
+        #{author},
+        #{flag},
+        #{complexFalg},
+        #{time},
+        #{rightTime},
+        #{errorTime},
+        #{accuracy}
+    </sql>
+	
+	<update id="updateQuestionById" parameterType="java.util.HashMap" >
+ 		update exam_question set QST_CONTENT=#{qstContent},IS_ASR=#{isAsr},LEVEL=#{level},qst_analyze=#{qstAnalyze} where id=#{id,jdbcType=INTEGER}
+ 	</update>
+ 	
+ 	<update id="updateQuestionWhenAddPointId" parameterType="ExamPoint" >
+ 		update exam_question set point_id=#{id} where point_id=#{parentId,jdbcType=INTEGER}
+ 	</update>
+ 	
+ 	<update id="updateQuestionWhenDelPointId" parameterType="ExamPoint" >
+ 		update exam_question set point_id=#{parentId} where point_id=#{id,jdbcType=INTEGER}
+ 	</update>
+ 	
+ 	<insert id="createQuestion" parameterType="Question" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO exam_question (<include refid="exam_question_columns"/>) VALUES (<include
+            refid="exam_question_properties"/>)
+    </insert>
+    
+     <insert id="addBatchQuestion" parameterType="String">
+        INSERT INTO exam_question (<include refid="exam_question_columns"/>) VALUES 
+     <!--    #{value} -->
+          <foreach collection="questionList" index="index" item="item" separator="," >
+        	 (
+        	    #{item.id},
+		        #{item.qstContent},
+		        #{item.isAsr},
+		        #{item.qstType},
+		        #{item.level},
+		        #{item.addTime},
+		        #{item.qstAnalyze},
+		        #{item.updateTime},
+		        #{item.subjectId},
+		        #{item.status},
+		        #{item.pointId},
+		        #{item.author},
+		        #{item.flag},
+		        #{item.complexFalg}
+		        )
+        </foreach>
+    </insert>
+    
+    
+	<!-- 添加收藏 -->
+	<insert id="addFavorite" parameterType="java.util.HashMap" >
+		 INSERT INTO exam_favorites_qst 
+		 (CUS_ID,Qst_id,ADD_DATE,SUBJECT_ID) VALUES(#{cusId},#{qstId},#{addDate},#{subjectId})
+	</insert>
+	
+	 <insert id="insertFavoriteBatch" parameterType="java.util.HashMap">
+        INSERT INTO exam_favorites_qst (CUS_ID,Qst_id,ADD_DATE,SUBJECT_ID) VALUES 
+         <foreach collection="favoriteList" index="index" item="item" separator="," >
+        	   (#{item.cusId},#{item.qstId},#{item.addDate},#{item.subjectId})
+        </foreach>
+    </insert>
+    
+ 	<select id="getAllQuestionList" resultMap="QueryQuestionResult"  parameterType="java.util.HashMap">
+          SELECT
+          <include refid="exam_question_columns"/>,
+          exam_point.Name,
+          exam_subject.SUBJECT_NAME
+          FROM exam_question 
+          left join exam_point on exam_question.point_id = exam_point.id
+          left join exam_subject on exam_subject.SUBJECT_ID = exam_question.subject_id
+             <where>
+            exam_question.STATUS =1
+            <if test="e.id!=null and e.id!=0">
+            and exam_question.id = #{e.id}
+            </if>
+            <if test="e.subjectId!=null and e.subjectId!=0">
+            and exam_question.subject_id = #{e.subjectId}
+            </if>
+            <if test="e.pointId!=null and e.pointId!=0">
+            and exam_question.point_id = #{e.pointId}
+            </if>
+            <if test="e.qstType!=0">
+            and exam_question.QST_TYPE = #{e.qstType}
+            </if>
+            <if test="e.complexFalg!= null and e.complexFalg!=0">
+            and exam_question.QST_TYPE != 6
+            </if>
+            <if test="e.level!=0">
+            and exam_question.LEVEL = #{e.level}
+            </if>
+             <if test="e.qstContent!=null and e.qstContent!=''">
+            and exam_question.QST_CONTENT like CONCAT('%',#{e.qstContent},'%' )
+            </if>
+            <if test="e.flag!=null and e.flag!=''">
+            and exam_question.flag like CONCAT('%',#{e.flag},'%' )
+            </if>
+              </where>
+			order by exam_question.id desc            
+          <include refid="publicMapper.pageEnd"/>
+      </select>
+        
+       <select id="getAllQuestionListCount" resultType="int" parameterType="java.util.HashMap">
+           SELECT COUNT(1)
+           FROM exam_question
+          <where>
+            exam_question.STATUS =1
+            <if test="e.id!=null and e.id!=0">
+            and exam_question.id = #{e.id}
+            </if>
+            <if test="e.subjectId!=null and e.subjectId!=0">
+            and exam_question.subject_id = #{e.subjectId}
+            </if>
+            <if test="e.pointId!=null and e.pointId!=0">
+            and exam_question.point_id = #{e.pointId}
+            </if>
+            <if test="e.qstType!=0">
+            and exam_question.QST_TYPE = #{e.qstType}
+            </if>
+            <if test="e.complexFalg!= null and e.complexFalg!=0">
+            and exam_question.QST_TYPE != 6
+            </if>
+            <if test="e.level!=0">
+            and exam_question.LEVEL = #{e.level}
+            </if>
+             <if test="e.qstContent!=null and e.qstContent!=''">
+            and exam_question.QST_CONTENT like CONCAT('%',#{e.qstContent},'%' )
+            </if>
+            <if test="e.flag!=null and e.flag!=''">
+            and exam_question.flag like CONCAT('%',#{e.flag},'%' )
+            </if>
+              </where>
+       </select>
+    <select id="getQuestionListCount" resultType="int" parameterType="java.util.HashMap">
+        SELECT COUNT(1)
+        FROM exam_question
+        <where>
+            exam_question.STATUS =1
+            <if test="subjectId!=null and subjectId!=0">
+                and exam_question.subject_id = #{subjectId}
+            </if>
+        </where>
+    </select>
+	<select id="getQuestionList" resultMap="QuestionResult"  parameterType="java.util.HashMap">
+          SELECT
+          <include refid="exam_question_columns"/>
+          FROM exam_question
+             <where>
+            exam_question.STATUS =1
+            <if test="id!=null and id!=0">
+            and exam_question.id = #{id}
+            </if>
+              </where>
+			order by exam_question.updateTime desc            
+      </select>
+      <!-- 查看单个题目的解析 -->
+       <select id="getParse" resultMap="QueryQuestionResult"  parameterType="java.util.HashMap">
+      	SELECT 
+      	  <include refid="exam_question_columns"/>,
+      	  exam_favorites_qst.id favoritesId,
+      	  exam_options.OPT_CONTENT,exam_options.OPT_ORDER,
+      	  exam_options.OPT_ANSWER,exam_point.Name,exam_note.NOTE_CONTENT,
+      	  exam_note.id noteId,exam_error_question.id errorQuestionId,
+      	  exam_point.parent_id
+      	 FROM exam_question
+      	   LEFT JOIN exam_favorites_qst on exam_favorites_qst.cus_id =#{cusId} 
+      	   and exam_question.id=exam_favorites_qst.Qst_id
+      	   LEFT JOIN exam_options ON exam_question.id=exam_options.QST_ID
+      	   LEFT JOIN exam_point ON exam_question.point_id=exam_point.id
+      	   LEFT JOIN exam_note ON exam_note.cus_id=#{cusId} and exam_question.id=exam_note.QST_ID
+      	   LEFT JOIN exam_error_question ON exam_error_question.cus_id=#{cusId} and exam_question.id=exam_error_question.QST_ID
+      	 WHERE 
+      	  exam_question.id = #{id}
+      </select>
+      
+	<!--  批量删除 -->
+ 	<delete id="deleteQuestionByidBatch">
+ 		update exam_question set STATUS = 2 
+        WHERE
+        id in 
+        <foreach collection="array" item="item" open="(" close=")" separator=",">
+        	#{item}
+        </foreach>
+    </delete>
+    <!-- 验证是否收藏 -->
+    <select id="isFavorite" resultType="int" parameterType="java.util.HashMap">
+     SELECT  count(*)
+ 		FROM exam_favorites_qst 
+ 	 WHERE Qst_id =#{id} and CUS_ID=#{cusId}
+    </select>
+    
+    <select id="queryQuestiponMaxId" resultType="int">
+     SELECT  IFNULL(max(id),0)
+ 		FROM exam_question 
+    </select>
+    
+    <!--  通过考点删除试题 -->
+ 	<delete id="delQuestionListBypointId" parameterType="java.util.HashMap">
+ 		update exam_question set STATUS = 2 
+        WHERE
+        <if test="id!=null and id!=0">
+        point_id=#{id}
+        </if>
+    </delete>
+   	<select id="getFavoriteQuestion" resultMap="QueryQuestionResult"   parameterType="java.util.HashMap">
+		SELECT
+		<include refid="exam_question_columns"/>,exam_favorites_qst.ADD_DATE
+		FROM exam_favorites_qst
+		LEFT JOIN exam_question ON exam_favorites_qst.Qst_id=exam_question.id
+		where
+		exam_favorites_qst.CUS_ID=#{e.cusId} and exam_favorites_qst.subject_id = #{e.subjectId}
+		order by exam_favorites_qst.ADD_DATE desc            
+          <include refid="publicMapper.pageEnd"/>
+	</select>
+	<select id="getFavoriteQuestionCount" resultType="int"   parameterType="java.util.HashMap">
+		SELECT
+		count(*)
+		FROM exam_favorites_qst
+		LEFT JOIN exam_question ON exam_favorites_qst.Qst_id=exam_question.id
+		where
+		exam_favorites_qst.CUS_ID=#{e.cusId} and exam_favorites_qst.subject_id = #{e.subjectId}
+	</select>
+    <select id="getRandomQuestionByPointIds" resultMap="QueryQuestionResult"  parameterType="java.util.HashMap">
+          SELECT
+          <include refid="exam_question_columns"/>
+          FROM exam_question 
+           <where>
+           exam_question.status = 1 and complex_falg = 0 and exam_question.QST_TYPE!=6
+           and  exam_question.point_id in
+           <foreach collection="pointIds" item="item" open="(" close=")" separator=",">
+        		#{item}
+        	</foreach>
+           <if test="qstType!=0">
+        	and exam_question.QST_TYPE = #{qstType}
+        	</if>
+            </where>
+			order by  RAND()
+			limit #{num}
+      </select>
+      
+       <select id="getRandomQuestionByErrorQst" resultType="QueryErrorQuestion"  parameterType="java.util.HashMap">
+          SELECT
+          exam_error_question.Id,
+          exam_error_question.CUS_ID cusId,
+          exam_error_question.paper_id paperId,
+          exam_error_question.QST_ID qstId,
+          exam_error_question.subject_id,
+          exam_error_question.ADDTIME,
+          exam_error_question.PAPER_RECORD_ID,
+          exam_error_question.PLACE_NUMBER
+          FROM exam_error_question 
+		 left join exam_question
+          on exam_error_question.qst_id = exam_question.id          
+          where 
+          exam_error_question.cus_id = #{cusId} and exam_error_question.subject_Id = #{subjectId}  
+          and exam_question.qst_type!=6 and exam_question.qst_type!=4
+		  ORDER BY RAND()
+		  limit #{num}
+      </select>
+      <!-- 顺序获得错误试题 -->
+       <select id="getQuestionByErrorQst" resultType="QueryErrorQuestion"  parameterType="java.util.HashMap">
+          SELECT
+           exam_error_question.Id,
+          exam_error_question.CUS_ID cusId,
+          exam_error_question.paper_id paperId,
+          exam_error_question.QST_ID qstId,
+          exam_error_question.subject_id,
+          exam_error_question.ADDTIME,
+          exam_error_question.PAPER_RECORD_ID,
+          exam_error_question.PLACE_NUMBER
+          FROM exam_error_question 
+          left join exam_question
+          on exam_error_question.qst_id = exam_question.id  
+          where 
+          exam_error_question.cus_id = #{cusId} and exam_error_question.subject_Id = #{subjectId}  
+            and exam_question.qst_type!=6 and exam_question.qst_type!=4
+		  ORDER BY ADDTIME desc
+		  limit #{num}
+      </select>
+      
+      <select id="getQuestionByQuestionRecord" resultMap="QueryQuestionResult" parameterType="java.util.HashMap">
+          SELECT
+          <include refid="exam_question_columns"/>,
+          exam_options.OPT_CONTENT,
+          exam_options.OPT_ORDER,
+          exam_question_record.userAnswer,
+          exam_question_record.status qstRecordstatus,
+          exam_favorites_qst.id favoritesId,
+          exam_options.OPT_ANSWER,
+          exam_point.Name pointName,
+          exam_note.NOTE_CONTENT,
+		  exam_note.id noteId,
+          exam_options.OPT_ANSWER,
+		  exam_point.parent_id
+          FROM exam_question_record
+          left join exam_question on  exam_question_record.qst_id = exam_question.id 
+          left join exam_options on  exam_question_record.qst_id = exam_options.qst_id
+          LEFT JOIN exam_favorites_qst on exam_favorites_qst.cus_id =#{cusId} 
+          and exam_question_record.qst_id=exam_favorites_qst.Qst_id
+          LEFT JOIN exam_point ON exam_question.point_id=exam_point.id
+      	  LEFT JOIN exam_note  ON exam_note.cus_id=#{cusId} 
+      	  and exam_question_record.qst_id=exam_note.QST_ID
+          where 
+          exam_question_record.paper_id = #{epId} 
+          and exam_question_record.cus_id =#{cusId}
+          and exam_question_record.paper_record_id =#{id}
+          order by exam_question.id,exam_question.QST_TYPE
+      </select>
+      
+       <select id="getQuestionByIds" resultMap="QueryQuestionResult" parameterType="java.util.HashMap">
+          SELECT
+          <include refid="exam_question_columns"/>,
+          exam_options.OPT_CONTENT,
+          exam_options.OPT_ORDER,
+          exam_favorites_qst.id favoritesId,
+          exam_options.OPT_ANSWER,
+          exam_point.name pointName
+          FROM exam_question
+          left join exam_options on exam_options.qst_id = exam_question.id 
+          LEFT JOIN exam_favorites_qst on exam_favorites_qst.cus_id =#{cusId} and exam_question.id=exam_favorites_qst.Qst_id
+           left join exam_point on exam_question.point_id=exam_point.id
+          where 
+          exam_question.id in
+		   <foreach collection="ids" item="item" open="(" close=")" separator=",">
+        	#{item}
+        </foreach>
+          order by exam_question.id,exam_question.QST_TYPE
+      </select>
+    <!-- 取消收藏 -->
+    <delete id="delFavorite">
+    	DELETE FROM exam_favorites_qst
+    	WHERE CUS_ID=#{cusId} and Qst_id =#{qstId}
+    </delete>
+    
+    <!-- 取消收藏 -->
+    <delete id="delQueryErrorQuestion" parameterType="java.util.HashMap">
+    	DELETE FROM exam_error_question
+    	WHERE exam_error_question.id= #{id}
+    </delete>
+    <!-- 取消收藏 -->
+    <delete id="clearQueryErrorQuestion" parameterType="java.util.HashMap">
+        DELETE FROM exam_error_question
+        WHERE
+        exam_error_question.CUS_ID= #{cusId}
+        and   exam_error_question.subject_id= #{subjectId}
+    </delete>
+
+    <select id="getErrorQuestionList" resultMap="QueryQuestionResult"  parameterType="java.util.HashMap">
+          SELECT
+          <include refid="exam_question_columns"/>,
+          exam_error_question.id errorQuestionId,
+          exam_error_question.addTime errorQuestionAddTime,
+          exam_error_question.PAPER_RECORD_ID,
+          exam_error_question.PLACE_NUMBER
+          FROM exam_error_question
+          left join  exam_question on exam_error_question.qst_id = exam_question.id
+          <where>
+          exam_error_question.cus_id = #{e.cusId} and 
+          exam_error_question.subject_id = #{e.subjectId}
+          </where>
+			order by exam_error_question.ADDTIME desc
+          <include refid="publicMapper.pageEnd"/>
+      </select>   
+      
+       <select id="getErrorQuestionitemList" resultMap="QueryQuestionResult" parameterType="java.util.HashMap">
+          SELECT
+          <include refid="exam_question_columns"/>,
+          exam_error_question.id errorQuestionId
+          FROM exam_error_question
+          left join  exam_question on exam_error_question.qst_id = exam_question.id
+          <where>
+          exam_error_question.cus_id = #{cusId} and 
+          exam_error_question.subject_id = #{subjectId}
+          </where>
+			order by exam_error_question.ADDTIME desc
+           limit 2
+      </select>
+      
+      
+       <select id="getErrorQuestionListCount" resultType="int" parameterType="java.util.HashMap">
+           SELECT COUNT(1)
+          FROM exam_error_question
+          left join exam_question on exam_question.id = exam_error_question.qst_id
+          <where>
+          exam_error_question.cus_id = ${e.cusId} and 
+          exam_error_question.subject_id = ${e.subjectId}
+          </where>
+       </select>
+       
+        <select id="getNoteQuestionList" resultMap="QueryQuestionResult"  parameterType="java.util.HashMap">
+          SELECT
+          <include refid="exam_question_columns"/>,
+          exam_note.id noteId
+          FROM exam_note
+          left join exam_question on exam_question.id = exam_note.qst_id
+          <where>
+          exam_note.cus_id = ${e.cusId} and 
+          exam_note.subject_id = ${e.subjectId}
+          and exam_note.NOTE_CONTENT!=''
+          </where>
+			order by exam_note.ADDTIME desc
+          <include refid="publicMapper.pageEnd"/>
+      </select>
+      
+       <select id="getNoteQuestionitemList" resultMap="QueryQuestionResult"  parameterType="java.util.HashMap">
+          SELECT
+          <include refid="exam_question_columns"/>,
+          exam_note.id noteId
+          FROM exam_note
+          left join exam_question on exam_question.id = exam_note.qst_id
+          <where>
+          exam_note.cus_id = ${cusId} and 
+          exam_note.subject_id = ${subjectId}
+          </where>
+			order by exam_note.ADDTIME desc
+          limit 2
+      </select>
+      
+      <select id="getNoteQuestionListCount" resultType="int" parameterType="java.util.HashMap">
+          SELECT COUNT(1) 
+          FROM exam_note
+          left join exam_question on exam_question.id = exam_note.qst_id
+          <where>
+          exam_note.cus_id = ${e.cusId} and 
+          exam_note.subject_id = ${e.subjectId}
+          and exam_note.NOTE_CONTENT!=''
+          </where>
+          <include refid="publicMapper.pageEnd"/>
+      </select>
+      
+      <select id="queryQuestionById" resultMap="QueryQuestionResult"  parameterType="java.util.HashMap">
+          SELECT
+          <include refid="exam_question_columns"/>
+          FROM exam_question 
+           <where>
+        	exam_question.id = #{id}
+           </where>
+      </select>
+      <update id="updateQuestionForTimeAndRightTimeById" parameterType="java.util.HashMap" >
+ 		update exam_question set 
+ 		time=#{time},right_time=#{rightTime},
+ 		error_time=#{errorTime},accuracy=#{accuracy} where id=#{id,jdbcType=INTEGER}
+ 	</update>
+ 	
+ 	<!-- lucene获取id后批量获取数据用 -->
+ 	 <select id="getLuceneQuestionByIds" resultMap="QueryQuestionResult" parameterType="java.util.HashMap">
+          SELECT
+          <include refid="exam_question_columns"/>,
+          exam_options.OPT_CONTENT,
+          exam_options.OPT_ORDER,
+          exam_favorites_qst.id favoritesId,
+          exam_options.OPT_ANSWER
+          FROM exam_question
+          left join exam_options on exam_options.qst_id = exam_question.id 
+          LEFT JOIN exam_favorites_qst on exam_favorites_qst.cus_id =#{cusId} and exam_question.id=exam_favorites_qst.Qst_id
+          where 
+          exam_question.id in
+		   <foreach collection="ids" item="item" open="(" close=")" separator=",">
+        	#{item}
+        </foreach>
+          order by exam_question.id,exam_question.QST_TYPE
+      </select>
+      
+      <select id="getLuceneAllQuestonCount" resultType="long">
+      	 SELECT
+          count(1)
+          FROM exam_question
+             where
+            exam_question.STATUS =1
+      </select>
+      <select id="getQuestionByPageQuery" resultMap="QuestionResult" parameterType="java.util.HashMap">
+      	 SELECT
+          <include refid="exam_question_columns"/>
+          FROM exam_question
+             where
+            exam_question.STATUS =1
+            limit #{offset}, #{size}
+      </select>
+      
+       <select id="getQuestionSubjectiveList" resultMap="QueryQuestionResult" parameterType="java.util.HashMap">
+      	SELECT <include refid="exam_question_columns"/>,
+      	exam_question_record.id qstrdId,
+      	exam_question_record.userAnswer,
+      	exam_question_record.score userscore,
+      	exam_question_record.state,
+      	exam_question_record.paper_id
+      	FROM `exam_question_record`
+		LEFT JOIN  exam_question ON
+		exam_question.`id` = exam_question_record.`qst_id`
+		left join exam_exampaper_record
+		on exam_question_record.paper_record_id = exam_exampaper_record.id
+		WHERE exam_question_record.`paper_record_id` = #{e.paperRecordId}
+		and exam_question.QST_TYPE = 6 and exam_exampaper_record.status = 0
+		 <if test="e.qstContent!=null and e.qstContent!=''">
+		 and exam_question.QST_CONTENT like CONCAT('%',#{e.qstContent},'%' )
+       	</if>
+		order by exam_question_record.state
+		 <include refid="publicMapper.pageEnd"/>
+      </select>
+      
+       <select id="getQuestionSubjectiveListCount" resultType="int" parameterType="java.util.HashMap">
+      	SELECT count(1) FROM `exam_question_record`
+		LEFT JOIN  exam_question ON
+		exam_question.`id` = exam_question_record.`qst_id`
+		left join exam_exampaper_record
+		on exam_question_record.paper_record_id = exam_exampaper_record.id
+		WHERE exam_question_record.`paper_record_id` = #{e.paperRecordId}
+		and exam_question.QST_TYPE = 6 and exam_exampaper_record.status = 0
+		 <if test="e.qstContent!=null and e.qstContent!=''">
+		 and exam_question.QST_CONTENT like CONCAT('%',#{e.qstContent},'%' )
+       	</if>
+      </select>
+      
+</mapper>

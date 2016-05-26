@@ -1,0 +1,532 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SugSuggestMapper">
+
+	<resultMap id="SugSuggestResult" type="SugSuggest">
+		<result property="id" column="id" />
+		<result property="cusId" column="cus_id" />
+		<result property="content" column="content" />
+		<result property="type" column="type" />
+		<result property="status" column="status" />
+		<result property="courseId" column="course_id" />
+		<result property="kpointId" column="kpoint_id" />
+		<result property="replycount" column="replycount" />
+		<result property="addtime" column="addTime" />
+		<result property="showname" column="showname" />
+		<result property="summary" column="summary" />
+
+	</resultMap>
+	<resultMap id="QuerySugSuggestResult" type="QuerySugSuggest"
+		extends="SugSuggestResult">
+		<result property="lineNum" column="lineNum" />
+		<result property="maxId" column="maxId" />
+	</resultMap>
+	<!-- 建议表全部的属性 -->
+	<sql id="sns_sug_suggest_columns">
+		sns_sug_suggest.id,
+		sns_sug_suggest.cus_id,
+		sns_sug_suggest.title,
+		sns_sug_suggest.content,
+		sns_sug_suggest.type,
+		sns_sug_suggest.status,
+		sns_sug_suggest.course_id,
+		sns_sug_suggest.kpoint_id,
+		sns_sug_suggest.replycount,
+		sns_sug_suggest.addTime,
+		sns_sug_suggest.browseNum,
+		sns_sug_suggest.top,
+		sns_sug_suggest.heat,
+		sns_sug_suggest.showname,
+		sns_sug_suggest.acceptuid,
+		sns_sug_suggest.acceptshowname,
+		sns_sug_suggest.updatetime,
+		sns_sug_suggest.summary
+	</sql>
+	
+	<!-- 建议表去除内容属性获得摘要属性 -->
+	<sql id="sns_sug_suggest_columns_summary">
+		sns_sug_suggest.id,
+		sns_sug_suggest.cus_id,
+		sns_sug_suggest.title,
+		sns_sug_suggest.type,
+		sns_sug_suggest.status,
+		sns_sug_suggest.course_id,
+		sns_sug_suggest.kpoint_id,
+		sns_sug_suggest.replycount,
+		sns_sug_suggest.addTime,
+		sns_sug_suggest.browseNum,
+		sns_sug_suggest.top,
+		sns_sug_suggest.heat,
+		sns_sug_suggest.showname,
+		sns_sug_suggest.acceptuid,
+		sns_sug_suggest.acceptshowname,
+		sns_sug_suggest.updatetime,
+		sns_sug_suggest.summary
+	</sql>
+
+	<sql id="sns_sug_suggest_properties">
+		#{id},
+		#{cusId},
+		#{title},
+		#{content},
+		#{type},
+		#{status},
+		#{courseId},
+		#{kpointId},
+		#{replycount},
+		#{addtime},
+		#{browseNum},
+		#{top},
+		#{heat},
+		#{showname},
+		#{acceptuid},
+		#{acceptshowname},
+		#{updatetime},
+		#{summary}
+	</sql>
+
+	<insert id="createSugSuggest" parameterType="SugSuggest"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		insert INTO sns_sug_suggest (
+		<include refid="sns_sug_suggest_columns" />
+		) VALUES (
+		<include refid="sns_sug_suggest_properties" />
+		)
+	</insert>
+
+	<delete id="deleteSugSuggestById" parameterType="long">
+		delete from
+		sns_sug_suggest
+		where
+		id = #{value}
+	</delete>
+	<!-- 更新建议 -->
+	<update id="updateSugSuggest" parameterType="SugSuggest">
+		update
+		sns_sug_suggest
+		SET
+		id = #{id},
+		cus_id = #{cusId},
+		content = #{content},
+		type = #{type},
+		status = #{status},
+		course_id = #{courseId},
+		kpoint_id =	#{kpointId},
+		replyCount = #{replyCount},
+		addTime = #{addTime}
+		where
+		id =
+		#{id}
+	</update>
+	<!-- 通过建议id更新标题和内容 -->
+	<update id="updateSugSuggestBySugSuggestIdForContentAndTitle"
+		parameterType="java.util.HashMap">
+		update sns_sug_suggest
+		SET
+		sns_sug_suggest.title = #{title},
+		content = #{content},
+		summary = #{summary}
+		where
+		id = #{id}
+	</update>
+	<!-- 通过建议id查询建议 -->
+	<select id="getSugSuggestById" resultMap="SugSuggestResult"
+		parameterType="long">
+		select
+		<include refid="sns_sug_suggest_columns" />
+		from sns_sug_suggest
+		where
+		id = #{value}
+	</select>
+
+	<select id="getSugSuggestList" resultMap="SugSuggestResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="sns_sug_suggest_columns_summary" />
+		from sns_sug_suggest
+		<where>
+			<if test="e.id!=null and e.id!=0">
+				and sns_sug_suggest.id = #{e.id}
+			</if>
+			<if test="e.addTimeStr!=null and e.addTimeStr!=''">
+				and substring( sns_sug_suggest.addTime, 1, 10 ) = #{e.addTimeStr}
+			</if>
+			<if test="e.showname!=null and e.showname!=''">
+				and sns_sug_suggest.showname LIKE CONCAT('%',#{e.showname},'%')
+			</if>
+			<if test="e.type != 0">
+				and sns_sug_suggest.type = #{e.type}
+			</if>
+			<if test="e.top != -1">
+				and sns_sug_suggest.top = #{e.top}
+			</if>
+			<if test="e.title!=null and e.title!=''">
+				and sns_sug_suggest.title LIKE CONCAT('%',#{e.title},'%')
+			</if>
+			<if test="e.kpointId!=null and e.kpointId!=0">
+				and sns_sug_suggest.kpoint_id  = #{e.kpointId}
+			</if>
+		</where>
+		<if test="e.orderFalg=='addTime'">
+			order by sns_sug_suggest.addTime desc
+		</if>
+		<if test="e.orderFalg=='replycount'">
+			order by sns_sug_suggest.replycount desc
+		</if>
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="getSugSuggestListCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select
+		count(1)
+		from sns_sug_suggest
+		<where>
+			<if test="e.id!=null and e.id!=0">
+				and sns_sug_suggest.id = #{e.id}
+			</if>
+			<if test="e.addTimeStr!=null and e.addTimeStr!=''">
+				and substring( sns_sug_suggest.addTime, 1, 10 ) = #{e.addTimeStr}
+			</if>
+			<if test="e.showname!=null and e.showname!=''">
+				and sns_sug_suggest.showname LIKE CONCAT('%',#{e.showname},'%')
+			</if>
+			<if test="e.type != 0">
+				and sns_sug_suggest.type = #{e.type}
+			</if>
+			<if test="e.top != -1">
+				and sns_sug_suggest.top = #{e.top}
+			</if>
+			<if test="e.title!=null and e.title!=''">
+				and sns_sug_suggest.title LIKE CONCAT('%',#{e.title},'%')
+			</if>
+			<if test="e.kpointId!=null and e.kpointId!=0">
+				and sns_sug_suggest.kpoint_id  = #{e.kpointId}
+			</if>
+		</where>
+	</select>
+
+	<select id="querySugSuggestByType" resultMap="SugSuggestResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="sns_sug_suggest_columns_summary" />
+		from sns_sug_suggest
+		<where>
+			sns_sug_suggest.status = #{e.status}
+			<if test="e.type!=0">
+				sns_sug_suggest.type = #{e.type}
+			</if>
+		</where>
+		order by
+		sns_sug_suggest.addTime desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="querySugSuggestByTypeCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select
+		count(1)
+		from sns_sug_suggest
+		<where>
+			sns_sug_suggest.status = #{e.status}
+			<if test="e.type!=0">
+				sns_sug_suggest.type = #{e.type}
+			</if>
+
+		</where>
+	</select>
+
+	<select id="querySuggestByCusIdAndStatus" resultMap="SugSuggestResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="sns_sug_suggest_columns_summary" />
+		from sns_sug_suggest
+		where sns_sug_suggest.cus_id = #{e.cusId}
+		and
+		sns_sug_suggest.status = #{e.status}
+		order by sns_sug_suggest.addTime
+		desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="querySuggestByCusIdAndStatusCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select
+		count(1)
+		from sns_sug_suggest
+		where
+		sns_sug_suggest.cus_id =
+		#{e.cusId}
+		and sns_sug_suggest.status =
+		#{e.status}
+	</select>
+
+	<select id="querySuggestByReplyCusId" resultMap="SugSuggestResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="sns_sug_suggest_columns_summary" />
+		from sns_sug_suggest
+		left join sns_sug_suggest_reply
+		on
+		sns_sug_suggest.id =
+		sns_sug_suggest_reply.suggest_id
+		where
+		sns_sug_suggest_reply.cus_id =
+		#{e.cusId}
+		group by sns_sug_suggest.id
+		order by sns_sug_suggest.addTime desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="querySuggestByReplyCusIdCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select
+		count(distinct sns_sug_suggest_reply.suggest_id)
+		from
+		sns_sug_suggest_reply
+		where
+		sns_sug_suggest_reply.cus_id =
+		#{e.cusId}
+	</select>
+
+	<select id="querySuggestByReplyCusIdAndIsBest" resultMap="SugSuggestResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="sns_sug_suggest_columns_summary" />
+		from sns_sug_suggest
+		left join sns_sug_suggest_reply
+		on
+		sns_sug_suggest.id =
+		sns_sug_suggest_reply.suggest_id
+		where
+		sns_sug_suggest_reply.cus_id =
+		#{e.cusId}
+		and
+		sns_sug_suggest_reply.isBest = 1
+		and sns_sug_suggest.status = 1
+		group by
+		sns_sug_suggest.id
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="querySuggestByReplyCusIdAndIsBestCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select
+		count(distinct sns_sug_suggest.id)
+		from
+		sns_sug_suggest
+		left join
+		sns_sug_suggest_reply
+		on sns_sug_suggest.id =
+		sns_sug_suggest_reply.suggest_id
+		where
+		sns_sug_suggest_reply.cus_id =
+		#{e.cusId}
+		and sns_sug_suggest_reply.isBest = 1
+		and
+		sns_sug_suggest.status = 1
+	</select>
+
+	<select id="querySuggestRecommend" resultMap="SugSuggestResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="sns_sug_suggest_columns_summary" />
+		from sns_sug_suggest
+		where sns_sug_suggest.status = 1
+
+		<if test="e.type != 0">
+			and sns_sug_suggest.type = #{e.type}
+		</if>
+		<if test="e.title!=null and e.title!=''">
+			and sns_sug_suggest.title LIKE CONCAT('%',#{e.title},'%')
+		</if>
+		<if test="e.id!=null and e.id!=0">
+			and sns_sug_suggest.id = #{e.id}
+		</if>
+		<if test="e.addTimeStr!=null and e.addTimeStr!=''">
+			and substring( sns_sug_suggest.addTime, 1, 10 ) =
+			#{e.addTimeStr}
+		</if>
+		<if test="e.showname!=null and e.showname!=''">
+			and sns_sug_suggest.showname LIKE
+			CONCAT('%',#{e.showname},'%')
+		</if>
+		<if test="e.top != -1">
+			and sns_sug_suggest.top = #{e.top}
+		</if>
+		order by sns_sug_suggest.top desc,sns_sug_suggest.addTime desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="querySuggestRecommendCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select
+		count(1)
+		from sns_sug_suggest
+		where sns_sug_suggest.status = 1
+		<if test="e.id!=null and e.id!=0">
+			and sns_sug_suggest.id = #{e.id}
+		</if>
+		<if test="e.type != 0">
+			and sns_sug_suggest.type = #{e.type}
+		</if>
+		<if test="e.addTimeStr!=null and e.addTimeStr!=''">
+			and substring( sns_sug_suggest.addTime, 1, 10 ) =
+			#{e.addTimeStr}
+		</if>
+		<if test="e.showname!=null and e.showname!=''">
+			and sns_sug_suggest.showname LIKE
+			CONCAT('%',#{e.showname},'%')
+		</if>
+		<if test="e.title!=null and e.title!=''">
+			and sns_sug_suggest.title LIKE CONCAT('%',#{e.title},'%')
+		</if>
+		<if test="e.top != -1">
+			and sns_sug_suggest.top = #{e.top}
+		</if>
+	</select>
+
+	<update id="updateSugSuggestBySuggestIdForWisdomScore"
+		parameterType="java.util.HashMap">
+		
+	</update>
+	<!-- 给建议的热心次数字段加一 -->
+	<update id="updateSugSuggestBySuggestIdForHotScore"
+		parameterType="java.util.HashMap">
+	</update>
+	<!-- 给建议的热度次数字段加一 -->
+	<update id="updateSugSuggestBySuggestIdFoHeat" parameterType="java.util.HashMap">
+		update sns_sug_suggest SET
+		heat = heat+1
+		where
+		sns_sug_suggest.id = #{id}
+	</update>
+	<!-- 该建议id的回复数更新 -->
+	<update id="updateSugSuggestBySuggestIdCount" parameterType="java.util.HashMap">
+		update sns_sug_suggest SET
+		sns_sug_suggest.replycount =
+		sns_sug_suggest.replycount+#{count}
+		where
+		sns_sug_suggest.id =
+		#{suggestId}
+	</update>
+
+	<update id="updateSugSuggestBySuggestIdForStatus" parameterType="java.util.HashMap">
+		update sns_sug_suggest SET
+		sns_sug_suggest.status = #{status}
+		where
+		sns_sug_suggest.id = #{id}
+	</update>
+
+	<update id="updateSugSuggestBySuggestIdForTop" parameterType="java.util.HashMap">
+		update sns_sug_suggest SET
+		sns_sug_suggest.top = #{top},
+		sns_sug_suggest.acceptuid = #{acceptuid},
+		sns_sug_suggest.acceptshowname = #{acceptshowname}
+		where
+		sns_sug_suggest.id =
+		#{id}
+	</update>
+
+	<update id="updateSugSuggestBySuggestIdForContentAndTitle"
+		parameterType="java.util.HashMap">
+		update sns_sug_suggest SET
+		sns_sug_suggest.title =
+		#{title},
+		sns_sug_suggest.content = #{content}
+		where
+		sns_sug_suggest.id =
+		#{id}
+	</update>
+
+	<select id="getLuceneSugSuggestByIds" parameterType="java.util.HashMap"
+		resultMap="SugSuggestResult">
+		select
+		<include refid="sns_sug_suggest_columns" />
+		from sns_sug_suggest
+		where sns_sug_suggest.id in
+		<foreach collection="list" separator="," item="SugSuggestIds"
+			open="(" close=")">
+			#{SugSuggestIds}
+		</foreach>
+	</select>
+
+	<select id="getSugSuggestCountAfterId" parameterType="java.util.HashMap"
+		resultMap="QuerySugSuggestResult">
+		select count(1) lineNum,IFNULL(max(id),0) maxId
+		from sns_sug_suggest
+		where 
+	<![CDATA[sns_sug_suggest.id >= #{SugSuggestId} ]]>
+
+	</select>
+
+	<select id="getSugSuggestByPageQuery" parameterType="java.util.HashMap"
+		resultMap="SugSuggestResult">
+		select
+		<include refid="sns_sug_suggest_columns" />
+		from sns_sug_suggest
+		where <![CDATA[ sns_sug_suggest.id between #{minSugSuggestId} and   #{maxSugSuggestId} ]]>
+		limit #{beginRow},#{pageSize}
+	</select>
+	<!-- 根据建议id 给该建议浏览数加一 -->
+	<update id="updateSugSuggestBySuggestIdForBrowseNumAddCount"
+		parameterType="java.util.HashMap">
+		update sns_sug_suggest SET
+		sns_sug_suggest.browseNum =
+		sns_sug_suggest.browseNum+#{count}
+		where
+		sns_sug_suggest.id =
+		#{sugSuggestId}
+	</update>
+	<!-- 根据建议id 给该建议回复数减一 -->
+	<update id="updateSugSuggestBySuggestIdForReplycountSubtractOne"
+		parameterType="java.util.HashMap">
+		update sns_sug_suggest SET
+		sns_sug_suggest.replycount =
+		sns_sug_suggest.replycount-1
+		where
+		sns_sug_suggest.id = #{id}
+	</update>
+
+	<select id="querySuggestOrderById" parameterType="java.util.HashMap"
+		resultMap="SugSuggestResult">
+		select
+		<include refid="sns_sug_suggest_columns" />
+		from sns_sug_suggest
+		order by
+		sns_sug_suggest.id desc
+		limit #{size}
+	</select>
+
+	<select id="queryRecommendSuggestOrderByHotNum" parameterType="java.util.HashMap"
+		resultMap="SugSuggestResult">
+		select
+		<include refid="sns_sug_suggest_columns" />
+		from sns_sug_suggest
+		where
+		sns_sug_suggest.status = 1
+		order by
+		sns_sug_suggest.kpoint_id
+		desc
+		limit #{size}
+	</select>
+
+	<select id="queryRecommendSuggestOrderByWisdomNumPage"
+		parameterType="java.util.HashMap" resultMap="SugSuggestResult">
+		select
+		<include refid="sns_sug_suggest_columns_summary" />
+		from sns_sug_suggest
+		order by sns_sug_suggest.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="queryRecommendSuggestOrderByWisdomNumPageCount"
+		resultType="int" parameterType="java.util.HashMap">
+		select
+		count(1)
+		from sns_sug_suggest
+		order by
+		sns_sug_suggest.id desc
+	</select>
+</mapper>

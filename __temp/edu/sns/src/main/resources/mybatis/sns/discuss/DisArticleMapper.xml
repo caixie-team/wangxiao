@@ -1,0 +1,735 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DisArticleMapper">
+
+	<resultMap type="DisArticle" id="DisArticleResult">
+		<result property="id" column="id" />
+		<result property="title" column="title" />
+		<result property="content" column="content" />
+		<result property="createTime" column="createTime" />
+		<result property="cusId" column="cus_id" />
+		<result property="groupId" column="dis_groupid" />
+		<result property="showName" column="showname" />
+		<result property="reNum" column="reNum" />
+		<result property="countView" column="countView" />
+		<result property="top" column="top" />
+		<result property="lastTime" column="lasttime" />
+		<result property="lastReply" column="lastreply" />
+		<result property="disname" column="name" />
+		<result property="selType" column="selType"/>
+		<result property="status" column="status"/>
+		<result property="summary" column="summary"/>
+		<result property="favorCount" column="favorCount"/>
+		<result property="recomCount" column="recomCount"/>
+		<result property="groupName" column="groupName"/>
+	</resultMap>
+	<resultMap type="QueryDisArtAndRep" id="QueryDisArtAndRepResult">
+		<result property="id" column="id" />
+		<result property="title" column="title" />
+		<result property="createTime" column="createTime" />
+		<result property="content" column="content"/>
+		<result property="cusId" column="cus_id" />
+		<result property="showName" column="showname" />
+		<result property="reNum" column="reNum" />
+		<result property="countView" column="countView" />
+		<result property="groupId" column="dis_groupid" />
+		<result property="top" column="top" />
+		<result property="lastTime" column="lasttime" />
+		<result property="lastReply" column="lastreply" />
+		<result property="selType" column="selType"/>
+		<result property="status" column="status"/>
+		<result property="summary" column="summary"/>
+		<result property="favorCount" column="favorCount"/>
+		<result property="recomCount" column="recomCount"/>
+	</resultMap>
+	<!-- 用户回复 -->
+	<resultMap type="DisArticleReply" id="DisArticleReplyResult">
+		<result property="id" column="id" />
+		<result property="articleId" column="dis_articleid" />
+		<result property="replyContent" column="replyContent" />
+		<result property="replyTime" column="replyTime" />
+		<result property="recusId" column="recus_id" />
+		<result property="groupId" column="groupId" />
+	</resultMap>
+	<!-- 用户浏览记录 -->
+	<resultMap type="DisLookArticle" id="DisLookArticleResult">
+		<result property="id" column="id" />
+		<result property="cusId" column="cus_id" />
+		<result property="bizId" column="bizId" />
+		<result property="type" column="type" />
+		<result property="addTime" column="add_time" />
+		<result property="viewDay" column="view_day" />
+	</resultMap>
+	<!-- 文章分类 -->
+	<resultMap type="Artclassify" id="ArtclassifyResult">
+		<result property="artId" column="id" />
+		<result property="name" column="name" />
+		<result property="sort" column="sort" />
+		<result property="addTime" column="addTime" />
+		<result property="blogNum" column="blogNum" />
+		<result property="disArticleNum" column="disArticleNum" />
+	</resultMap>
+	
+	<resultMap type="DisArticleFavor" id="DisArticleFavorResult">
+		<result property="id" column="id"/>
+		<result property="articleId" column="articleId"/>
+		<result property="cusId" column="cusId"/>
+		<result property="type" column="type"/>
+		<result property="addTime" column="addTime"/>
+	    <result property="content" column="content"/>
+	</resultMap>
+	<sql id="sns_dis_article_columns">
+		sns_dis_article.id,
+		sns_dis_article.title,
+		sns_dis_article.content,
+		sns_dis_article.createTime,
+		sns_dis_article.cus_id,
+		sns_dis_article.showname,
+		sns_dis_article.dis_groupid,
+		sns_dis_article.artClassifyId,
+		sns_dis_article.selType,
+		sns_dis_article.summary
+	</sql>
+	<insert id="addDisArticle" parameterType="DisArticle"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		INSERT INTO
+		sns_dis_article
+		(
+		<include refid="sns_dis_article_columns" />
+		)VALUES(
+		#{id},
+		#{title},
+		#{content},
+		#{createTime},
+		#{cusId},
+		#{showName},
+		#{groupId},
+		#{artClassifyId},
+		#{selType},
+		#{summary}
+		)
+	</insert>
+	<!-- 分页查询文章列表 -->
+	<select id="querydisArticleList" resultMap="DisArticleResult"
+		parameterType="java.util.HashMap">
+		SELECT
+		sns_dis_article.id,
+		sns_dis_article.title,
+		sns_dis_article.cus_id,
+		sns_dis_article.showname,
+		sns_dis_article.summary,
+		sns_dis_article.createTime,
+		sns_dis_article.countView,
+		sns_dis_article.reNum,
+		sns_dis_article.top,
+		sns_dis_article.dis_groupid,
+		sns_dis_article.lastreply,
+		sns_dis_article.lasttime,
+		sns_dis_article.selType,
+		sns_dis_article.status,
+		sns_dis_article.favorCount,
+		sns_dis_article.recomCount
+		FROM
+		sns_dis_article
+		WHERE
+		sns_dis_article.dis_groupid=#{e}
+		ORDER BY
+		sns_dis_article.top DESC,
+		sns_dis_article.lasttime DESC
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="querydisArticleListCount" resultType="int"
+		parameterType="java.util.HashMap">
+		SELECT COUNT(1)
+		FROM sns_dis_article
+		WHERE
+		sns_dis_article.dis_groupid=#{e}
+	</select>
+	
+	<!-- 后台根据条件查询文章列表 -->
+	<select id="querydisArticleListByCondition" resultMap="DisArticleResult"
+		parameterType="java.util.HashMap">
+		SELECT
+		sns_dis_article.id,
+		sns_dis_article.title,
+		sns_dis_article.cus_id,
+		sns_dis_article.showname,
+		sns_dis_article.summary,
+		sns_dis_article.createTime,
+		sns_dis_article.countView,
+		sns_dis_article.reNum,
+		sns_dis_article.selType,
+		sns_dis_article.top,
+		sns_dis_article.dis_groupid,
+		sns_dis_article.artClassifyId,
+		sns_dis_article.lastreply,
+		sns_dis_article.status,
+		sns_dis_article.favorCount,
+		sns_dis_article.recomCount,
+		sns_dis_group.name as groupName,
+		sns_dis_group_classify.name as classifyName
+		FROM
+		sns_dis_article left join sns_dis_group
+		on sns_dis_article.dis_groupid=sns_dis_group.id left join sns_dis_group_classify
+		on sns_dis_article.artClassifyId=sns_dis_group_classify.id
+		<where>
+			<if test="e.cusId!=null and e.cusId!='' and e.cusId!=0">
+				and sns_dis_article.cus_id=#{e.cusId}
+			</if>
+			<if test="e.artClassifyId!=null and e.artClassifyId!='' and e.artClassifyId!=0">
+				and sns_dis_article.artClassifyId=#{e.artClassifyId}
+			</if>
+			<if test="e.groupName!=null and e.groupName!=''">
+				and sns_dis_group.name=#{e.groupName}			
+			</if>
+			<if test="e.showName!=null and e.showName!=''">
+				and sns_dis_article.showName=#{e.showName}			
+			</if>
+			<if test="e.title!=null and e.title!=''">
+				and sns_dis_article.title like CONCAT('%',#{e.title},'%' )			
+			</if>
+		</where>
+		ORDER BY sns_dis_article.id DESC
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="querydisArticleListByConditionCount" resultType="int"
+		parameterType="java.util.HashMap">
+		SELECT
+		count(1)
+		FROM
+		sns_dis_article left join sns_dis_group
+		on sns_dis_article.dis_groupid=sns_dis_group.id
+		<where>
+			<if test="e.cusId!=null and e.cusId!='' and e.cusId!=0">
+				and sns_dis_article.cus_id=#{e.cusId}
+			</if>
+			<if test="e.artClassifyId!=null and e.artClassifyId!='' and e.artClassifyId!=0">
+				and sns_dis_article.artClassifyId=#{e.artClassifyId}
+			</if>
+			<if test="e.groupName!=null and e.groupName!=''">
+				and sns_dis_group.name=#{e.groupName}			
+			</if>
+			<if test="e.showName!=null and e.showName!=''">
+				and sns_dis_article.showName=#{e.showName}			
+			</if>
+			<if test="e.title!=null and e.title!=''">
+				and sns_dis_article.title like CONCAT('%',#{e.title},'%' )			
+			</if>
+		</where>
+	</select>
+	<!-- 查询文章详情 -->
+	<select id="queryDisArticleDetail" parameterType="DisArticle"
+		resultMap="DisArticleMapper.DisArticleResult">
+		SELECT
+		sns_dis_article.id,
+		sns_dis_article.title,
+		sns_dis_article.content,
+		sns_dis_article.createTime,
+		sns_dis_article.artClassifyId,
+		sns_dis_article.cus_id,
+		sns_dis_article.showname,
+		sns_dis_article.countView,
+		sns_dis_article.dis_groupid,
+		sns_dis_article.reNum,
+		sns_dis_article.selType,
+		sns_dis_article.status,
+		sns_dis_article.favorCount,
+		sns_dis_article.recomCount,
+		sns_dis_group.name,
+		sns_dis_article_classify.name classifyName
+		FROM
+		sns_dis_article
+		LEFT
+		JOIN
+		sns_dis_group
+		ON sns_dis_article.dis_groupid=sns_dis_group.id
+		left join
+		sns_dis_article_classify on sns_dis_article.artClassifyId
+		=sns_dis_article_classify.id
+		WHERE
+		sns_dis_article.dis_groupid=#{groupId} and
+		sns_dis_article.id=#{id}
+	</select>
+	<!-- ajax分页查询回复列表 -->
+	<select id="queryDisArticleReplyList" resultMap="DisArticleMapper.DisArticleReplyResult"
+		parameterType="java.util.HashMap">
+		SELECT
+		sns_dis_article_reply.id,
+		sns_dis_article_reply.dis_articleid,
+		sns_dis_article_reply.replyContent,
+		sns_dis_article_reply.replyTime,
+		sns_dis_article_reply.recus_id,
+		sns_dis_article_reply.groupId,
+		sns_dis_article_reply.showname
+		FROM
+		sns_dis_article_reply
+		WHERE
+		sns_dis_article_reply.dis_articleid=#{e.id}
+		ORDER BY
+		sns_dis_article_reply.replyTime asc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryDisArticleReplyListCount" resultType="int"
+		parameterType="java.util.HashMap">
+		SELECT COUNT(1)
+		FROM
+		sns_dis_article_reply
+		WHERE
+		sns_dis_article_reply.dis_articleid=#{e.id}
+	</select>
+	<!-- 添加文章回复 -->
+	<insert id="addDisArticleReply" parameterType="DisArticleReply"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		INSERT INTO
+		sns_dis_article_reply
+		(id,
+		dis_articleid,
+		replyContent,
+		replyTime,
+		recus_id,
+		groupId,
+		showname
+		)VALUES(
+		#{id},
+		#{articleId},
+		#{replyContent},
+		#{replyTime},
+		#{recusId},
+		#{groupId},
+		#{showName}
+		)
+	</insert>
+	<!-- 根据用户看过的文章id 统计群浏览 -->
+	<select id="queryDisLookArticleRecord" parameterType="DisLookArticle"
+		resultMap="DisArticleMapper.DisLookArticleResult">
+		SELECT
+		sns_dis_article_visit.id,
+		sns_dis_article_visit.cus_id,
+		sns_dis_article_visit.bizId,
+		sns_dis_article_visit.type,
+		max(sns_dis_article_visit.add_time)
+		add_time,
+		sns_dis_article_visit.view_day,
+		sns_dis_article_visit.showname
+		FROM
+		sns_dis_article_visit
+		WHERE
+		sns_dis_article_visit.bizId=#{bizId} and
+		sns_dis_article_visit.type=#{type}
+		group by
+		sns_dis_article_visit.cus_id
+		ORDER BY
+		add_time DESC
+		limit 6
+	</select>
+	<!-- 文章浏览量统计 -->
+	<select id="queryVisitArticleNum" resultType="int">
+		SELECT COUNT(1)
+		FROM
+		sns_dis_article_visit
+		WHERE
+		sns_dis_article_visit.bizId=#{bizId} and
+		sns_dis_article_visit.type=#{type}
+	</select>
+	<update id="updateDisArticleReplyCount" parameterType="java.util.HashMap">
+		UPDATE
+		sns_dis_article
+		SET
+		sns_dis_article.reNum=sns_dis_article.reNum+#{count}
+		WHERE
+		sns_dis_article.id=#{id}
+	</update>
+	<!-- 查询我的文章 -->
+	<select id="queryMyDisArticle" parameterType="DisArticle"
+		resultMap="DisArticleMapper.DisArticleResult">
+		SELECT
+		sns_dis_article.id,
+		sns_dis_article.title,
+		sns_dis_article.summary,
+		sns_dis_article.createTime,
+		sns_dis_article.cus_id,
+		sns_dis_article.showname,
+		sns_dis_article.countView,
+		sns_dis_article.reNum,
+		sns_dis_article.dis_groupid,
+		sns_dis_article.selType,
+		sns_dis_article.status,
+		sns_dis_article.favorCount,
+		sns_dis_article.recomCount
+		FROM sns_dis_article
+		WHERE
+		sns_dis_article.cus_id=#{cus_id} AND
+		sns_dis_article.dis_groupid=#{dis_groupid}
+	</select>
+	<!-- 查询博客文章分类 -->
+	<select id="queryArtclassifyList" resultMap="DisArticleMapper.ArtclassifyResult">
+		SELECT
+		sns_dis_article_classify.id,
+		sns_dis_article_classify.name,
+		sns_dis_article_classify.sort,
+		sns_dis_article_classify.addTime,
+		count(sns_blog.type) blogNum
+		FROM
+		sns_dis_article_classify
+		LEFT JOIN
+		sns_blog on sns_dis_article_classify.id=sns_blog.type
+		where sns_dis_article_classify.status=0
+		group by
+		sns_dis_article_classify.id
+		order by sns_dis_article_classify.sort
+		desc
+	</select>
+	<!-- 查询群文章分类 -->
+	<select id="querydisArtcicleList" resultMap="DisArticleMapper.ArtclassifyResult">
+		SELECT
+		sns_dis_article_classify.id,
+		sns_dis_article_classify.name,
+		sns_dis_article_classify.sort,
+		sns_dis_article_classify.addTime,
+		count(sns_dis_article.artClassifyId) disArticleNum
+		FROM
+		sns_dis_article_classify
+		LEFT JOIN sns_dis_article on
+		sns_dis_article_classify.id=sns_dis_article.artClassifyId
+		 where sns_dis_article_classify.status=0
+		group by
+		sns_dis_article_classify.id
+		order by sns_dis_article_classify.sort
+		desc
+	</select>
+
+	<!-- 首页查询我的群文章 -->
+	<select id="queryMyArticleById" parameterType="java.util.HashMap"
+		resultMap="DisArticleMapper.QueryDisArtAndRepResult">
+		SELECT
+		sns_dis_article.id,
+		sns_dis_article.title,
+		sns_dis_article.cus_id,
+		sns_dis_article.summary,
+		sns_dis_article.createTime,
+		sns_dis_article.countView,
+		sns_dis_article.reNum,
+		sns_dis_article.top,
+		sns_dis_article.dis_groupid,
+		sns_dis_article.showname,
+		sns_dis_article.lastreply,
+		sns_dis_article.lasttime,
+		sns_dis_article.selType,
+		sns_dis_article.status,
+		sns_dis_article.favorCount,
+		sns_dis_article.recomCount
+		FROM
+		sns_dis_article
+		left join sns_dis_group on sns_dis_article.cus_id=#{e} and sns_dis_article.dis_groupid=sns_dis_group.id
+		left join sns_dis_group_classify  on sns_dis_group.disclassifyId=sns_dis_group_classify.id
+		WHERE
+		sns_dis_article.cus_id=#{e} and sns_dis_group_classify.status=0 
+		order by sns_dis_article.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryMyArticleByIdCount" resultType="int"
+		parameterType="java.util.HashMap">
+		SELECT COUNT(1)
+		FROM
+		sns_dis_article
+		left join sns_dis_group on sns_dis_article.cus_id=#{e} and sns_dis_article.dis_groupid=sns_dis_group.id
+		left join sns_dis_group_classify  on sns_dis_group.disclassifyId=sns_dis_group_classify.id
+		WHERE
+		sns_dis_article.cus_id=#{e} and sns_dis_group_classify.status=0
+	</select>
+	<!-- 记录用户浏览记录 -->
+	<insert id="addLookDisArticle" parameterType="DisLookArticle"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		INSERT INTO
+		sns_dis_article_visit
+		(id,
+		cus_id,
+		bizId,
+		type,
+		add_time,
+		showname,
+		view_day
+		)VALUES(
+		#{id},
+		#{cusId},
+		#{bizId},
+		#{type},
+		#{addTime},
+		#{showName},
+		#{viewDay}
+		)
+	</insert>
+	<!-- 更新查看文章数 -->
+	<update id="updateDisArticleViewCount" parameterType="java.util.HashMap">
+		UPDATE
+		sns_dis_article
+		SET
+		sns_dis_article.countView=sns_dis_article.countView+#{count}
+		WHERE
+		sns_dis_article.id=#{id}
+	</update>
+	<!-- 判断用户是否存在浏览表里 -->
+	<select id="queryLookArticleRecord" resultMap="DisArticleMapper.DisLookArticleResult"
+		parameterType="DisLookArticle">
+		select
+		sns_dis_article_visit.id,
+		sns_dis_article_visit.cus_id,
+		sns_dis_article_visit.bizId,
+		sns_dis_article_visit.type,
+		sns_dis_article_visit.add_time,
+		sns_dis_article_visit.view_day,
+		sns_dis_article_visit.showName
+		from
+		sns_dis_article_visit
+		where
+		sns_dis_article_visit.cus_id=#{cusId} and
+		sns_dis_article_visit.bizId=#{bizId}
+		and
+		sns_dis_article_visit.type=#{type} and view_day = #{viewDay}
+
+	</select>
+	<!-- 更新用户浏览时间 -->
+	<update id="updateCusLookRecord" parameterType="DisLookArticle">
+		update
+		sns_dis_article_visit
+		set sns_dis_article_visit.add_time=#{addTime}
+		where
+		sns_dis_article_visit.cus_id=#{cusId} and
+		sns_dis_article_visit.bizId=#{bizId}
+		and
+		sns_dis_article_visit.type=#{type}
+	</update>
+	<!-- 删除我的文章 -->
+	<delete id="deleteMyArticleById" parameterType="DisArticle">
+		delete
+		from
+		sns_dis_article
+		where sns_dis_article.id=#{id} and
+		sns_dis_article.dis_groupid=#{groupId}
+	</delete>
+	<!-- 查询我的文章详情 -->
+	<select id="queryMyArticleDetail" resultMap="DisArticleMapper.DisArticleResult"
+		parameterType="DisArticle">
+		SELECT
+		sns_dis_article.id,
+		sns_dis_article.title,
+		sns_dis_article.showname,
+		sns_dis_article.content,
+		sns_dis_article.createTime,
+		sns_dis_article.artClassifyId,
+		sns_dis_article.cus_id,
+		sns_dis_article.countView,
+		sns_dis_article.dis_groupid,
+		sns_dis_article.reNum,
+		sns_dis_group.name,
+		sns_dis_article.selType,
+		sns_dis_article.status,
+		sns_dis_article.favorCount,
+		sns_dis_article.recomCount,
+		sns_dis_article_classify.name classifyName
+		FROM
+		sns_dis_article
+		LEFT
+		JOIN
+		sns_dis_group
+		ON sns_dis_article.dis_groupid=sns_dis_group.id
+		left join
+		sns_dis_article_classify on sns_dis_article.artClassifyId
+		=sns_dis_article_classify.id
+		where sns_dis_article.id=#{id} and
+		sns_dis_article.dis_groupid=#{groupId}
+	</select>
+	<!-- 更新群文章 -->
+	<update id="updateMyArticle" parameterType="DisArticle">
+		update
+		sns_dis_article
+		set sns_dis_article.title=#{title},
+		sns_dis_article.content=#{content},
+		sns_dis_article.selType=#{selType},
+		sns_dis_article.summary=#{summary}
+		where
+		sns_dis_article.id=#{id} and
+		sns_dis_article.dis_groupid=#{groupId}
+	</update>
+	<!-- 删除回复 -->
+	<delete id="deleteDisArticleReply" parameterType="DisArticleReply">
+		delete from
+		sns_dis_article_reply
+		where
+		sns_dis_article_reply.id=#{id} and
+		sns_dis_article_reply.dis_articleid=#{articleId}
+	</delete>
+	<update id="updateDisArticleReNum" parameterType="java.lang.Long">
+		update
+		sns_dis_article
+		set sns_dis_article.reNum=sns_dis_article.reNum-1
+		where
+		sns_dis_article.id=#{id}
+	</update>
+	<!-- 查询此条回复是不是本人 -->
+	<select id="getDisArticleReplyIsMine" parameterType="DisArticleReply"
+		resultType="int">
+		select count(1)
+		from sns_dis_article_reply
+		where
+		sns_dis_article_reply.id=#{id} and
+		sns_dis_article_reply.recus_id=#{recusId}
+	</select>
+	<!-- 后台置顶群文章 -->
+	<select id="updateDisArticleByTop" parameterType="long">
+		update
+		sns_dis_article
+		set sns_dis_article.top=1
+		where sns_dis_article.id=#{id}
+	</select>
+	<!-- 取消置顶群文章 -->
+	<select id="updateCancelDisArticleByTop" parameterType="long">
+		update
+		sns_dis_article
+		set sns_dis_article.top=0
+		where sns_dis_article.id=#{id}
+	</select>
+	<select id="queryDisArticleIsExsit" parameterType="Artclassify"
+		resultType="int">
+		select count(1)
+		from sns_dis_article_classify
+		where
+		sns_dis_article_classify.name=#{name}
+	</select>
+	<update id="updateArticleLastReply" parameterType="DisArticle">
+		update
+		sns_dis_article
+		set sns_dis_article.lastreply=#{lastReply},
+		sns_dis_article.lasttime=#{lastTime}
+		where
+		sns_dis_article.id=#{id}
+	</update>
+	<!-- 查询分类下的 群文章 -->
+	<select id="queryClassifyDisArticleById" parameterType="java.util.HashMap"
+		resultMap="DisArticleResult">
+		SELECT
+		sns_dis_article.id,
+		sns_dis_article.title,
+		sns_dis_article.cus_id,
+		sns_dis_article.summary,
+		sns_dis_article.content,
+		sns_dis_article.createTime,
+		sns_dis_article.countView,
+		sns_dis_article.reNum,
+		sns_dis_article.top,
+		sns_dis_article.dis_groupid,
+		sns_dis_article.lastreply,
+		sns_dis_article.lasttime,
+		sns_dis_article.selType,
+		sns_dis_article.status
+		FROM
+		sns_dis_article
+		where
+		sns_dis_article.artClassifyId=#{e}
+		order by sns_dis_article.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryClassifyDisArticleByIdCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select count(1) from
+		sns_dis_article
+		where
+		sns_dis_article.artClassifyId=#{e}
+	</select>
+	<delete id="deleteReplyArticleById" parameterType="java.lang.Long">
+		delete from sns_dis_article_reply
+		where sns_dis_article_reply.dis_articleid=#{articleId}
+	</delete>
+	<!-- 更新文章状态 -->
+	<update id="updateDisArticleStatus" parameterType="DisArticle">
+		update sns_dis_article
+		set sns_dis_article.status=#{status}
+		where sns_dis_article.id=#{id} and sns_dis_article.dis_groupid=#{groupId}
+	</update>
+	<!-- 更新文章状态 -->
+	<update id="updateDisArticleFavorCount" parameterType="java.util.HashMap">
+		update sns_dis_article
+		set sns_dis_article.favorCount=sns_dis_article.favorCount+#{count}
+		where sns_dis_article.id=#{id}
+	</update>
+	<!-- 更新文章状态 -->
+	<update id="deleteDisArticleFavorCount" parameterType="java.util.HashMap">
+		update sns_dis_article
+		set sns_dis_article.favorCount=sns_dis_article.favorCount-#{count}
+		where sns_dis_article.id=#{id}
+	</update>
+	<!-- 更新文章状态 -->
+	<update id="updateDisArticleRecommendCount" parameterType="java.util.HashMap">
+		update sns_dis_article
+		set sns_dis_article.recomCount=sns_dis_article.recomCount+#{count}
+		where sns_dis_article.id=#{id}
+	</update>
+	<select id="queryDisArticleIsFavorOrRecom" parameterType="DisArticleFavor" resultType="int">
+		select count(1)
+		from sns_dis_article_like
+		where sns_dis_article_like.articleId=#{articleId} and sns_dis_article_like.cusId=#{cusId} and
+		sns_dis_article_like.type=#{type}
+	</select>
+	<!-- 添加喜欢或推荐 -->
+	<insert id="addDisArticleFavorAndRecom" parameterType="DisArticleFavor"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		INSERT INTO
+		sns_dis_article_like
+		(id,
+		cusId,
+		articleId,
+		content,
+		type,
+		addTime
+		)VALUES(
+		#{id},
+		#{cusId},
+		#{articleId},
+		#{content},
+		#{type},
+		#{addTime}
+		)
+	</insert>
+	<delete id="deleteDisArticleFavorAndRecom" parameterType="DisArticleFavor">
+		delete from
+		sns_dis_article_like 
+		where sns_dis_article_like.articleId=#{articleId} and sns_dis_article_like.cusId=#{cusId} and
+		sns_dis_article_like.type=#{type}
+	</delete>
+	<select id="queryDisArticleFavorAndRecom" parameterType="java.util.HashMap" resultMap="DisArticleFavorResult">
+		select 
+		sns_dis_article_like.id,
+		sns_dis_article_like.articleId,
+		sns_dis_article_like.cusId,
+		sns_dis_article_like.type,
+		sns_dis_article_like.addTime,
+		sns_dis_article_like.content
+		from
+		sns_dis_article_like
+		where sns_dis_article_like.type=#{type}
+		order by sns_dis_article_like.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryDisArticleFavorAndRecomCount" parameterType="java.util.HashMap" resultType="int">
+		select count(1)
+		from 
+		sns_dis_article_like
+		where sns_dis_article_like.type=#{type}
+	</select>
+	<select id="queryDisArticleListForHome" resultMap="DisArticleResult">
+		select 
+		sns_dis_article.id,
+		sns_dis_article.summary,
+		sns_dis_article.createTime,
+		sns_dis_article.title,
+    	sns_dis_article.cus_id,
+    	sns_dis_article.showname,
+    	sns_dis_article.dis_groupid
+		from 
+		sns_dis_article
+		where sns_dis_article.selType=0
+		order by sns_dis_article.favorCount desc, sns_dis_article.id desc
+		limit 10 
+	</select>
+</mapper>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="FriendMapper">
+ <resultMap id="FriendResult" type="Friend">
+       <result property="id" column="id" />
+       <result property="cusId" column="cus_id" />
+       <result property="addTime" column="add_TIME" />
+       <result property="cusFriendId" column="cus_friend_id" />
+       <result property="mutual" column="mutual" />
+    </resultMap>
+    
+	<sql id="sns_cus_friend_columns">
+		sns_cus_friend.id,
+		sns_cus_friend.cus_id,
+		sns_cus_friend.add_Time,
+		sns_cus_friend.cus_friend_id,
+		sns_cus_friend.mutual
+	</sql>
+	
+	<sql id="sns_cus_friend_properties">
+		#{id},
+		#{cusId},
+		#{addTime},
+		#{cusFriendId},
+		#{mutual}
+	</sql>
+	
+	 <insert id="addFriend" parameterType="java.util.HashMap" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO sns_cus_friend (<include refid="sns_cus_friend_columns"/>) VALUES (<include
+            refid="sns_cus_friend_properties"/>)
+     </insert>
+    
+    <delete id="delFriend" parameterType="java.util.HashMap">
+    	DELETE FROM sns_cus_friend WHERE 
+    	cus_id = #{cusId} and cus_friend_id = #{cusFriendId}
+    </delete>
+    
+    <delete id="delAllFriendByUid" parameterType="java.util.HashMap">
+    	DELETE FROM sns_cus_friend WHERE 
+    	cus_id = #{id} or cus_friend_id = #{id}
+    </delete>
+    
+    
+    <select id="queryFriendByCusIdAndCusFriendId" parameterType="java.util.HashMap" resultMap="FriendResult">
+    	select <include refid="sns_cus_friend_columns"/> from sns_cus_friend 
+    	where sns_cus_friend.cus_id = #{cusId}
+    	and sns_cus_friend.cus_friend_id = #{cusFriendId}
+    </select>
+    
+    <select id="queryMyFriendByCusId" parameterType="java.util.HashMap" resultType="Long">
+    	select sns_cus_friend.cus_friend_id from sns_cus_friend 
+    	where sns_cus_friend.cus_id = #{cusId}
+    </select>
+    
+    
+    <update id="updateFriendForRemarksByCusIdAndCusFriendId" parameterType="java.util.HashMap">
+    	UPDATE sns_cus_friend  SET sns_cus_friend.remarks = #{remarks} WHERE sns_cus_friend.cus_id = #{cusId} and sns_cus_friend.cus_friend_id = #{cusFriendId}
+    </update>
+    
+    <!-- 查找好友id的list  -->
+    <select id="getCommonFriend" resultMap="FriendResult" parameterType="list">
+    	SELECT  <include refid="sns_cus_friend_columns"/>
+		FROM sns_cus_friend 
+    	WHERE cus_id IN
+    	<foreach collection="list" item="item" open="(" close=")" separator=",">
+    		#{item}
+    	</foreach>
+    	ORDER BY cus_id,cus_friend_id
+    </select>
+        <select id="queryMyFriendCustomer" parameterType="java.util.HashMap" resultMap="FriendResult">
+           select  <include refid="sns_cus_friend_columns"/> from sns_cus_friend 
+           <where>
+           cus_id = #{cusId} 
+           </where>
+       </select>
+       <!--  -->
+       <update id="updateFriendMutual" parameterType="Map">
+	       update sns_cus_friend 
+	       set sns_cus_friend.mutual=#{mutual}
+	       where sns_cus_friend.cus_id=#{cusId} and cus_friend_id=#{cusFriendId}
+       </update>
+</mapper>

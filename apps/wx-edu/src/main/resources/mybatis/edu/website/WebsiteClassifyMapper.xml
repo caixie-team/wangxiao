@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="WebsiteClassifyMapper">
+
+	<resultMap id="WebsiteClassifyResult" type="WebsiteClassify">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="explain" column="explain" />
+		<result property="type" column="type" />
+		<result property="level" column="level" />
+		<result property="sort" column="sort" />
+	</resultMap>
+
+	<sql id="edu_website_classify_columns">
+		edu_website_classify.id,
+		edu_website_classify.name,
+		edu_website_classify.explain,
+		edu_website_classify.type,
+		edu_website_classify.level,
+		edu_website_classify.sort
+	</sql>
+
+	<sql id="edu_website_classify_properties">
+		#{id},
+		#{name},
+		#{explain},
+		#{type},
+		#{level},
+		#{sort}
+	</sql>
+	<insert id="addWebsiteClassify" keyColumn="id" keyProperty="id"
+		useGeneratedKeys="true">
+		insert into edu_website_classify
+		(
+		<include refid="edu_website_classify_columns" />
+		)
+		values(
+		<include refid="edu_website_classify_properties" />
+		)
+	</insert>
+	<!-- 查询所有 -->
+	<select id="getWebsiteClassifyList" parameterType="map"
+		resultMap="WebsiteClassifyResult">
+		select
+		<include refid="edu_website_classify_columns" />
+		from edu_website_classify
+		<where>
+			<if test="e.name!=null  and e.name!=''">
+				edu_website_classify.name=#{e.name}
+			</if>
+			<if test="e.type!=null and e.type!=''">
+				and edu_website_classify.type=#{e.type}
+			</if>
+		</where>
+		order by edu_website_classify.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getWebsiteClassifyListCount" parameterType="map"
+		resultType="int">
+		select count(1) from edu_website_classify
+		<where>
+			<if test="e.name!=null  and e.name!=''">
+				edu_website_classify.name=#{e.name}
+			</if>
+			<if test="e.type!=null and e.type!=''">
+				and edu_website_classify.type=#{e.type}
+			</if>
+		</where>
+	</select>
+	<select id="getWebsiteClassifyByCondition" parameterType="WebsiteClassify" resultMap="WebsiteClassifyResult">
+		select
+		<include refid="edu_website_classify_columns" />
+		from edu_website_classify
+		<where>
+			<if test="name!=null  and name!=''">
+				edu_website_classify.name=#{name}
+			</if>
+			<if test="type!=null and type!=''">
+				and edu_website_classify.type=#{type}
+			</if>
+		</where>
+		order by edu_website_classify.sort desc
+	</select>
+	
+	<delete id="delWebsiteClassifyById" parameterType="Long">
+	 	delete from  edu_website_classify where edu_website_classify.id=#{id}
+	</delete>
+	
+	<select id="getWebsiteClassifyById" parameterType="Long" resultMap="WebsiteClassifyResult">
+		select <include refid="edu_website_classify_columns" />
+		from edu_website_classify
+		where edu_website_classify.id=#{id}
+	</select>
+	
+	<update id="updateWebsiteClassify" parameterType="WebsiteClassify">
+		 update edu_website_classify set 
+		 edu_website_classify.name=#{name},
+		 edu_website_classify.explain=#{explain},
+		 edu_website_classify.type=#{type},
+		 edu_website_classify.sort=#{sort}
+		 where edu_website_classify.id=#{id}
+	</update>
+</mapper>

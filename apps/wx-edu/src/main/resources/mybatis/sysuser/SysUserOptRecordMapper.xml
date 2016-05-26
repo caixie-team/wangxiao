@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SysUserOptRecordMapper" >
+
+    <resultMap id="SysUserOptRecordResult" type="SysUserOptRecord">
+        <result property="id" column="id" />
+        <result property="createTime" column="create_time" />
+        <result property="optAccount" column="opt_account"/>
+        <result property="optUsername" column="opt_username" />
+        <result property="optName" column="opt_name"/>
+        <result property="optObj" column="opt_obj"/>
+        <result property="optIp" column="opt_ip"/>
+        <result property="modifyBefore" column="modify_before"/>
+        <result property="modifyAfter" column="modify_after"/>
+    </resultMap>
+
+    <sql id="sys_user_opt_record_columns">
+        sys_user_opt_record.id,
+        sys_user_opt_record.create_time,
+        sys_user_opt_record.opt_account,
+        sys_user_opt_record.opt_username,
+        sys_user_opt_record.opt_name,
+        sys_user_opt_record.opt_obj,
+        sys_user_opt_record.opt_ip,
+        sys_user_opt_record.modify_before,
+        sys_user_opt_record.modify_after
+    </sql>
+
+    <sql id="sys_user_opt_record_properties">
+        #{id},
+        #{createTime},
+        #{optAccount},
+        #{optUsername},
+        #{optName},
+        #{optObj},
+        #{optIp},
+        #{modifyBefore},
+        #{modifyAfter}
+    </sql>
+
+    <insert id="addRecord" parameterType="SysUserOptRecord" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO sys_user_opt_record (<include refid="sys_user_opt_record_columns"/>) VALUES (<include
+            refid="sys_user_opt_record_properties"/>)
+    </insert>
+
+    <select id="getRecordList" parameterType="java.util.HashMap" resultMap="SysUserOptRecordResult">
+        SELECT <include refid="sys_user_opt_record_columns"/> FROM sys_user_opt_record
+        <where>
+            <if test="e.id!=null and e.id>0">
+                AND sys_user_opt_record.id = #{e.id}
+            </if>
+            <if test="e.optAccount!=null and e.optAccount!=''">
+                AND sys_user_opt_record.opt_account LIKE CONCAT('%',#{e.optAccount},'%')
+            </if>
+            <if test="e.optUsername!=null and e.optUsername!=''">
+                AND sys_user_opt_record.opt_username LIKE CONCAT('%',#{e.optUsername},'%')
+            </if>
+            <if test="e.startTime!=null and e.startTime!=''">
+                AND <![CDATA[ sys_user_opt_record.create_time>=#{e.startTime} ]]>
+            </if>
+            <if test="e.endTime!=null and e.endTime!=''">
+                AND <![CDATA[ sys_user_opt_record.create_time<=#{e.endTime} ]]>
+            </if>
+        </where>
+        ORDER BY sys_user_opt_record.create_time DESC
+        <include refid="publicMapper.pageEnd"/>
+    </select>
+    <select id="getRecordListCount" parameterType="java.util.HashMap" resultType="int">
+        SELECT COUNT(1) FROM sys_user_opt_record
+        <where>
+            <if test="e.id!=null and e.id>0">
+                AND sys_user_opt_record.id = #{e.id}
+            </if>
+            <if test="e.optAccount!=null and e.optAccount!=''">
+                AND sys_user_opt_record.opt_account LIKE CONCAT('%',#{e.optAccount},'%')
+            </if>
+            <if test="e.optUsername!=null and e.optUsername!=''">
+                AND sys_user_opt_record.opt_username LIKE CONCAT('%',#{e.optUsername},'%')
+            </if>
+            <if test="e.startTime!=null and e.startTime!=''">
+                AND <![CDATA[ sys_user_opt_record.create_time>=#{e.startTime} ]]>
+            </if>
+            <if test="e.endTime!=null and e.endTime!=''">
+                AND <![CDATA[ sys_user_opt_record.create_time<=#{e.endTime} ]]>
+            </if>
+        </where>
+    </select>
+
+    <select id="getRecordById" parameterType="Long" resultMap="SysUserOptRecordResult">
+        SELECT <include refid="sys_user_opt_record_columns"/> FROM sys_user_opt_record
+        WHERE sys_user_opt_record.id = #{value}
+    </select>
+</mapper>

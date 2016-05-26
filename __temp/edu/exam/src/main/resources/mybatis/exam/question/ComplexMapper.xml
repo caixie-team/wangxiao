@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ComplexMapper" >
+
+
+	<resultMap id="ComplexResult" type="QstComplex">
+       <result property="id" column="id" />
+       <result property="paperId" column="paper_id" />
+       <result property="paperMiddleId" column="papermiddle_id" />
+       <result property="complexContent" column="complex_content" />
+       <result property="addTime" column="add_time" />
+       <result property="updateTime" column="update_time" />
+    </resultMap>
+    
+    <sql id="exam_complex_columns">
+        exam_complex.id,
+        exam_complex.paper_id,
+        exam_complex.papermiddle_id,
+        exam_complex.complex_content,
+        exam_complex.ADD_TIME,
+        exam_complex.update_time
+    </sql>
+
+    <sql id="exam_complex_properties">
+        #{id},
+        #{paperId},
+        #{paperMiddleId},
+        #{complexContent},
+        #{addTime},
+        #{updateTime}
+    </sql>
+
+    <insert id="createComple" parameterType="QstComplex" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO exam_complex (<include refid="exam_complex_columns"/>) VALUES (<include refid="exam_complex_properties"/>)
+    </insert>
+	
+	<update id="updateComplex" parameterType="java.util.HashMap" >
+ 		update exam_complex set complex_content=#{complexContent} where id=#{id,jdbcType=INTEGER}
+ 	</update>
+ 	
+ 	<delete id="delComplexById" parameterType="java.util.HashMap">
+ 		DELETE from exam_complex
+ 		where id=  #{id}
+         
+    </delete>
+    
+    <delete id="delComplexByComplex" parameterType="java.util.HashMap">
+ 		DELETE from exam_complex
+ 		where paper_id=  #{paperId} and 
+        paperMiddle_id=#{paperMiddleId}
+         
+    </delete>
+    
+    
+    
+    
+    <select id="getQstComplexList" resultMap="ComplexResult" parameterType="map">
+    	select <include refid="exam_complex_columns"/>
+    	from exam_complex
+    	where paper_id=  #{paperId} and 
+        paperMiddle_id=#{paperMiddleId}
+    </select>
+</mapper>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ArrangeMiddleUserMapper">
+
+	<resultMap id="ArrangeMiddleUserResult" type="ArrangeMiddleUser">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="arrangeId" column="arrange_id" />
+	</resultMap>
+
+	<sql id="edu_arrange_middle_user_columns">
+		edu_arrange_middle_user.id,
+		edu_arrange_middle_user.user_id,
+		edu_arrange_middle_user.arrange_id
+	</sql>
+
+	<sql id="edu_arrange_middle_user_properties">
+		#{id},
+		#{userId},
+		#{arrangeId}
+	</sql>
+
+	<insert id="createArrangeMiddleUser" parameterType="ArrangeMiddleUser"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_arrange_middle_user (
+		<include refid="edu_arrange_middle_user_columns" />
+		) VALUES (
+		<include refid="edu_arrange_middle_user_properties" />
+		)
+	</insert>
+	<!-- 批量添加员工 -->
+	<insert id="batchAddArrangeMiddleUser" parameterType="list">
+		insert INTO edu_arrange_middle_user (
+		<include refid="edu_arrange_middle_user_columns" />
+		) VALUES
+		<foreach collection="list" item="itme" index="index"
+			separator=",">
+			(#{itme.id},#{itme.userId},#{itme.arrangeId})
+		</foreach>
+	</insert>
+	<!-- 删除任务下的员工 -->
+	<delete id="deleteArrangeMiddleUserById" parameterType="Long">
+		delete from
+		edu_arrange_middle_user
+		where edu_arrange_middle_user.arrange_id=#{arrangeId}
+	</delete>
+
+	<update id="updateArrangeMiddleUser" parameterType="ArrangeMiddleUser">
+		update
+		edu_arrange_middle_user SET
+		id = #{id},
+		user_id = #{userId},
+		arrange_id =
+		#{arrangeId}
+	</update>
+
+	<select id="getArrangeMiddleUserById" resultMap="ArrangeMiddleUserResult"
+		parameterType="Long">
+		select
+		<include refid="edu_arrange_middle_user_columns" />
+		from edu_arrange_middle_user
+	</select>
+
+	<select id="getArrangeMiddleUserList" resultMap="ArrangeMiddleUserResult"
+		parameterType="ArrangeMiddleUser">
+		select
+		<include refid="edu_arrange_middle_user_columns" />
+		from edu_arrange_middle_user
+		<where>
+			1=1
+			<if test="arrangeId!=null and arrangeId>0">
+				and edu_arrange_middle_user.arrange_id=#{arrangeId}
+			</if>
+		</where>
+	</select>
+	<!-- 查询任务下的员工 -->
+	<select id="getTaakUserById" parameterType="ArrangeMiddleUser" resultMap="ArrangeMiddleUserResult">
+		SELECT
+		<include refid="edu_arrange_middle_user_columns" />
+		FROM
+		`EDU_ARRANGE_MIDDLE_USER` 
+		<where>
+			<if test="arrangeId!=null and arrangeId!=0">
+				edu_arrange_middle_user.arrange_id=#{arrangeId}
+			</if>
+		</where>
+	</select>
+</mapper>

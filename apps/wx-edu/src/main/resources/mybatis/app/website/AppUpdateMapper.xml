@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AppUpdateMapper">
+
+	<resultMap type="AppUpdate" id="AppUpdateResult">
+	<result property="id" column="ID"/>
+	<result property="kType" column="K_TYPE"/>
+	<result property="downloadUrl" column="DOWNLOAD_URL"/>
+	<result property="versionNo" column="VERSION_NO"/>
+	<result property="depict" column="DEPICT"/>
+	</resultMap>
+    
+    <sql id="app_update_column">
+    APP_UPDATE.ID,
+    APP_UPDATE.K_TYPE,
+   	APP_UPDATE.DOWNLOAD_URL,
+    APP_UPDATE.VERSION_NO,
+    APP_UPDATE.DEPICT
+    </sql>
+    
+    <select id="queryAllList" resultMap="AppUpdateResult">
+    SELECT <include refid="app_update_column"/> FROM APP_UPDATE
+    </select>
+    
+    <update id="updateApp" parameterType="AppUpdate">
+    UPDATE APP_UPDATE SET DOWNLOAD_URL=#{downloadUrl},VERSION_NO=#{versionNo},DEPICT=#{depict} WHERE ID=#{id}
+    </update>
+    
+    <select id="queryAppUpdateById" parameterType="long" resultMap="AppUpdateResult">
+    SELECT <include refid="app_update_column"/> FROM APP_UPDATE WHERE ID=#{value}
+    </select>
+    
+</mapper>

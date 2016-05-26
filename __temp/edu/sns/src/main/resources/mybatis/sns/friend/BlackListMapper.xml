@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BlackListMapper">
+
+ <resultMap id="WeiBoResult" type="WeiBo">
+       <result property="id" column="id" />
+       <result property="cusId" column="cus_id" />
+       <result property="addTime" column="add_TIME" />
+       <result property="cusFriendId" column="cus_friend_id" />
+    </resultMap>
+    <resultMap type="SnsUserExpand" id="CustomerMap">
+		<result property="cusId" column="user_id" />
+		<result property="weiBoNum" column="weibo_num" />
+		<result property="fansNum" column="fans_num" />
+		<result property="attentionNum" column="attention_num" />
+		<result property="showname" column="showname" />
+		
+	</resultMap>
+	
+	<resultMap type="SnsUserExpandDto" id="QueryCustomerMap" extends="CustomerMap">
+	</resultMap>
+	<sql id="sns_cus_blacklist_columns">
+		sns_cus_blacklist.id,
+		sns_cus_blacklist.cus_id,
+		sns_cus_blacklist.add_Time,
+		sns_cus_blacklist.cus_blacklist_id
+	</sql>
+	
+	<sql id="sns_cus_blacklist_properties">
+		#{id},
+		#{cusId},
+		#{addTime},
+		#{cusBlackListId}
+	</sql>
+	
+	 <insert id="addBlackList" parameterType="java.util.HashMap" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO sns_cus_blacklist (<include refid="sns_cus_blacklist_columns"/>) VALUES (<include
+            refid="sns_cus_blacklist_properties"/>)
+     </insert>
+    
+    <delete id="delFriend" parameterType="java.util.HashMap">
+    	DELETE FROM sns_cus_friend WHERE 
+    	cus_id = #{cusId} and cus_friend_id = #{cusFriendId}
+    </delete>
+    
+    <select id="queryBlackListByCusIdAndCusBlacklistId" parameterType="java.util.HashMap" resultType="int">
+    	select count(1)
+    	from sns_cus_blacklist
+    	<where>
+    	sns_cus_blacklist.cus_id = #{cusId}
+    	and sns_cus_blacklist.cus_blacklist_id = #{cusBlackListId}
+    	</where>
+    </select>
+    
+   	<select id="queryBlackListByCusId" parameterType="java.util.HashMap" resultType="SnsUserExpandDto">
+		select 
+			cus_blacklist_id id,
+			cus_blacklist_id cusId
+		 from sns_cus_blacklist 
+		 where sns_cus_blacklist.cus_Id=#{e.cusId,jdbcType=INTEGER}
+		 <include refid="publicMapper.pageEnd" />
+ 	</select>
+ 	
+ 	<select id="queryBlackListByCusIdCount" parameterType="java.util.HashMap" resultType="int">
+ 		select count(1)
+ 		 from sns_cus_blacklist
+ 		 where sns_cus_blacklist.cus_id=#{e.cusId,jdbcType=INTEGER}
+ 	</select>
+ 	
+ 	<delete id="delBlackList" parameterType="java.util.HashMap">
+ 	delete from sns_cus_blacklist 
+ 	where sns_cus_blacklist.cus_id = #{cusId}
+ 	and sns_cus_blacklist.cus_blacklist_id = #{cusBlackListId}
+ 	</delete>
+ 	
+</mapper>

@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CourseKpointMapper">
+
+	<resultMap id="CourseKpointResult" type="CourseKpoint">
+		<result property="id" column="id" />
+		<result property="courseId" column="course_id" />
+		<result property="name" column="name" />
+		<result property="parentId" column="parentId" />
+		<result property="type" column="type" />
+		<result property="status" column="status" />
+		<result property="addTime" column="add_time" />
+		<result property="sort" column="sort" />
+		<result property="playcount" column="playcount" />
+		<result property="isfree" column="isfree" />
+		<result property="videotype" column="videotype" />
+		<result property="videourl" column="videourl" />
+		<result property="videojson" column="videojson" />
+		<result property="teacherId" column="teacher_id" />
+		<result property="courseMinutes" column="course_minutes" />
+		<result property="courseSeconds" column="course_seconds" />
+	</resultMap>
+	<resultMap type="CourseKpoint" id="CourseKpointNewResult" >
+		<result property="id" column="id" />
+		<result property="courseId" column="course_id" />
+		<result property="name" column="name" />
+		<result property="parentId" column="parentId" />
+		<result property="type" column="type" />
+		<result property="status" column="status" />
+		<result property="addTime" column="add_time" />
+		<result property="sort" column="sort" />
+		<result property="playcount" column="playercount" />
+		<result property="isfree" column="isfree" />
+		<result property="videotype" column="videotype" />
+		<result property="videourl" column="videourl" />
+		<result property="videojson" column="videojson" />
+		<result property="teacherId" column="teacher_id" />
+		<result property="courseMinutes" column="course_minutes" />
+		<result property="courseSeconds" column="course_seconds" />
+		<result property="personNum" column="personNum"/>
+		<result property="courseName" column="course_name"/>
+	</resultMap>
+
+	<sql id="edu_course_kpoint_columns">
+		edu_course_kpoint.id,
+		edu_course_kpoint.course_id,
+		edu_course_kpoint.name,
+		edu_course_kpoint.parentId,
+		edu_course_kpoint.type,
+		edu_course_kpoint.status,
+		edu_course_kpoint.add_time,
+		edu_course_kpoint.sort,
+		edu_course_kpoint.playcount,
+		edu_course_kpoint.isfree,
+		edu_course_kpoint.videotype,
+		edu_course_kpoint.videourl,
+		edu_course_kpoint.videojson,
+		edu_course_kpoint.teacher_id,
+		edu_course_kpoint.course_minutes,
+		edu_course_kpoint.course_seconds
+	</sql>
+
+	<sql id="edu_course_kpoint_properties">
+		#{id},
+		#{courseId},
+		#{name},
+		#{parentId},
+		#{type},
+		#{status},
+		#{addTime},
+		#{sort},
+		#{playcount},
+		#{isfree},
+		#{videotype},
+		#{videourl},
+		#{videojson},
+		#{teacherId},
+		#{courseMinutes},
+		#{courseSeconds}
+	</sql>
+
+	<insert id="createCourseKpoint" parameterType="CourseKpoint" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_course_kpoint (
+		<include refid="edu_course_kpoint_columns" />
+		) VALUES (
+		<include refid="edu_course_kpoint_properties" />
+		)
+	</insert>
+
+	<delete id="deleteCourseKpointById" parameterType="Long">
+		delete from
+		edu_course_kpoint
+		where
+		id = #{value}
+	</delete>
+
+	<update id="updateCourseKpoint" parameterType="CourseKpoint">
+		update
+		edu_course_kpoint SET
+		course_id = #{courseId},
+		name =
+		#{name},
+		parentId =
+		#{parentId},
+		type = #{type},
+		sort = #{sort},
+		playcount = #{playcount},
+		isfree =
+		#{isfree},
+		videotype = #{videotype},
+		videourl = #{videourl},
+		videojson = #{videojson},
+		teacher_id =
+		#{teacherId},
+		course_minutes = #{courseMinutes},
+		course_seconds =
+		#{courseSeconds}
+		where
+		id = #{id}
+	</update>
+	<update id="deleteCourseKpointByIdBatch">
+		update edu_course_kpoint set status = 1
+		WHERE
+		id in
+		<foreach collection="array" item="item" open="(" close=")" separator=",">
+			#{item}
+		</foreach>
+	</update>
+	<select id="getCourseKpointById" resultMap="CourseKpointResult" parameterType="Long">
+		select
+		<include refid="edu_course_kpoint_columns" />
+		from edu_course_kpoint
+		where
+		id = #{value}
+	</select>
+
+	<select id="getCourseKpointList" resultMap="CourseKpointResult" parameterType="Map">
+		select
+		<include refid="edu_course_kpoint_columns" />
+		from edu_course_kpoint
+		<where>
+			edu_course_kpoint.status = 0
+			<if test="courseId!=null">
+				and edu_course_kpoint.course_id=#{courseId}
+			</if>
+			<if test="type!=null">
+				and edu_course_kpoint.type=#{type}
+			</if>
+		</where>
+        order by edu_course_kpoint.sort
+	</select>
+	<update id="updateCourseKpointPlaycountAdd" parameterType="Long">
+		update
+		edu_course_kpoint SET
+		playcount = playcount+1
+		where
+		id = #{value}
+	</update>
+	<select id="getKpointNumByCourseId" resultType="Long" parameterType="Long">
+		select
+		    count(DISTINCT edu_course_kpoint.id)
+		from edu_course_kpoint
+		where 
+		type=0 
+		and
+		status=0
+		and
+		course_id= #{value}
+	</select>
+	<select id="getCourseKpointNewList" resultMap="CourseKpointNewResult" parameterType="Map">
+		select
+		<include refid="edu_course_kpoint_columns" />,edu_course_studyhistory.playercount playercount
+		,personNum,
+		edu_course_studyhistory.course_name
+		from edu_course_kpoint
+		left join edu_course_studyhistory on edu_course_studyhistory.kpoint_id=edu_course_kpoint.id
+		left join 
+		(select kpoint_id,count(1) personNum from edu_course_studyhistory
+		group by kpoint_id 
+		) 
+		temp_playCount on temp_playCount.kpoint_id=edu_course_kpoint.id
+		<where>
+			edu_course_kpoint.status = 0
+			<if test="e.courseId!=null">
+				and edu_course_kpoint.course_id=#{e.courseId}
+			</if>
+			<if test="e.type!=null">
+				and edu_course_kpoint.type=#{e.type}
+			</if>
+			<if test="e.name!=null and e.name!=''">
+				and edu_course_kpoint.name like CONCAT('%',#{e.name},'%')
+			</if>
+			<if test="e.courseName!=null and e.courseName!=''">
+				and edu_course_studyhistory.course_name like CONCAT('%',#{e.courseName},'%')
+			</if>
+		</where>
+		group by edu_course_kpoint.id
+        order by edu_course_studyhistory.playercount desc
+        <include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getCourseKpointNewListCount" resultType="int" parameterType="Map">
+		select
+		count(1)
+		from edu_course_kpoint
+		left join edu_course_studyhistory on edu_course_studyhistory.kpoint_id=edu_course_kpoint.id
+		<where>
+			edu_course_kpoint.status = 0
+			<if test="e.courseId!=null">
+				and edu_course_kpoint.course_id=#e.courseId}
+			</if>
+			<if test="e.type!=null">
+				and edu_course_kpoint.type=#{e.type}
+			</if>
+			<if test="e.name!=null and e.name!=''">
+				and edu_course_kpoint.name like CONCAT('%',#{e.name},'%')
+			</if>
+			<if test="e.courseName!=null and e.courseName!=''">
+				and edu_course_studyhistory.course_name like CONCAT('%',#{e.courseName},'%')
+			</if>
+		</where>
+	</select>
+	<select id="getCourseKpointNumByCourseList" resultType="Long" parameterType="list">
+		select
+		count(1)
+		from edu_course_kpoint
+		where
+			edu_course_kpoint.status=0
+			and edu_course_kpoint.type=0
+			and edu_course_kpoint.course_id in
+			<foreach collection="list" item="item" open="(" close=")" separator=",">
+			#{item.id}
+			</foreach>
+	</select>
+	
+	<!-- 通过IDS查询节点集合 -->
+	<select id="getCourseKpointByIds" parameterType="String" resultMap="CourseKpointResult">
+		select <include refid="edu_course_kpoint_columns"/>
+		from edu_course_kpoint
+		where edu_course_kpoint.id in (${value})
+	</select>
+	
+	<!-- 批量添加子节点 -->
+	<insert id="createChildCourseKpointList" parameterType="list">
+		insert INTO edu_course_kpoint (
+		<include refid="edu_course_kpoint_columns" />
+		) VALUES 
+		<foreach collection="list" item="item" index="index" separator="," > 
+			(#{item.id},#{item.courseId},#{item.name},#{item.parentId},#{item.type},#{item.status},#{item.addTime}
+			,#{item.sort},#{item.playcount},#{item.isfree},#{item.videotype},#{item.videourl},#{item.videojson},#{item.teacherId}
+			,#{item.courseMinutes},#{item.courseSeconds}) 
+		</foreach>
+	</insert>
+</mapper>

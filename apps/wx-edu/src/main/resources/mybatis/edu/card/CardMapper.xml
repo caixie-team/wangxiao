@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CardMapper">
+
+	<resultMap id="CardResult" type="Card">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="money" column="money" />
+		<result property="type" column="type" />
+		<result property="num" column="num" />
+		<result property="beginTime" column="begin_time" />
+		<result property="endTime" column="end_time" />
+		<result property="remark" column="remark" />
+		<result property="createUser" column="create_user" />
+		<result property="createTime" column="create_time" />
+		<result property="courseName" column="course_name" />
+	</resultMap>
+	<sql id="edu_card_columns">
+		edu_card.id,
+		edu_card.name,
+		edu_card.money,
+		edu_card.type,
+		edu_card.num,
+		edu_card.begin_time,
+		edu_card.end_time,
+		edu_card.remark,
+		edu_card.create_user,
+		edu_card.create_time,
+		edu_card.course_name
+	</sql>
+
+	<sql id="edu_card_properties">
+		#{id},
+		#{name},
+		#{money},
+		#{type},
+		#{num},
+		#{beginTime},
+		#{endTime},
+		#{remark},
+		#{createUser},
+		#{createTime},
+		#{courseName}
+	</sql>
+
+	<insert id="createCard" parameterType="Card" keyColumn="id"
+		keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_card (
+		<include refid="edu_card_columns" />
+		) VALUES (
+		#{id},
+		#{name},
+		#{money},
+		#{type},
+		#{num},
+		#{beginTime},
+		CONCAT(DATE_FORMAT(#{endTime},'%Y-%m-%d'),' 23:59:59'),
+		#{remark},
+		#{createUser},
+		#{createTime},
+		#{courseName}
+		)
+	</insert>
+
+	<delete id="deleteCardById" parameterType="Long">
+		delete from edu_card
+		where
+		id = #{value}
+	</delete>
+
+	<update id="updateCard" parameterType="Card">
+		update edu_card SET
+		id = #{id},
+		name = #{name},
+		money = #{money},
+		type = #{type},
+		num = #{num},
+		begin_time = #{beginTime},
+		end_time = #{endTime},
+		remark = #{remark},
+		create_user = #{createUser},
+		create_time = #{createTime}
+		where
+		id = #{id}
+
+	</update>
+
+	<select id="getCardById" resultMap="CardResult" parameterType="Long">
+		select
+		<include refid="edu_card_columns" />
+		from edu_card
+		where
+		id = #{value}
+
+	</select>
+
+
+
+
+	<select id="getCardList" resultMap="CardResult" parameterType="Card">
+		select
+		<include refid="edu_card_columns" />
+		from edu_card
+	</select>
+
+</mapper>

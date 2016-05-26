@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserCourseKpointStatisticMapper">
+
+        <resultMap id="UserCourseKpointStatisticResult" type="UserCourseKpointStatistic">
+            <result property="id" column="id"/>
+            <result property="statisticDate" column="statistic_date"/>
+            <result property="playCount" column="play_count"/>
+            <result property="playerNum" column="player_num"/>
+            <result property="date" column="date"/>
+        </resultMap>
+
+        <sql id="edu_user_course_kpoint_statistic_columns">
+            edu_user_course_kpoint_statistic.id,
+            edu_user_course_kpoint_statistic.statistic_date,
+            edu_user_course_kpoint_statistic.play_count,
+            edu_user_course_kpoint_statistic.player_num
+        </sql>
+
+        <sql id="edu_user_course_kpoint_statistic_properties">
+            #{id},
+            #{statisticDate},
+            #{playCount},
+            #{playerNum}
+        </sql>
+
+        <insert id="createUserCourseKpointStatistic" parameterType="UserCourseKpointStatistic" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_user_course_kpoint_statistic (<include refid="edu_user_course_kpoint_statistic_columns"/>) VALUES (<include refid="edu_user_course_kpoint_statistic_properties"/>)
+        </insert>
+
+        <delete id="deleteUserCourseKpointStatisticById" parameterType="Long">
+            delete from edu_user_course_kpoint_statistic
+            where
+                id = #{value}
+
+
+
+        </delete>
+
+        <update id="updateUserCourseKpointStatistic" parameterType="UserCourseKpointStatistic">
+            update edu_user_course_kpoint_statistic SET
+                id = #{id},
+                statistic_date = #{statisticDate},
+                play_count = #{playCount},
+                player_num = #{playerNum}
+            where
+                id = #{id}
+        </update>
+
+        <select id="getUserCourseKpointStatisticById" resultMap="UserCourseKpointStatisticResult" parameterType="Long">
+            select
+            <include refid="edu_user_course_kpoint_statistic_columns"/>
+            from edu_user_course_kpoint_statistic
+            where
+                id = #{value}
+
+
+
+        </select>
+        <select id="getUserCourseKpointStatistic" resultMap="UserCourseKpointStatisticResult" parameterType="UserCourseKpointStatistic">
+            select
+            <include refid="edu_user_course_kpoint_statistic_columns"/>
+            from edu_user_course_kpoint_statistic
+            <where>
+                <if test="statisticDate!=null">
+                    edu_user_course_kpoint_statistic.statistic_date = date(#{statisticDate})
+                </if>
+            </where>
+        </select>
+        <select id="getUserCourseKpointStatisticList" resultMap="UserCourseKpointStatisticResult" parameterType="UserCourseKpointStatistic">
+            select
+            <include refid="edu_user_course_kpoint_statistic_columns"/>
+            from edu_user_course_kpoint_statistic
+        </select>
+
+
+    <!-- 按年查询网站统计 -->
+    <select id="getKpointStatisticsByYear" resultMap="UserCourseKpointStatisticResult" parameterType="Map">
+        SELECT
+        year.m AS date,play_count,player_num FROM
+        (SELECT 12 AS m UNION ALL
+        SELECT 11 UNION ALL
+        SELECT 10 UNION ALL
+        SELECT 09 UNION ALL
+        SELECT 08 UNION ALL
+        SELECT 07 UNION ALL
+        SELECT 06 UNION ALL
+        SELECT 05 UNION ALL
+        SELECT 04 UNION ALL
+        SELECT 03 UNION ALL
+        SELECT 02 UNION ALL
+        SELECT 01) AS year
+        LEFT JOIN (
+        SELECT DATE_FORMAT(edu_user_course_kpoint_statistic.`statistic_date`,'%m') AS m,
+            SUM(edu_user_course_kpoint_statistic.`play_count`) AS play_count,
+            SUM(edu_user_course_kpoint_statistic.`player_num`) AS player_num
+            FROM edu_user_course_kpoint_statistic
+            WHERE DATE_FORMAT(edu_user_course_kpoint_statistic.`statistic_date`,'%Y')=#{year}
+            GROUP BY DATE_FORMAT(edu_user_course_kpoint_statistic.`statistic_date`,'%Y-%m')
+        ) AS edu_user_course_kpoint_statistic
+        ON year.m = edu_user_course_kpoint_statistic.m
+    </select>
+    <!-- 按月查询网站统计 -->
+    <select id="getKpointStatisticsByMonth" resultMap="UserCourseKpointStatisticResult" parameterType="Map">
+        SELECT
+        month.d AS date,play_count,player_num FROM
+        (SELECT 31 AS d UNION ALL
+        SELECT 30 UNION ALL
+        SELECT 29 UNION ALL
+        SELECT 28 UNION ALL
+        SELECT 27 UNION ALL
+        SELECT 26 UNION ALL
+        SELECT 25 UNION ALL
+        SELECT 24 UNION ALL
+        SELECT 23 UNION ALL
+        SELECT 22 UNION ALL
+        SELECT 21 UNION ALL
+        SELECT 20 UNION ALL
+        SELECT 19 UNION ALL
+        SELECT 18 UNION ALL
+        SELECT 17 UNION ALL
+        SELECT 16 UNION ALL
+        SELECT 15 UNION ALL
+        SELECT 14 UNION ALL
+        SELECT 13 UNION ALL
+        SELECT 12 UNION ALL
+        SELECT 11 UNION ALL
+        SELECT 10 UNION ALL
+        SELECT 09 UNION ALL
+        SELECT 08 UNION ALL
+        SELECT 07 UNION ALL
+        SELECT 06 UNION ALL
+        SELECT 05 UNION ALL
+        SELECT 04 UNION ALL
+        SELECT 03 UNION ALL
+        SELECT 02 UNION ALL
+        SELECT 01 ) AS month
+        LEFT JOIN (
+        SELECT DATE_FORMAT(edu_user_course_kpoint_statistic.`statistic_date`,'%d') AS d,
+        SUM(edu_user_course_kpoint_statistic.`play_count`) AS play_count,
+        SUM(edu_user_course_kpoint_statistic.`player_num`) AS player_num
+        FROM edu_user_course_kpoint_statistic
+        WHERE DATE_FORMAT(edu_user_course_kpoint_statistic.`statistic_date`,'%Y-%m')=#{yearAndMonth}
+        GROUP BY DATE_FORMAT(edu_user_course_kpoint_statistic.`statistic_date`,'%Y-%m-%d')
+        ) AS edu_user_course_kpoint_statistic
+        ON month.d = edu_user_course_kpoint_statistic.d
+    </select>
+
+    <!-- 查询网站总统计,不分时间 -->
+    <select id="getKpointStatisticsSumMsg" resultMap="UserCourseKpointStatisticResult">
+        select
+        <include refid="edu_user_course_kpoint_statistic_columns"/>
+        from edu_user_course_kpoint_statistic
+    </select>
+
+    <!-- 查询记录条数 -->
+    <select id="getStatisticListByDays" resultMap="UserCourseKpointStatisticResult" parameterType="int">
+        SELECT <include refid="edu_user_course_kpoint_statistic_columns"/> from edu_user_course_kpoint_statistic
+        ORDER BY edu_user_course_kpoint_statistic.statistic_date DESC
+        limit 0,#{value}
+    </select>
+
+</mapper>

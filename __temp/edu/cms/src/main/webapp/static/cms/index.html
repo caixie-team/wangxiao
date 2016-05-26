@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>资讯中心 | 理臣教育</title>
+	<meta name="author" content=""/>
+	<meta name="keywords" content="" />
+	<meta name="description" content="" />
+	<link rel="stylesheet" type="text/css" href="http://127.0.0.1:82/static/cms/css/style.css">
+	<script type="text/javascript" src="http://127.0.0.1:82/static/common/jquery-1.11.1.min.js"></script>
+	<script type="text/javascript" src="http://127.0.0.1:82/static/common/webutils.js"></script>
+	<script type="text/javascript" src="http://127.0.0.1:82/static/cms/js/cms-util.js"></script>
+	<!--[if lt IE 9]><script src="http://127.0.0.1:82/static/common/html5.js" type="text/javascript"></script><![endif]-->
+	<script type="text/javascript">
+	
+	function checkLichen(type){
+		$("li[name='lichen']").removeClass();
+		$("#lichen"+type).addClass("current");
+		$("div[name='lShow']").hide();
+		$("#lShow"+type).show();
+	}
+	function checkHangye(type){
+		$("li[name='hangye']").removeClass();
+		$("#hangye"+type).addClass("current");
+		$("div[name='hShow']").hide();
+		$("#hShow"+type).show();
+	}
+	function checkShequ(type){
+		$("li[name='shequ']").removeClass();
+		$("#shequ"+type).addClass("current");
+		$("div[name='sShow']").hide();
+		$("#sShow"+type).show();
+	}
+	function getSearch(){
+		var search=$("#search").val();
+		if(search==""){
+			search="0";
+		}
+		window.open("http://127.0.0.1:82/line/course/search/"+search); 
+	};
+	</script>
+</head>
+<body>
+	<script type="text/javascript">
+	function searchArticle(){
+		var searchKey = jQuery("#search").val();
+		jQuery("#articleName").val(searchKey);
+		jQuery("#searchForm").submit();
+	}
+</script>
+<section class="o-topBar">
+		<form action="/cms/news/list" name="searchForm" id="searchForm" method="post">
+		<input name="queryArticle.title" id="articleName" type="hidden">
+		<input id="pageCurrentPage" type="hidden" name="page.currentPage" value="1"/>
+		<input type="hidden" name="queryArticle.typeId" value="0" id="cmsTypeId"/>
+		<input type="hidden" id="infoTypeLinkId" name="queryArticle.typeLink" value=""/>
+		</form>
+		<div class="container-i">
+			<div class="otb-li">
+				<ol class="fr">
+					<li class="isLogin" style="display:none;">
+						<a class="cusImg" href="/uc/home">
+						<img width="30" height="30" class="vam" id="cusImg" src=""/>
+						<tt class="fsize14 cusName vam"></tt>
+						</a>
+					</li>
+					<li class="isLogin" style="display:none;"><a href="/letter">消息</a></li>
+					<li class="isLogin" style="display:none;"><a href="javascript:void(0)" onclick="exit()">退出</a></li>
+					<li class="notLogin"><a href="/login" target="_blank">登录</a></li>
+					<li class="notLogin"><a href="/register" target="_blank">注册</a></li>
+					<li class="notLogin"><a href="/front/forget_passwd" target="_blank">忘记密码?</a></li>
+					<li class="line-share">
+						<a href="" target="_blank" class="t-share"><em class="icon14 mr5">&nbsp;</em>分享关注</a>
+						<aside class="t-link-sub tShareBox">
+							<div class="bdsharebuttonbox"><a href="#" class="bds_more" data-cmd="more"></a><a title="分享到新浪微博" href="#" class="bds_tsina" data-cmd="tsina"></a><a title="分享到QQ空间" href="#" class="bds_qzone" data-cmd="qzone"></a><a title="分享到微信" href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+							<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+						</aside>
+					</li>
+				</ol>
+				<ul class="fl">
+					<li><a href="/" target="_blank">理臣官网</a></li>
+					<li><a href="/index" target="_blank">理臣网校</a></li>
+				</ul>
+				<div class="clear"></div>
+			</div>
+		</div>
+	</section>
+	<!-- header begin -->
+	<header class="header">
+		<div class="container-i cms-header">
+			<div class="h-i-l o-h-i-l"> 
+				<h1 class="logo-2014 of fl"> 
+					<a target="_blank" title="理臣教育" class="fl" href="/">
+						<img width="255" height="74" class="dis" src="http://127.0.0.1:82/static/edu/images/lc_official_line/logo-blue.png">
+					</a> 
+					<span class="ml15 fl mt30">
+						<img width="142" height="24" class="dis" src="http://127.0.0.1:82/static/edu/images/lc_official_line/slogan-blue.png">
+					</span> 
+				</h1>
+				<div class="clear"></div>
+			</div>
+			<div class="h-i-r"> 
+				<section class="mt50 of o-h-i-r"> 
+					<div class="t-search-i fl"> 
+						<label class="clearfix"> 
+							<input type="text" id="search" placeholder="search..."> 
+							<a class="tscBtn" onclick="searchArticle()" href="javascript:void(0);">
+							<em class="icon14">&nbsp;</em>
+							</a> 
+						</label> 
+					</div>
+					<div class="fr">
+						<section class="cms-tel">
+							<em class="icon30">&nbsp;</em>
+							<span class="ml5 vam fsize18 f-fM">${websitemap.web.phone}</span>
+						</section>
+					</div>
+				</section> 
+			</div>
+			<div class="clear"></div>
+		</div>
+	</header>
+	<!-- header end -->
+	<!-- nav begin -->
+	<div class="container-i">
+		<nav class="cms-nav clearfix">
+												<dl class="CN-1">
+				<dt><a href="/cms/news/list?queryArticle.typeId=2">优护资讯：</a></dt>
+				<dd>
+																	<a href="/cms/news/list?queryArticle.typeId=15">教学动态</a>
+												<a href="/cms/news/list?queryArticle.typeId=16">理臣动态</a>
+															</dd>
+			</dl>
+												<dl class="CN-1">
+				<dt><a href="/cms/news/list?queryArticle.typeId=3">就业服务：</a></dt>
+				<dd>
+																	<a href="/cms/news/list?queryArticle.typeId=6">就业政策</a>
+												<a href="/cms/news/list?queryArticle.typeId=7">就业资讯</a>
+												<a href="/cms/news/list?queryArticle.typeId=8">招聘信息</a>
+															</dd>
+			</dl>
+												<dl class="CN-2">
+				<dt><a href="/cms/news/list?queryArticle.typeId=4">行业资讯：</a></dt>
+				<dd>
+																	<a href="/cms/news/list?queryArticle.typeId=17">焦点新闻</a>
+												<a href="/cms/news/list?queryArticle.typeId=18">财会新闻</a>
+												<a href="/cms/news/list?queryArticle.typeId=19">税务新闻</a>
+												<a href="/cms/news/list?queryArticle.typeId=20">财商新闻</a>
+												<a href="/cms/news/list?queryArticle.typeId=21">考试新闻</a>
+												<a href="/cms/news/list?queryArticle.typeId=22">职场新闻</a>
+															</dd>
+			</dl>
+												<dl class="CN-3">
+				<dt><a href="/cms/news/list?queryArticle.typeId=5">社区资讯：</a></dt>
+				<dd>
+																	<a href="/cms/news/list?queryArticle.typeId=24">学习指南</a>
+												<a href="/cms/news/list?queryArticle.typeId=25">考试攻略</a>
+												<a href="/cms/news/list?queryArticle.typeId=26">案例分享</a>
+												<a href="/cms/news/list?queryArticle.typeId=27">互动问答</a>
+															</dd>
+			</dl>
+									<dl class="CN-5">
+				<dt><a href="/cms/aboutus">关于我们：</a></dt>
+				<dd>
+										<a href="/official/join">加盟理臣</a>
+				</dd>
+			</dl>
+		</nav>
+	</div>
+	<!-- nav end -->
+		<!-- cms main begin -->
+	<div class="container-i">
+		<article class="mt20">
+			<section class="cms-l">
+				<div class="mr30">
+					<div id="cms-slider">
+						<ul>
+																			<li>
+								<a target="_blank" href=" http://127.0.0.1:82/static/cms/info/224.html ">
+									<img alt="" src="http://static.baidu.com//upload/eduplat/article/20141231/1420023448277322553.png">
+									<p class="cs-txt"><span>李亚董事长荣任第七届管理咨询委员会副主任</span></p>
+								</a>
+							</li>
+													<li>
+								<a target="_blank" href=" http://127.0.0.1:82/static/cms/info/225.html ">
+									<img alt="" src="http://static.baidu.com//upload/eduplat/article/20141231/1420023506624744602.jpg">
+									<p class="cs-txt"><span>理臣再次入选2014中国管理咨询机构50大</span></p>
+								</a>
+							</li>
+												</ul>
+					</div><!--focus end-->
+				</div>
+			</section>
+			<aside class="cms-r">
+												<section class="h-c-r-h2">
+					<h2 class="unFw"><a href=" http://127.0.0.1:82/static/cms/info/248.html " title="" class="c-333 f-fM">2014年中级会计职称考试题型和考试教材解读</a></h2>
+					<div class="h-c-r-desc">
+						<p>据《关于2014年中级会计职称考试题型等有关问题的通知》获悉，2014年中级会计职称考试的试题题型已确定。那么今年的中级会计师考试题型有哪些?与往年相比有何变化?备考时需要注意哪些问题呢?在这里，考试吧为大家做了一个有关2014中级会计职称考试题型的详解，针对学员关心的问题进行解答，供大家参考。</p>
+					</div>
+				</section>
+								<section class="h-c-r-h2">
+					<h2 class="unFw"><a href=" http://127.0.0.1:82/static/cms/info/247.html " title="" class="c-333 f-fM">会计职称备考心态：朝目标奔跑 无任何借口</a></h2>
+					<div class="h-c-r-desc">
+						<p>　随着会计职称考试的临近，复习时间感觉很不够用，总是在想：好多内容还没有学会呢？怎么就考试了呢？心中难免充满紧张。有些恐惧，有些慌张，有时还会莫名其妙的感到不安。80%的考生可能都会有这样的想法，这个时候，建议大家一定要调解好，要有足够的意志力，天天给自己加油，不妨每天都对自己说：我会学得更好，我一定能成功!</p>
+					</div>
+				</section>
+								<section class="h-c-r-h2">
+					<h2 class="unFw"><a href=" http://127.0.0.1:82/static/cms/info/246.html " title="" class="c-333 f-fM">中职称考生容易走入的几个学习方法误区</a></h2>
+					<div class="h-c-r-desc">
+						<p>会计职称考试：中级考生容易走入的学习方法误区</p>
+					</div>
+				</section>
+								<section class="h-c-r-h2">
+					<h2 class="unFw"><a href=" http://127.0.0.1:82/static/cms/info/245.html " title="" class="c-333 f-fM">写给中级会计职称考生：失败并不可怕</a></h2>
+					<div class="h-c-r-desc">
+						<p>今年，我过了，不是为了想说明什么，只是想告诉那些曾经跟我一样没有过的朋友，还有第一次参加中级的朋友们，或许你我都会失败，失败一次并不可怕，只要你和米基·洛克一样，保持着一股力量，一种精神，中级，只会成为我们脚下的一块踏板，走向成功的一块阶梯。</p>
+					</div>
+				</section>
+							</aside>
+			<div class="clear"></div>
+		</article>
+		<article class="mt20">
+			<header class="cms-c-title">
+				<h4 class="">热门专题</h4>
+				<div class="clear"></div>
+			</header>
+			<!-- /cms-c-title -->
+			<div class="activities-list">
+				<ol class="clearfix">
+															<li>
+						<a href=" http://127.0.0.1:82/static/cms/info/145.html " title="">
+							<img src="http://static.baidu.com//upload/eduplat/article/20141223/1419312344238567891.jpg" width="220" height="120" alt="">
+							<p class="mt10 hLh20">在线教育会不会有“韩流”？</p>
+						</a>
+					</li>
+										<li>
+						<a href=" http://127.0.0.1:82/static/cms/info/124.html " title="">
+							<img src="http://static.baidu.com//upload/eduplat/article/20141220/1419045399315611918.jpg" width="220" height="120" alt="">
+							<p class="mt10 hLh20">非物质文化遗产——典雅吟诵</p>
+						</a>
+					</li>
+										<li>
+						<a href=" http://127.0.0.1:82/static/cms/info/143.html " title="">
+							<img src="http://static.baidu.com//upload/eduplat/article/20141223/1419311975544492789.png" width="220" height="120" alt="">
+							<p class="mt10 hLh20">教育APP近九成差评 指尖教育被指浮夸</p>
+						</a>
+					</li>
+										<li>
+						<a href=" http://127.0.0.1:82/static/cms/info/144.html " title="">
+							<img src="http://static.baidu.com//upload/eduplat/article/20141223/1419312170385390258.jpg" width="220" height="120" alt="">
+							<p class="mt10 hLh20">2014年在线教育发生的那些事儿</p>
+						</a>
+					</li>
+										<li>
+						<a href=" http://127.0.0.1:82/static/cms/info/146.html " title="">
+							<img src="http://static.baidu.com//upload/eduplat/article/20141223/1419312427749858364.jpg" width="220" height="120" alt="">
+							<p class="mt10 hLh20">答案会在你的行动中——2014地平线报告基础教育版</p>
+						</a>
+					</li>
+									</ol>
+			</div>
+		</article>
+		<article class="mt30">
+			<header class="cms-c-title">
+				<h4 class="">理臣资讯</h4>
+				<ul>
+																<li id="lichen1"  name="lichen"  class="current" ><a href="javascript:checkLichen(1)" title="教学动态">教学动态</a></li>
+																	<li id="lichen2"  name="lichen" ><a href="javascript:checkLichen(2)" title="理臣动态">理臣动态</a></li>
+															</ul>
+				<div class="clear"></div>
+			</header>
+			<!-- /cms-c-title -->
+			<div class="mt20">
+				<section class="cms-l" style="width:250px;">
+					<div class="mr30">
+						<aside class="c-l-200">
+							<div id="sub-slider" class="sub-slider">
+								<ul>
+																								</ul>
+							</div>
+						</aside>
+					</div>
+				</section>
+				
+												<div id="lShow1" name="lShow" >
+				
+								<aside class="cms-r" style="margin-right:40px;">
+					<div class="hot-c-box">
+																					<a href=" http://127.0.0.1:82/static/cms/info/132.html " title=""><img src="http://static.baidu.com//upload/eduplat/article/20141223/1419305674562603682.jpg" width="165" height="90" class="dis fl mr10" alt=""></a>
+									<section class="h-c-r-desc">
+										理臣会计培训零起点会计速成班现正开班
+									</section>
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-22</span>
+								</section>
+																		</div>
+					<ul class="cms-clist">
+																														</ul>
+				</aside>
+								<aside class="cms-r">
+					<div class="hot-c-box">
+																								</div>
+					<ul class="cms-clist">
+																														</ul>
+				</aside>
+				</div>
+												<div id="lShow2" name="lShow"  style="display: none" >
+				
+								<aside class="cms-r" style="margin-right:40px;">
+					<div class="hot-c-box">
+																					<a href=" http://127.0.0.1:82/static/cms/info/131.html " title=""><img src="http://static.baidu.com//upload/eduplat/article/20141223/1419305520266718162.jpg" width="165" height="90" class="dis fl mr10" alt=""></a>
+									<section class="h-c-r-desc">
+										理臣会计培训教育观
+									</section>
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-22</span>
+								</section>
+																																												</div>
+					<ul class="cms-clist">
+																																																					<li><a href=" http://127.0.0.1:82/static/cms/info/126.html " title="理臣教育进驻漳州，全新模式免费课程献礼全城"><em>·</em>理臣教育进驻漳州，全新模式免费课程献礼全城</a></li>
+																		</ul>
+				</aside>
+								<aside class="cms-r">
+					<div class="hot-c-box">
+																																		<a href=" http://127.0.0.1:82/static/cms/info/225.html " title=""><img src="http://static.baidu.com//upload/eduplat/article/20141231/1420023506624744602.jpg" width="165" height="90" class="dis fl mr10" alt=""></a>
+								<section class="h-c-r-desc">
+									理臣再次入选2014中国管理咨询机构50大
+								</section>
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-30</span>
+								</section>
+																															</div>
+					<ul class="cms-clist">
+																																																								</ul>
+				</aside>
+				</div>
+												<div class="clear"></div>
+			</div>
+		</article>
+		<!-- /ads-cms begin -->
+		<article class="mt20">
+			<a href="" title=""><img src="http://127.0.0.1:82/static/edu/images/lc_official_line/ts-banner.jpg" width="1000" height="120" class="dis" alt=""></a>
+		</article>
+		<!-- /ads-cms end -->
+		<article class="mt30">
+			<header class="cms-c-title">
+				<h4 class="">行业资讯</h4>
+				<ul>
+																<li id="hangye1"  name="hangye"  class="current" ><a href="javascript:checkHangye(1)" title="焦点新闻">焦点新闻</a></li>
+																	<li id="hangye2"  name="hangye" ><a href="javascript:checkHangye(2)" title="财会新闻">财会新闻</a></li>
+																	<li id="hangye3"  name="hangye" ><a href="javascript:checkHangye(3)" title="税务新闻">税务新闻</a></li>
+																	<li id="hangye4"  name="hangye" ><a href="javascript:checkHangye(4)" title="财商新闻">财商新闻</a></li>
+																	<li id="hangye5"  name="hangye" ><a href="javascript:checkHangye(5)" title="考试新闻">考试新闻</a></li>
+																	<li id="hangye6"  name="hangye" ><a href="javascript:checkHangye(6)" title="职场新闻">职场新闻</a></li>
+															</ul>
+				<div class="clear"></div>
+			</header>
+			<!-- /cms-c-title -->
+			<div class="mt20">
+				<section class="cms-l" style="width:250px;">
+					<div class="mr30">
+						<aside class="c-l-200">
+							<div id="sub-slider2" class="sub-slider">
+								<ul>
+																									<li>
+										<a target="_blank" href=" http://127.0.0.1:82/static/cms/info/138.html ">
+											<img alt="" src="http://static.baidu.com//upload/eduplat/article/20141223/1419310947436351562.jpg">
+											<p class="cs-txt"><span>在线教育行业的概念</span></p>
+										</a>
+									</li>
+																	<li>
+										<a target="_blank" href=" http://127.0.0.1:82/static/cms/info/137.html ">
+											<img alt="" src="http://static.baidu.com//upload/eduplat/article/20141223/1419310778778662145.jpg">
+											<p class="cs-txt"><span>不懂“在线学习”不要再谈在线教育</span></p>
+										</a>
+									</li>
+																	<li>
+										<a target="_blank" href=" http://127.0.0.1:82/static/cms/info/117.html ">
+											<img alt="" src="http://static.baidu.com//upload/eduplat/article/20141205/1417770955421126181.jpg">
+											<p class="cs-txt"><span>行业资讯 News</span></p>
+										</a>
+									</li>
+																	<li>
+										<a target="_blank" href=" http://127.0.0.1:82/static/cms/info/119.html ">
+											<img alt="" src="http://static.baidu.com//upload/eduplat/article/20141205/1417770994919292388.jpg">
+											<p class="cs-txt"><span>香港高校内地招生否认“遇冷”：我们不缺学生</span></p>
+										</a>
+									</li>
+																	<li>
+										<a target="_blank" href=" http://127.0.0.1:82/static/cms/info/109.html ">
+											<img alt="" src="http://static.baidu.com//upload/eduplat/article/20141220/1419054042844887381.jpg">
+											<p class="cs-txt"><span>2014高等教育之绣红榜</span></p>
+										</a>
+									</li>
+																</ul>
+							</div>
+						</aside>
+					</div>
+					
+				</section>
+												<div id="hShow1" name="hShow" >
+				
+								<aside class="cms-r" style="margin-right:40px;">
+					<div class="hot-c-box">
+																					<a href=" http://127.0.0.1:82/static/cms/info/148.html " title=""><img src="http://static.baidu.com//upload/eduplat/article/20141223/1419313494667817375.jpg" width="165" height="90" class="dis fl mr10" alt=""></a>
+									<section class="h-c-r-desc">
+										贝塔斯曼频频出手在线教育，看好职教平台型产品
+									</section>
+								
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-23</span>
+								</section>
+																																																																																																																																							</div>
+					<ul class="cms-clist">
+																																																					<li><a href=" http://127.0.0.1:82/static/cms/info/138.html " title="在线教育行业的概念"><em>·</em>在线教育行业的概念</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/151.html " title="谷歌和Chrombook同苹果将在教育市场正面交锋"><em>·</em>谷歌和Chrombook同苹果将在教育市场正面交锋</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/117.html " title="行业资讯 News"><em>·</em>行业资讯 News</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/172.html " title="财政部建立和实施内部控制，走上“快车道”"><em>·</em>财政部建立和实施内部控制，走上“快车道”</a></li>
+																																																																						</ul>
+				</aside>
+								<aside class="cms-r">
+					<div class="hot-c-box">
+																																		<a href=" http://127.0.0.1:82/static/cms/info/147.html " title=""><img src="http://static.baidu.com//upload/eduplat/article/20141223/1419313386334550333.jpg" width="165" height="90" class="dis fl mr10" alt=""></a>
+								<section class="h-c-r-desc">
+									不可不知的三十个国外在线教育工具
+								</section>
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-23</span>
+								</section>
+																																																																																																																										</div>
+					<ul class="cms-clist">
+																																																																																																									<li><a href=" http://127.0.0.1:82/static/cms/info/180.html " title=""><em>·</em>《不动产登记暂行条例》于2015年3月1日起施行</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/136.html " title=""><em>·</em>在线教育：看上去美做起来难</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/108.html " title=""><em>·</em>台湾职业教育哪些值得大陆借鉴</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/109.html " title=""><em>·</em>2014高等教育之绣红榜</a></li>
+																		</ul>
+				</aside>
+				</div>
+												<div id="hShow2" name="hShow"  style="display: none" >
+				
+								<aside class="cms-r" style="margin-right:40px;">
+					<div class="hot-c-box">
+																					<a href=" http://127.0.0.1:82/static/cms/info/209.html " title=""><img src="http://static.baidu.com//upload/eduplat/article/20141231/1420010454500430286.png" width="165" height="90" class="dis fl mr10" alt=""></a>
+									<section class="h-c-r-desc">
+										商务部官员：明年消费增速降低 新增长点将形成
+									</section>
+								
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-30</span>
+								</section>
+																																																																																																																																							</div>
+					<ul class="cms-clist">
+																																																					<li><a href=" http://127.0.0.1:82/static/cms/info/119.html " title="香港高校内地招生否认“遇冷”：我们不缺学生"><em>·</em>香港高校内地招生否认“遇冷”：我们不缺学生</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/204.html " title="金融体系改革需解决五大关联问题"><em>·</em>金融体系改革需解决五大关联问题</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/203.html " title="风险不断加大 以监管消除网贷业七年之痒"><em>·</em>风险不断加大 以监管消除网贷业七年之痒</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/208.html " title="小米敲定11亿美元融资 估值450亿美元仅次于BAT"><em>·</em>小米敲定11亿美元融资 估值450亿美元仅次于BAT</a></li>
+																																																																						</ul>
+				</aside>
+								<aside class="cms-r">
+					<div class="hot-c-box">
+																																		<a href=" http://127.0.0.1:82/static/cms/info/207.html " title=""><img src="http://static.baidu.com//upload/eduplat/article/20141230/1419932031067206712.jpg" width="165" height="90" class="dis fl mr10" alt=""></a>
+								<section class="h-c-r-desc">
+									中国养老金隐形债务86.2万亿 副总理称缺口不是一星半点
+								</section>
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-30</span>
+								</section>
+																																																																																																																										</div>
+					<ul class="cms-clist">
+																																																																																																									<li><a href=" http://127.0.0.1:82/static/cms/info/206.html " title=""><em>·</em>“互联网银行”终于露脸了 微众银行悄悄上线</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/205.html " title=""><em>·</em>央行387号文被指鼓励套利 银行或将专做同业存款</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/114.html " title=""><em>·</em>房地产建筑业营改增又升温 专家预测税率或为11%</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/187.html " title=""><em>·</em>韩国将对进口大米征513%关税</a></li>
+																		</ul>
+				</aside>
+				</div>
+												<div id="hShow3" name="hShow"  style="display: none" >
+				
+								<aside class="cms-r" style="margin-right:40px;">
+					<div class="hot-c-box">
+																					<a href=" http://127.0.0.1:82/static/cms/info/210.html " title=""><img src="http://static.baidu.com/" width="165" height="90" class="dis fl mr10" alt=""></a>
+									<section class="h-c-r-desc">
+										央企薪改核心被触及 约200多人将受影响
+									</section>
+								
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-30</span>
+								</section>
+																																																																																																																																							</div>
+					<ul class="cms-clist">
+																																																					<li><a href=" http://127.0.0.1:82/static/cms/info/112.html " title="瑞典对外交流委员会：微博微信齐上阵 招生方式更多元"><em>·</em>瑞典对外交流委员会：微博微信齐上阵 招生方式更多元</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/176.html " title="税种税率等制度只能法律定 规章不得减损公民权利"><em>·</em>税种税率等制度只能法律定 规章不得减损公民权利</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/177.html " title="吸烟致死超百万，提高烟草税刻不容缓"><em>·</em>吸烟致死超百万，提高烟草税刻不容缓</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/178.html " title="重大税务案件审理将有效避免“久审不决”"><em>·</em>重大税务案件审理将有效避免“久审不决”</a></li>
+																																																																						</ul>
+				</aside>
+								<aside class="cms-r">
+					<div class="hot-c-box">
+																																		<a href=" http://127.0.0.1:82/static/cms/info/211.html " title=""><img src="http://static.baidu.com//upload/eduplat/article/20141231/1420010492101293768.png" width="165" height="90" class="dis fl mr10" alt=""></a>
+								<section class="h-c-r-desc">
+									明年起小微企业再获减54项行政收费
+								</section>
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-30</span>
+								</section>
+																																																																																																																										</div>
+					<ul class="cms-clist">
+																																																																																																									<li><a href=" http://127.0.0.1:82/static/cms/info/179.html " title=""><em>·</em>国家税务总局关于调整增值税纳税申报有关事项的公告</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/182.html " title=""><em>·</em>适应形势发展 加大财税扶持力度</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/183.html " title=""><em>·</em>跨境电商需求旺盛 税务问题仍为头等大事</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/184.html " title=""><em>·</em>个税改革方案敲定：赡养老人支出等扣除</a></li>
+																		</ul>
+				</aside>
+				</div>
+												<div id="hShow4" name="hShow"  style="display: none" >
+				
+								<aside class="cms-r" style="margin-right:40px;">
+					<div class="hot-c-box">
+																					<a href=" http://127.0.0.1:82/static/cms/info/191.html " title=""><img src="http://static.baidu.com//upload/eduplat/article/20141226/1419566873151983930.png" width="165" height="90" class="dis fl mr10" alt=""></a>
+									<section class="h-c-r-desc">
+										财商测试：您适合做股票投资吗?
+									</section>
+								
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-25</span>
+								</section>
+																																																																																																																																							</div>
+					<ul class="cms-clist">
+																																																					<li><a href=" http://127.0.0.1:82/static/cms/info/190.html " title="【你的财商到底有多高】测试你的储蓄观念"><em>·</em>【你的财商到底有多高】测试你的储蓄观念</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/189.html " title="万达商业12月23日报收每股46.75港元 总市值为2092亿港元"><em>·</em>万达商业12月23日报收每股46.75港元 总市值为2092亿港元</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/128.html " title="如何还房贷最划算_怎样还房贷最划算解放房奴秘诀"><em>·</em>如何还房贷最划算_怎样还房贷最划算解放房奴秘诀</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/188.html " title="李克强：加大金融支持企业走出去力度"><em>·</em>李克强：加大金融支持企业走出去力度</a></li>
+																																																																						</ul>
+				</aside>
+								<aside class="cms-r">
+					<div class="hot-c-box">
+																																		<a href=" http://127.0.0.1:82/static/cms/info/200.html " title=""><img src="http://static.baidu.com/" width="165" height="90" class="dis fl mr10" alt=""></a>
+								<section class="h-c-r-desc">
+									压岁钱是孩子财商教育的第一步
+								</section>
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-26</span>
+								</section>
+																																																																																																																										</div>
+					<ul class="cms-clist">
+																																																																																																									<li><a href=" http://127.0.0.1:82/static/cms/info/198.html " title=""><em>·</em>父母坏习惯培养孩子"负财商" 抱怨家里没宝马</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/199.html " title=""><em>·</em>培养孩子财商：且看外国妈妈如何做</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/201.html " title=""><em>·</em>房奴秘诀——怎样还房贷最划算解放</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/202.html " title=""><em>·</em>金融界明星后生可畏 看孩子财商教育的六字诀</a></li>
+																		</ul>
+				</aside>
+				</div>
+												<div id="hShow5" name="hShow"  style="display: none" >
+				
+								<aside class="cms-r" style="margin-right:40px;">
+					<div class="hot-c-box">
+																					<a href=" http://127.0.0.1:82/static/cms/info/137.html " title=""><img src="http://static.baidu.com//upload/eduplat/article/20141223/1419310778778662145.jpg" width="165" height="90" class="dis fl mr10" alt=""></a>
+									<section class="h-c-r-desc">
+										不懂“在线学习”不要再谈在线教育
+									</section>
+								
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-23</span>
+								</section>
+																																																																																																																																							</div>
+					<ul class="cms-clist">
+																																																					<li><a href=" http://127.0.0.1:82/static/cms/info/212.html " title="2015年初/中/高级会计职称考试报名时间汇总"><em>·</em>2015年初/中/高级会计职称考试报名时间汇总</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/213.html " title="应届生报考2015年会计从业考试常见问题汇总"><em>·</em>应届生报考2015年会计从业考试常见问题汇总</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/216.html " title="福建2015年第一季会计从业准考证打印2月10日起"><em>·</em>福建2015年第一季会计从业准考证打印2月10日起</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/192.html " title="2015年注册会计师报名时间和考试时间公布"><em>·</em>2015年注册会计师报名时间和考试时间公布</a></li>
+																																																																						</ul>
+				</aside>
+								<aside class="cms-r">
+					<div class="hot-c-box">
+																																		<a href=" http://127.0.0.1:82/static/cms/info/186.html " title=""><img src="http://static.baidu.com/" width="165" height="90" class="dis fl mr10" alt=""></a>
+								<section class="h-c-r-desc">
+									2015年(第一季度)福建省会计从业资格考试有关事项的公告
+								</section>
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-25</span>
+								</section>
+																																																																																																																										</div>
+					<ul class="cms-clist">
+																																																																																																									<li><a href=" http://127.0.0.1:82/static/cms/info/214.html " title=""><em>·</em>2015年中级会计师考试“首次报考”考生报班建议</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/215.html " title=""><em>·</em>中国证券业协会：2015年证券从业资格考试计划</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/113.html " title=""><em>·</em>北京高考地方性加分或仅保留少数民族一类</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/185.html " title=""><em>·</em>福建省2015年初级会计职称报名时间</a></li>
+																		</ul>
+				</aside>
+				</div>
+												<div id="hShow6" name="hShow"  style="display: none" >
+				
+								<aside class="cms-r" style="margin-right:40px;">
+					<div class="hot-c-box">
+																					<a href=" http://127.0.0.1:82/static/cms/info/150.html " title=""><img src="http://static.baidu.com//upload/eduplat/article/20141223/1419313679484641804.jpg" width="165" height="90" class="dis fl mr10" alt=""></a>
+									<section class="h-c-r-desc">
+										【聚焦E-learning】移动学习的“速度与激情”
+									</section>
+								
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-23</span>
+								</section>
+																																																																																																																																							</div>
+					<ul class="cms-clist">
+																																																					<li><a href=" http://127.0.0.1:82/static/cms/info/220.html " title="法律顾问企管知识重点：劳动争议处理"><em>·</em>法律顾问企管知识重点：劳动争议处理</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/219.html " title="应对职场“过劳”有绝招"><em>·</em>应对职场“过劳”有绝招</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/217.html " title="面试时，让自己工资多谈一点的六个秘密"><em>·</em>面试时，让自己工资多谈一点的六个秘密</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/218.html " title="简历写作技巧：用简历标题打动HR的心"><em>·</em>简历写作技巧：用简历标题打动HR的心</a></li>
+																																																																						</ul>
+				</aside>
+								<aside class="cms-r">
+					<div class="hot-c-box">
+																																		<a href=" http://127.0.0.1:82/static/cms/info/197.html " title=""><img src="http://static.baidu.com/" width="165" height="90" class="dis fl mr10" alt=""></a>
+								<section class="h-c-r-desc">
+									9岁小学生成资深股民 父亲称为锻炼孩子“财商”
+								</section>
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-26</span>
+								</section>
+																																																																																																																										</div>
+					<ul class="cms-clist">
+																																																																																																									<li><a href=" http://127.0.0.1:82/static/cms/info/125.html " title=""><em>·</em>盘点2014年在线教育十大之最</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/127.html " title=""><em>·</em>好未来1.5亿战略投资宝宝树，在线教育将从娃娃抓起</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/194.html " title=""><em>·</em>财会人员职场存活的九大技巧</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/195.html " title=""><em>·</em>财会人的职场16字诀</a></li>
+																		</ul>
+				</aside>
+				</div>
+												<div class="clear"></div>
+			</div>
+		</article>
+		<article class="mt30">
+			<header class="cms-c-title">
+				<h4 class="">社区资讯</h4>
+				<ul>
+																<li id="shequ1"  name="shequ"  class="current" ><a href="javascript:checkShequ(1)" title="学习指南">学习指南</a></li>
+																	<li id="shequ2"  name="shequ" ><a href="javascript:checkShequ(2)" title="考试攻略">考试攻略</a></li>
+																	<li id="shequ3"  name="shequ" ><a href="javascript:checkShequ(3)" title="案例分享">案例分享</a></li>
+																	<li id="shequ4"  name="shequ" ><a href="javascript:checkShequ(4)" title="互动问答">互动问答</a></li>
+															</ul>
+				<div class="clear"></div>
+			</header>
+			<!-- /cms-c-title -->
+			<div class="mt20">
+				<section class="cms-l" style="width:250px;">
+					<div class="mr30">
+						<aside class="c-l-200">
+														<div>
+																																			<a href=" http://127.0.0.1:82/static/cms/info/140.html " title="">
+										<img src="http://static.baidu.com//upload/eduplat/article/20141223/1419311290550377394.jpg" width="220" height="120" class="dis" alt="">
+										<p class="mt10 hLh20 of"><span class="fsize14 c-4e">在线教育发展迅速 纸教科书淡出视野</span></p>
+										</a>
+																																																											
+							</div>
+							<div class="pt10">
+								<ul class="cms-clist">
+																																																									<li><a title="" href=" http://127.0.0.1:82/static/cms/info/134.html "><em>·</em>初级会计职称零基础考生备考攻略</a></li>
+																																							<li><a title="" href=" http://127.0.0.1:82/static/cms/info/142.html "><em>·</em>网络教育学习指南</a></li>
+																											</ul>
+							</div>
+						</aside>
+						
+					</div>
+				</section>
+												<div id="sShow1" name="sShow" >
+				
+								<aside class="cms-r" style="margin-right:40px;">
+					<div class="hot-c-box">
+																					<a href=" http://127.0.0.1:82/static/cms/info/247.html " title=""><img src="http://static.baidu.com//upload/eduplat/article/20141231/1420015624272173977.png" width="165" height="90" class="dis fl mr10" alt=""></a>
+									<section class="h-c-r-desc">
+										会计职称备考心态：朝目标奔跑 无任何借口
+									</section>
+								
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-30</span>
+								</section>
+																																																																																																																																							</div>
+					<ul class="cms-clist">
+																																																					<li><a href=" http://127.0.0.1:82/static/cms/info/159.html " title="高绩效企业长驱直入移动学习领域"><em>·</em>高绩效企业长驱直入移动学习领域</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/221.html " title="小留学生是与非：国外学习生活优势与挑战"><em>·</em>小留学生是与非：国外学习生活优势与挑战</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/115.html " title="千万考生赴考大学英语四六级 严查违纪舞弊"><em>·</em>千万考生赴考大学英语四六级 严查违纪舞弊</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/133.html " title="AICPA学习指导—如何攻克FAR"><em>·</em>AICPA学习指导—如何攻克FAR</a></li>
+																																																																						</ul>
+				</aside>
+								<aside class="cms-r">
+					<div class="hot-c-box">
+																																		<a href=" http://127.0.0.1:82/static/cms/info/140.html " title=""><img src="http://static.baidu.com//upload/eduplat/article/20141223/1419311290550377394.jpg" width="165" height="90" class="dis fl mr10" alt=""></a>
+								<section class="h-c-r-desc">
+									在线教育发展迅速 纸教科书淡出视野
+								</section>
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-23</span>
+								</section>
+																																																																																																																										</div>
+					<ul class="cms-clist">
+																																																																																																									<li><a href=" http://127.0.0.1:82/static/cms/info/141.html " title=""><em>·</em>在线教育的核心优势是提供主动学习的方法</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/142.html " title=""><em>·</em>网络教育学习指南</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/157.html " title=""><em>·</em>韩国在线教育给我们带来的思考</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/158.html " title=""><em>·</em>追逐移动学习浪潮需快中求稳</a></li>
+																		</ul>
+				</aside>
+				</div>
+												<div id="sShow2" name="sShow"  style="display: none" >
+				
+								<aside class="cms-r" style="margin-right:40px;">
+					<div class="hot-c-box">
+																					<a href=" http://127.0.0.1:82/static/cms/info/248.html " title=""><img src="http://static.baidu.com//upload/eduplat/article/20141231/1420015611817621680.png" width="165" height="90" class="dis fl mr10" alt=""></a>
+									<section class="h-c-r-desc">
+										2014年中级会计职称考试题型和考试教材解读
+									</section>
+								
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-30</span>
+								</section>
+																																																																																																																																							</div>
+					<ul class="cms-clist">
+																																																					<li><a href=" http://127.0.0.1:82/static/cms/info/222.html " title="三大策略解决考卷常见问题"><em>·</em>三大策略解决考卷常见问题</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/226.html " title="合理分配答题时间"><em>·</em>合理分配答题时间</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/229.html " title="考场考出好成绩的几个小技巧"><em>·</em>考场考出好成绩的几个小技巧</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/230.html " title="考场发挥十招"><em>·</em>考场发挥十招</a></li>
+																																																																						</ul>
+				</aside>
+								<aside class="cms-r">
+					<div class="hot-c-box">
+																																		<a href=" http://127.0.0.1:82/static/cms/info/228.html " title=""><img src="http://static.baidu.com//upload/eduplat/article/20141231/1420015336841222327.png" width="165" height="90" class="dis fl mr10" alt=""></a>
+								<section class="h-c-r-desc">
+									备考攻略：答题顺序很关键
+								</section>
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-30</span>
+								</section>
+																																																																																																																										</div>
+					<ul class="cms-clist">
+																																																																																																									<li><a href=" http://127.0.0.1:82/static/cms/info/223.html " title=""><em>·</em>制胜考场的五大考试技巧</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/231.html " title=""><em>·</em>马虎也是一种病：考试马虎现象大揭秘</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/227.html " title=""><em>·</em>十种最优答题技巧</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/129.html " title=""><em>·</em>LEED AP 中文考试全攻略</a></li>
+																		</ul>
+				</aside>
+				</div>
+												<div id="sShow3" name="sShow"  style="display: none" >
+				
+								<aside class="cms-r" style="margin-right:40px;">
+					<div class="hot-c-box">
+																					<a href=" http://127.0.0.1:82/static/cms/info/234.html " title=""><img src="http://static.baidu.com//upload/eduplat/article/20141231/1420015476414780027.png" width="165" height="90" class="dis fl mr10" alt=""></a>
+									<section class="h-c-r-desc">
+										餐饮成购物中心引流标配 培育期短成主因
+									</section>
+								
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-30</span>
+								</section>
+																																																																																																																																							</div>
+					<ul class="cms-clist">
+																																																					<li><a href=" http://127.0.0.1:82/static/cms/info/236.html " title="　美团7亿美元融资传闻背后的压力"><em>·</em>　美团7亿美元融资传闻背后的压力</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/237.html " title="奥特莱斯重庆跑马圈地 繁华暗藏泡沫"><em>·</em>奥特莱斯重庆跑马圈地 繁华暗藏泡沫</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/238.html " title="星巴克首家店迁址 外企陷"高租金"之痛"><em>·</em>星巴克首家店迁址 外企陷"高租金"之痛</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/239.html " title="2014中国商业纪事：大变局中没有谁是绝对安全"><em>·</em>2014中国商业纪事：大变局中没有谁是绝对安全</a></li>
+																																																																						</ul>
+				</aside>
+								<aside class="cms-r">
+					<div class="hot-c-box">
+																																		<a href=" http://127.0.0.1:82/static/cms/info/235.html " title=""><img src="http://static.baidu.com//upload/eduplat/article/20141231/1419989170498691459.jpg" width="165" height="90" class="dis fl mr10" alt=""></a>
+								<section class="h-c-r-desc">
+									小米美的格力：一场价值12亿的“三国杀”
+								</section>
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-30</span>
+								</section>
+																																																																																																																										</div>
+					<ul class="cms-clist">
+																																																																																																									<li><a href=" http://127.0.0.1:82/static/cms/info/232.html " title=""><em>·</em>“吸金潮”刚过理财产品就变脸</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/233.html " title=""><em>·</em>顶新遭催贷银行不续借 欲卖房卖地还65亿台币</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/106.html " title=""><em>·</em>职业教育改革正当时 适应潮流才是硬道理</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/135.html " title=""><em>·</em>2015年注册会计师考试经济法经典试题：案例分析题</a></li>
+																		</ul>
+				</aside>
+				</div>
+												<div id="sShow4" name="sShow"  style="display: none" >
+				
+								<aside class="cms-r" style="margin-right:40px;">
+					<div class="hot-c-box">
+																					<a href=" http://127.0.0.1:82/static/cms/info/240.html " title=""><img src="http://static.baidu.com//upload/eduplat/article/20141231/1420015595710741552.png" width="165" height="90" class="dis fl mr10" alt=""></a>
+									<section class="h-c-r-desc">
+										财务管理专业毕业生去向统计
+									</section>
+								
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-30</span>
+								</section>
+																																																																																																													</div>
+					<ul class="cms-clist">
+																																																					<li><a href=" http://127.0.0.1:82/static/cms/info/242.html " title="浅谈未来的会计职业发展"><em>·</em>浅谈未来的会计职业发展</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/243.html " title="2014中级会计职称各科目难度剖析及建议"><em>·</em>2014中级会计职称各科目难度剖析及建议</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/244.html " title="会计职称考试备考：有效预习的好方法"><em>·</em>会计职称考试备考：有效预习的好方法</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/245.html " title="写给中级会计职称考生：失败并不可怕"><em>·</em>写给中级会计职称考生：失败并不可怕</a></li>
+																																												</ul>
+				</aside>
+								<aside class="cms-r">
+					<div class="hot-c-box">
+																																		<a href=" http://127.0.0.1:82/static/cms/info/241.html " title=""><img src="http://static.baidu.com//upload/eduplat/article/20141231/1420015707038773779.png" width="165" height="90" class="dis fl mr10" alt=""></a>
+								<section class="h-c-r-desc">
+									财务管理专业就业前景及待遇之分析
+								</section>
+								<section class="mt20 tar">
+									<span class="c-999">2014-12-30</span>
+								</section>
+																																																																																																</div>
+					<ul class="cms-clist">
+																																																																																																									<li><a href=" http://127.0.0.1:82/static/cms/info/246.html " title=""><em>·</em>中职称考生容易走入的几个学习方法误区</a></li>
+																												<li><a href=" http://127.0.0.1:82/static/cms/info/130.html " title=""><em>·</em>在线教育互动问题的杀手之一-弹幕</a></li>
+																		</ul>
+				</aside>
+				</div>
+												<div class="clear"></div>
+			</div>
+		</article>
+	</div>
+	<!-- cms main end -->
+	<!-- cms footer begin -->
+	<footer class="footer-i cms-footer-i of">
+		<div class="container-i">
+			<aside class="w300 fr">
+			<div class="f-wx-wb">
+				<em class="top-l">&nbsp;</em><em class="top-r">&nbsp;</em><em class="bottom-r">&nbsp;</em><em class="bottom-l">&nbsp;</em><aside class="fl mt50"><img width="120" height="120" class="dis" src="http://127.0.0.1:82/static/edu/images/lc_official_line/winxinP.jpg">
+				<p class="mt5 tac c-fff">
+					APP二维码扫描下载
+				</p>
+				</aside><aside class="fr mt50"><img width="120" height="120" class="dis" src="http://127.0.0.1:82/static/edu/images/lc_official_line/winxinP.jpg">
+				<p class="mt5 tac c-fff">
+					理臣官方微博关注
+				</p>
+				</aside>
+				<div class="clear">
+				</div>
+			</div>
+			</aside><article class="fl w700">
+			<div class="mr50">
+				<section><img width="200" height="60" src="/static/edu/images/logo-white.png"></section><section class="mt30">
+				<ul class="f-link">
+					<li style="margin-left: -6px;" class="current">
+															</li>
+					<li><span>地址：${websitemap.web.address}</span></li>
+					<li><span>${websitemap.web.copyright}</span></li>
+				</ul>
+				</section>
+			</div>
+			</article>
+		</div>
+	</footer>	<!-- cms footer end -->
+	<script type="text/javascript">
+		$(function() {
+			sSlider("#cms-slider");
+			sSlider("#sub-slider");
+			sSlider("#sub-slider2");
+		});
+		//公共左右滚动图片幻灯片插件
+		function sSlider(sWrap) {
+			var sBox = $(sWrap);
+			var sUl = sBox.find("ul").eq(0);
+			var sWidth = sBox.width();
+			var len = sUl.find("li").length;
+			var index = 0;
+			var picTimer;
+			var btnBg = "<div class='btnBg'></div>";
+			var btn = "<div class='btn'>";
+			for (var i = 0; i < len; i++) {
+				btn += "<span></span>";
+			}
+			btn += "</div>";
+			//sBox.prepend(btnBg);
+			sBox.append(btn);
+			var sBtn = sBox.find(".btn");
+			//sBox.find(".cs-txt").css("opacity", 0.5);
+			sBtn.find("span").css("opacity", 0.4).mouseover(function() {
+				index = sBtn.find("span").index(this);
+				showPics(index);
+			}).eq(0).trigger("mouseover");
+			sBox.find(".preNext").css("opacity", 0.2).hover(function() {
+				$(this).stop(true, false).animate({
+					"opacity": "0.5"
+				},
+				300);
+			},
+			function() {
+				$(this).stop(true, false).animate({
+					"opacity": "0.2"
+				},
+				300);
+			});
+			sBox.find(".pre").click(function() {
+				index -= 1;
+				if (index == -1) {
+					index = len - 1;
+				}
+				showPics(index);
+			});
+			sBox.find(".next").click(function() {
+				index += 1;
+				if (index == len) {
+					index = 0;
+				}
+				showPics(index);
+			});
+			sUl.css("width", sWidth * (len));
+			sBox.hover(function() {
+				clearInterval(picTimer);
+			},
+			function() {
+				picTimer = setInterval(function() {
+					showPics(index);
+					index++;
+					if (index == len) {
+						index = 0;
+					}
+				},
+				4000);
+			}).trigger("mouseleave");
+			function showPics(index) {
+				var nowLeft = -index * sWidth;
+				sUl.stop(true, false).animate({
+					"left": nowLeft
+				},
+				300);
+				sBtn.find("span").stop(true, false).animate({
+					"opacity": "0.4"
+				},
+				300).eq(index).stop(true, false).animate({
+					"opacity": "1"
+				},
+				300);
+			}
+		}
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="LucenelastMapper" >
+
+  <resultMap id="BaseResultMap" type="LuceneLast" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="project" property="project" jdbcType="VARCHAR" />
+    <result column="maxid" property="maxid" jdbcType="INTEGER" />
+    <result column="updateTime" property="updatetime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  
+  <sql id="Base_Column_List" >
+    id, project, maxid, updateTime
+  </sql>
+  
+  <sql id="Base_Column_List_properties">
+        #{id},
+        #{project},
+        #{maxid},
+        #{updateTime}
+</sql>
+      
+  <select id="selectByProject" resultMap="BaseResultMap" parameterType="LuceneLast" >
+    select
+    <include refid="Base_Column_List" />
+    from sns_lucene_last
+    where project=#{project}
+  </select>
+  
+  <insert id="insertLuceneLast" parameterType="LuceneLast" >
+    insert into sns_lucene_last    (project,maxid,updateTime)
+    values (#{project,jdbcType=VARCHAR}, #{maxid,jdbcType=INTEGER},#{updatetime,jdbcType=TIMESTAMP})
+  </insert>
+  
+  <update id="updateLuceneLast" parameterType="LuceneLast" >
+    update sns_lucene_last
+    set 
+      maxid = #{maxid,jdbcType=INTEGER}
+      where id = #{id,jdbcType=INTEGER}
+  </update>
+  
+ <update id="clearLuceneLastData"  >
+    update sns_lucene_last set maxid = 0
+  </update>
+  
+</mapper>

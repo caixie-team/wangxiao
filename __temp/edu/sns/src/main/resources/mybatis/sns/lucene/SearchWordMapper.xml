@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SearchWordMapper">
+
+	<resultMap id="SearchWordResult" type="SearchWord">
+		<result property="id" column="id" />
+		<result property="type" column="type" />
+		<result property="word" column="word" />
+		<result property="count" column="count" />
+		<result property="updatetime" column="updatetime" />
+		<result property="top" column="top" />
+	</resultMap>
+
+	<sql id="sns_search_word_columns">
+		sns_search_word.id,
+		sns_search_word.type,
+		sns_search_word.word,
+		sns_search_word.count,
+		sns_search_word.updatetime,
+		sns_search_word.top
+	</sql>
+
+	<sql id="sns_search_word_properties">
+		#{id},
+		#{type},
+		#{word},
+		#{count},
+		#{updatetime},
+		#{top}
+	</sql>
+
+	<insert id="createSearchWord" parameterType="SearchWord"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO sns_search_word (
+		<include refid="sns_search_word_columns" />
+		) VALUES (
+		<include refid="sns_search_word_properties" />
+		)
+	</insert>
+
+	<delete id="deleteSearchWordById" parameterType="Long">
+		delete from
+		sns_search_word
+		where
+		id = #{value}
+	</delete>
+
+	<update id="updateSearchWord" parameterType="SearchWord">
+		update
+		sns_search_word SET
+		count = count+1
+		where
+		type = #{type} and word =
+		#{word}
+	</update>
+	
+	<update id="updateSearchWordByTypeAndWord" parameterType="SearchWord">
+		update
+		sns_search_word SET
+		count = #{count},
+		top = #{top}
+		where
+		type = #{type} and word =
+		#{word}
+	</update>
+	
+	<!-- 根据id查searchWord -->
+	<select id="getSearchWordById" resultMap="SearchWordResult"
+		parameterType="SearchWord">
+		select
+		<include refid="sns_search_word_columns" />
+		from sns_search_word
+		where
+		id=#{id}
+	</select>
+
+	<select id="getSearchWordByTypeAndWord" resultMap="SearchWordResult"
+		parameterType="SearchWord">
+		select
+		<include refid="sns_search_word_columns" />
+		from sns_search_word
+		where
+		type = #{type} and word=#{word}
+	</select>
+
+	<select id="getSearchWordList" resultMap="SearchWordResult"
+		parameterType="string">
+		select
+		<include refid="sns_search_word_columns" />
+		from sns_search_word where type = #{value} order by top desc,count desc limit
+		10
+	</select>
+	
+	<select id="getSearchWordListPage" resultMap="SearchWordResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="sns_search_word_columns" />
+		from sns_search_word where type = #{e.type} 
+		<if test="e.word!=null and e.word!=''">
+		and word LIKE CONCAT('%',#{e.word},'%')
+		</if>
+		order by top desc,count desc 
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	
+	<select id="getSearchWordListPageCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select
+		count(1)
+		from sns_search_word where type = #{e.type} 
+		<if test="e.word!=null and e.word!=''">
+		and word LIKE CONCAT('%',#{e.word},'%')
+		</if>
+	</select>
+	
+	
+
+</mapper>

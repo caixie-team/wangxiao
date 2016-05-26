@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ProfessionalMapper" >
+
+    <resultMap id="ProfessionalResult" type="ExamProfessional">
+       <result property="professionalId" column="PROFESSIONAL_ID" />
+       <result property="professionalName" column="PROFESSIONAL_NAME" />
+       <result property="status" column="STATUS" />
+       <result property="createTime" column="CREATE_TIME" />
+       <result property="updateTime" column="UPDATE_TIME" />
+       <result property="sort" column="SORT" />
+    </resultMap>
+    <resultMap id="ProfessionalDTOResult" type="ExamProfessionalDTO" extends="ProfessionalResult">
+       <result property="subjectName" column="SUBJECT_NAME" />
+    </resultMap>
+    <resultMap id="ProfessionalAndSubjectResult" type="ExamProfessional" extends="ProfessionalResult">
+      <collection property="subjectList" column="PROFESSIONAL_ID" select="ExamSubjectMapper.querySubjectByProfessionalId"/>
+    </resultMap>
+    <resultMap id="ProfessionalAndSubjectAdminResult" type="ExamProfessional" extends="ProfessionalResult">
+      <collection property="subjectList" column="PROFESSIONAL_ID" select="ExamSubjectMapper.querySubjectAllByProfessionalId"/>
+    </resultMap>
+    <sql id="exam_professional_columns">
+        exam_professional.PROFESSIONAL_ID,
+        exam_professional.PROFESSIONAL_NAME,
+        exam_professional.STATUS,
+        exam_professional.CREATE_TIME,
+        exam_professional.UPDATE_TIME,
+        exam_professional.SORT
+    </sql>
+    <sql id="exam_professional_properties">
+	    #{professionalId},
+	    #{professionalName},
+	    #{status},
+	    #{createTime},
+	    #{updateTime},
+	    #{sort}
+    </sql>
+	<insert id="createProfessional" parameterType="ExamProfessional">
+		insert into exam_professional 
+		(<include refid="exam_professional_columns"/>)
+		values
+		(<include refid="exam_professional_properties"/>)
+	</insert>
+	<update id="updateProfessional" parameterType="ExamProfessional">
+		update exam_professional
+		set
+		PROFESSIONAL_NAME = #{professionalName},
+		UPDATE_TIME=#{updateTime},
+		SORT=#{sort}
+		where PROFESSIONAL_ID=#{professionalId}
+	</update>
+	<select id="queryExamProfessionalList" resultMap="ProfessionalAndSubjectResult">
+		select 
+		<include refid="exam_professional_columns"/>
+		from exam_professional
+		where exam_professional.STATUS=0
+		order by sort DESC
+	</select>
+	<select id="queryExamProfessionalListForAdmin" resultMap="ProfessionalAndSubjectAdminResult">
+		select 
+		<include refid="exam_professional_columns"/>
+		from exam_professional
+		where exam_professional.STATUS!=2
+		order by sort DESC
+	</select>
+	<update id="updateStatus" parameterType="ExamProfessional">
+		update exam_professional
+		set
+		STATUS=#{status}
+		where PROFESSIONAL_ID=#{professionalId}
+	</update>
+	<select id="getProfessionalById" parameterType="Long" resultMap="ProfessionalResult">
+		select 
+		<include refid="exam_professional_columns"/>
+		from exam_professional
+		where PROFESSIONAL_ID=#{value}
+	</select>
+	<select id="queryProfessionalList" resultMap="ProfessionalAndSubjectResult">
+	select 
+	<include refid="exam_professional_columns"/>
+	from exam_professional
+	where STATUS=0
+	order by sort DESC
+	</select>
+	<select id="getProfessionalBySubjectId" resultMap="ProfessionalDTOResult" parameterType="Long">
+	select 
+	<include refid="exam_professional_columns"/>,subject_name
+	from exam_professional
+	left join exam_subject on exam_professional.PROFESSIONAL_ID=exam_subject.PROFESSIONAL_ID
+	where subject_id=#{value}
+	</select>
+</mapper>

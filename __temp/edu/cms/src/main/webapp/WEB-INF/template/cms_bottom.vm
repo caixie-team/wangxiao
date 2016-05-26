@@ -1,0 +1,41 @@
+<footer class="footer-i cms-footer-i of">
+		<div class="container-i">
+			<aside class="w300 fr">
+			<div class="f-wx-wb">
+				<em class="top-l">&nbsp;</em><em class="top-r">&nbsp;</em><em class="bottom-r">&nbsp;</em><em class="bottom-l">&nbsp;</em><aside class="fl mt50"><img width="120" height="120" class="dis" src="${staticServer}/static/edu/images/lc_official_line/winxinP.jpg">
+				<p class="mt5 tac c-fff">
+					APP二维码扫描下载
+				</p>
+				</aside><aside class="fr mt50"><img width="120" height="120" class="dis" src="${staticServer}/static/edu/images/lc_official_line/winxinP.jpg">
+				<p class="mt5 tac c-fff">
+					理臣官方微博关注
+				</p>
+				</aside>
+				<div class="clear">
+				</div>
+			</div>
+			</aside><article class="fl w700">
+			<div class="mr50">
+				<section><img width="200" height="60" src="/static/edu/images/logo-white.png"></section><section class="mt30">
+				<ul class="f-link">
+					<li style="margin-left: -6px;" class="current">
+					#set($index=1)
+					#foreach($na in ${navigatemap.tabOfficialNavigates})
+						#if(${na.newPage}==0)
+						<a title="$!{na.name}" target="_blank" href="$!{na.url}" class="mr10 ml5">$!{na.name}</a>
+						#else
+						<a title="$!{na.name}" href="$!{na.url}" class="mr10 ml5">$!{na.name}</a>
+						#end
+						
+						#if($index!= $navigatemap.tabOfficialNavigates.size())|#end
+					#set($index=$index+1)
+					#end
+					</li>
+					<li><span>地址：${websitemap.web.address}</span></li>
+					<li><span>${websitemap.web.copyright}</span></li>
+				</ul>
+				</section>
+			</div>
+			</article>
+		</div>
+	</footer>

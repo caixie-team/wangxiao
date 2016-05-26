@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="WebsiteImageMangeMapper">
+	  <resultMap id="WebsiteImageMangeResult" type="WebsiteImageMange">
+			<result property="id" column="id" />
+			<result property="type" column="type" />
+			<result property="image_key" column="image_key" />
+		    <result property="createTime" column="createTime" />
+	</resultMap>
+	
+		<sql id="edu_website_imagesmange_columns">
+		edu_website_imagesmange.id,
+		edu_website_imagesmange.type,
+		edu_website_imagesmange.image_key,
+		edu_website_imagesmange.createTime
+	  </sql>
+	  <sql id="edu_website_imagesmange_properties">
+		#{id},
+		#{type},
+		#{image_key},
+        #{createTime}
+	</sql>
+<!-- 	查询所有的图片管理 -->
+	<select id="queryWebsiteImageMangeList" resultMap="WebsiteImageMangeResult" >
+		SELECT <include refid="edu_website_imagesmange_columns"/>
+		FROM edu_website_imagesmange 
+	 </select>
+	 <!-- 	添加图片管理 -->
+	   <insert id="createWebsiteImageMange"  parameterType="WebsiteImageMange">
+		  insert into
+		 edu_website_imagesmange
+		 (<include refid="edu_website_imagesmange_columns"/>)
+		 values
+		 (<include refid="edu_website_imagesmange_properties"/>)
+		 </insert>
+    <!-- 	删除图片管理 --> 
+       <delete id="deleteImagesMangeById"  parameterType="long">
+		  delete 
+		  from
+		 edu_website_imagesmange
+		where
+		edu_website_imagesmange.id=#{value}
+		</delete>
+		<!--   得到单个管理图片的信息 -->
+       <select id="getImagesMangeByKey"  parameterType="string"  resultType="WebsiteImageMange">
+		  select 
+		  <include refid="edu_website_imagesmange_columns"/>
+		  from
+		 edu_website_imagesmange
+		where
+		edu_website_imagesmange.image_key=#{value}
+		</select>
+		
+				<!--   得到单个管理图片的信息 -->
+       <update id="updateImagesMange"  parameterType="WebsiteImageMange">
+		  update 
+		 edu_website_imagesmange
+		set
+		edu_website_imagesmange.type=#{type},
+		edu_website_imagesmange.image_key=#{image_key}
+		where
+		edu_website_imagesmange.id=#{id}
+		</update>
+
+       <select id="checkImagesMange"  parameterType="string"  resultType="int">
+		select 
+		count(1)
+		from  edu_website_imagesmange
+		where
+		edu_website_imagesmange.image_key=#{value}
+		</select>
+		<!-- 批量删除图片类型 -->
+		<delete id="delImageMangebatch">
+			delete from edu_website_imagesmange 
+			where edu_website_imagesmange.id in 
+			<foreach collection="array" item="item" open="(" close=")" separator=",">
+				#{item}
+			</foreach>
+		</delete> 
+</mapper>

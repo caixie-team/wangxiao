@@ -1,0 +1,26 @@
+
+/*---======== /theme-matter ========---*/
+	.c-master {color: #1AA0BF;}
+	/* .e-logo a {background: url(../images/blue-theme/e-logo.png) no-repeat 0 0;} */
+	.icon14,.icon18,.icon20,.icon24,.kg-list dl dt span,.bj-link a,.subNav li.poiter-item a.a-subNav,.l-f-w-pic-1,.l-f-w-pic-2,.l-f-w-pic-3,.t-p-t-icon,.t-p-t-icon-1,.t-p-t-icon-2,.t-p-topic-num,.t-p-topic-img,.answer-bar,.answer-list ol li a,.answer-jg .answer-list ol li a,.exp-a-right,.exp-a-error,.qj-icon,.bc-icon,.dtClose,.thr-itme-icon,.goTopBtn a,.n-d-t-icon,.allKmIco {background: url(../images/blue-theme/e-icon.png) no-repeat;}
+	.e-km-title,.e-pl,.e-nr {background: url(../images/blue-theme/stair-icon.png) no-repeat;}
+	.e-km-i-list ul li a {background: url(../images/blue-theme/stair-bg.png) no-repeat -191px 0;}
+	.e-km-i-list ul li a:hover {background-position: 0 0;}
+	.subNav li.current a.a-subNav {background: url(../images/blue-theme/nav-curr-bg.png) no-repeat 50% 28px;color: #fff;}
+	.e-h-line {border-bottom: 2px solid #0DB3D9;}
+	.k-btn,.kg-list,.poin-item-sub-nav,.pagination ul > li > a:hover,.pagination ul > .active > a:hover,.pagination ul > .active > a {background: #0DB3D9;}
+	.a-s-n-title span,.answer-sheet-number,.zh-test-list {border: 1px dotted #0DB3D9;}
+	.l-f-w-menu ol li.current a,.l-f-w-menu ol li a:hover {border-bottom-color: #0DB3D9;}
+	.l-f-w-menu ol li.current a,.l-f-w-menu ol li a:hover,.ztree li a:hover,.ztree li a.curSelectedNode {color: #0DB3D9;}
+	.e-login-btn,.e-register-btn {background-color: #1AA0BF;}
+	.e-login-btn:hover,.e-register-btn:hover,.s-km-list ul li:hover .s-km-btn {background-color: #00A6CD;}
+	.s-km-list ul li .s-km-btn:hover {background-color: #0BC7F1;}
+	.subNav li.hover a.a-subNav {color: #02cbf8;font-weight: bold;}
+	.answer-bar.open,.allItemWrap dl dd a:hover {background-color: #02CBF8;}
+	.k-btn {border: 1px solid #02cbf8;}
+	.kg-list,.answer-bar,.answer-list {border: 1px solid #02CBF8;}
+	.d-tips-9 .d-s-head-txt {color: #02CBF8;}
+	.e-login-options li input:focus {border-color: #02CBF8;box-shadow: 0 0 5px rgba(2,203,248,.3);}
+	.my-history-title {border-bottom: 2px solid #02CBF8;}
+	.my-history-title ul li.current a {background-color: #02CBF8;border: 1px solid;border-color: #02CBF8 #02CBF8 #02CBF8 #02CBF8;border-top-width: 2px;}
+	.my-history-title ul li a:hover {color: #02CBF8;}

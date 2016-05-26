@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="WeiBoCommentMapper">
+
+	<resultMap id="CommentResult" type="QueryComment">
+		<result property="id" column="id" />
+		<result property="cusId" column="cus_id" />
+		<result property="addTime" column="add_TIME" />
+		<result property="updateTime" column="UPDATE_TIME" />
+		<result property="content" column="content" />
+		<result property="weiboId" column="weibo_id" />
+		<result property="cusName" column="CUS_NAME" />
+		<result property="email" column="EMAIL" />
+		<result property="showname" column="showname" />
+
+	</resultMap>
+
+	<sql id="sns_weibo_comment_columns">
+		sns_weibo_comment.id,
+		sns_weibo_comment.cus_id,
+		sns_weibo_comment.add_Time,
+		sns_weibo_comment.update_Time,
+		sns_weibo_comment.content,
+		sns_weibo_comment.weibo_id,
+		sns_weibo_comment.showname
+
+	</sql>
+
+	<sql id="sns_weibo_comment_properties">
+		#{id},
+		#{cusId},
+		#{addTime},
+		#{updateTime},
+		#{content},
+		#{weiboId},
+		#{showname}
+	</sql>
+
+	<insert id="addComment" parameterType="Comment"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		INSERT INTO sns_weibo_comment (
+		<include refid="sns_weibo_comment_columns" />
+		) VALUES (
+		<include refid="sns_weibo_comment_properties" />
+		)
+	</insert>
+
+	<select id="queryCommentByweiboId" parameterType="java.util.HashMap"
+		resultMap="CommentResult">
+		select
+		<include refid="sns_weibo_comment_columns" />
+		from sns_weibo_comment
+		<where>
+			sns_weibo_comment.weibo_id = #{e.weiboId}
+		</where>
+		order by sns_weibo_comment.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="queryCommentByweiboIdCount" parameterType="java.util.HashMap"
+		resultType="int">
+		select count(1)
+		from sns_weibo_comment
+		<where>
+			sns_weibo_comment.weibo_id = #{e.weiboId}
+		</where>
+	</select>
+	<!-- 通过评论id查询评论 -->
+	<select id="queryCommentById" parameterType="java.util.HashMap"
+		resultMap="CommentResult">
+		select
+		<include refid="sns_weibo_comment_columns" />
+		from sns_weibo_comment
+		<where>
+			sns_weibo_comment.id = #{id}
+		</where>
+	</select>
+	<!-- 通过微博id删除该微博下的回复 -->
+	<delete id="delCommentByweiboId" parameterType="java.util.HashMap">
+		DELETE FROM
+		sns_weibo_comment WHERE sns_weibo_comment.weibo_id = #{weiboId}
+	</delete>
+
+	<delete id="delCommentById" parameterType="java.util.HashMap">
+		DELETE FROM
+		sns_weibo_comment WHERE sns_weibo_comment.id = #{id}
+	</delete>
+
+	<select id="queryCommentByWbId" parameterType="java.util.HashMap"
+		resultMap="CommentResult">
+		select
+		<include refid="sns_weibo_comment_columns" />
+		from sns_weibo_comment
+		<where>
+			sns_weibo_comment.weibo_id = #{e.weiboId}
+		</where>
+		order by sns_weibo_comment.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="queryCommentByWbIdCount" parameterType="java.util.HashMap"
+		resultType="int">
+		select count(1)
+		from sns_weibo_comment
+		<where>
+			sns_weibo_comment.weibo_id = #{e.weiboId}
+		</where>
+	</select>
+	<!-- 通过微博id删除该微博下的回复 -->
+
+</mapper>

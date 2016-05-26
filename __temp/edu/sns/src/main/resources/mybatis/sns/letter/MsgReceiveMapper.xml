@@ -1,0 +1,311 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MsgReceiveMapper">
+
+	<resultMap id="MsgReceiveResult" type="MsgReceive">
+		<result property="id" column="id" />
+		<result property="cusId" column="cus_id" />
+		<result property="addTime" column="add_TIME" />
+		<result property="updateTime" column="update_time" />
+		<result property="content" column="content" />
+		<result property="type" column="type" />
+		<result property="status" column="status" />
+		<result property="receivingCusId" column="receiving_cusId" />
+		<result property="groupId" column="group_id" />
+		<result property="showname" column="showname" />
+	</resultMap>
+
+	<resultMap id="QueryMsgReceiveResult" type="QueryMsgReceive" extends="MsgReceiveResult">
+		<result property="remarks" column="remarks" />
+		<result property="groupName" column="groupName" />
+		<result property="systemNum" column="systemNum" />
+		<result property="letterNum" column="letterNum" />
+		<result property="friNum" column="friNum" />
+		<result property="groupNum" column="groupNum" />
+	</resultMap>
+
+	<sql id="sns_msg_receive_columns">
+		sns_msg_receive.id,
+		sns_msg_receive.cus_id,
+		sns_msg_receive.add_Time,
+		sns_msg_receive.update_time,
+		sns_msg_receive.content,
+		sns_msg_receive.type,
+		sns_msg_receive.status,
+		sns_msg_receive.receiving_cusId,
+		sns_msg_receive.group_id,
+		sns_msg_receive.showname
+	</sql>
+
+	<sql id="sns_msg_receive_properties">
+		#{id},
+		#{cusId},
+		#{addTime},
+		#{updateTime},
+		#{content},
+		#{type},
+		#{status},
+		#{receivingCusId},
+		#{groupId},
+		#{showname}
+	</sql>
+
+	<insert id="addMsgReceive" parameterType="java.util.HashMap"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		INSERT INTO sns_msg_receive (
+		<include refid="sns_msg_receive_columns" />
+		) VALUES (
+		<include refid="sns_msg_receive_properties" />
+		)
+	</insert>
+
+	<delete id="delFriend" parameterType="java.util.HashMap">
+		DELETE FROM sns_msg_receive
+		WHERE
+		cus_id = #{cusId} and cus_friend_id = #{cusFriendId}
+	</delete>
+	<!-- 删除收件箱 -->
+	<delete id="delMsgReceiveInbox" parameterType="java.util.HashMap">
+		DELETE FROM
+		sns_msg_receive WHERE id = #{id} and
+		receiving_cusId =
+		#{receivingCusId}
+	</delete>
+
+	<select id="queryMsgReceiveByInbox" parameterType="java.util.HashMap" resultMap="QueryMsgReceiveResult">
+		select
+		<include refid="sns_msg_receive_columns" />
+		from sns_msg_receive
+		<where>
+			sns_msg_receive.receiving_cusId =
+			#{e.receivingCusId}
+		</where>
+		order By sns_msg_receive.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="queryMsgReceiveByInboxCount" parameterType="java.util.HashMap"
+		resultType="int">
+		select count(1)
+		from sns_msg_receive
+		<where>
+			sns_msg_receive.receiving_cusId = #{e.receivingCusId}
+		</where>
+	</select>
+	<!-- 查询站内信发件箱 -->
+	<select id="queryMsgReceiveByOutbox" parameterType="java.util.HashMap" resultMap="QueryMsgReceiveResult">
+		select
+		<include refid="sns_msg_receive_columns" />
+		from sns_msg_receive
+		<where>
+			sns_msg_receive.type = 2
+			and sns_msg_receive.cus_id = #{e.cusId}
+		</where>
+		order By sns_msg_receive.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="queryMsgReceiveByOutboxCount" parameterType="java.util.HashMap"
+		resultType="int">
+		select count(1)
+		from sns_msg_receive
+		<where>
+			sns_msg_receive.type = 2
+			and sns_msg_receive.cus_id = #{e.cusId}
+		</where>
+	</select>
+	<!-- 根据站内信id和用户id 删除站内信 -->
+	<delete id="delMsgReceive" parameterType="java.util.HashMap">
+		DELETE FROM
+		sns_msg_receive WHERE sns_msg_receive.id = #{id}
+	</delete>
+
+	<update id="updateAllReadMsgReceiveInbox" parameterType="java.util.HashMap">
+		UPDATE
+		sns_msg_receive SET status = 1 WHERE
+		receiving_cusId =
+		#{receivingCusId} and status = 0
+	</update>
+
+	<update id="updateAllMsgReceiveReadByType" parameterType="java.util.HashMap">
+		UPDATE
+		sns_msg_receive SET status = 1
+		WHERE type = #{type} and receiving_cusId
+		= #{receivingCusId}
+		and status = 0
+	</update>
+
+	<update id="updateAllReadMsgReceiveOutbox" parameterType="java.util.HashMap">
+		UPDATE
+		sns_msg_receive SET status = 1 WHERE
+		type = 2 and cus_id = #{cusId} and
+		status = 0
+	</update>
+
+	<update id="updateReadMsgReceiveById" parameterType="java.util.HashMap">
+		UPDATE
+		sns_msg_receive SET status = 1 WHERE id=#{id}
+	</update>
+
+	<select id="querysystemInform" parameterType="java.util.HashMap"
+		resultMap="QueryMsgReceiveResult">
+		select
+		<include refid="sns_msg_receive_columns" />
+		from sns_msg_receive
+		<where>
+			sns_msg_receive.type = 1
+			and sns_msg_receive.receiving_cusId =
+			#{e.receivingCusId}
+		</where>
+		order By sns_msg_receive.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="querysystemInformCount" parameterType="java.util.HashMap"
+		resultType="int">
+		select count(1)
+		from sns_msg_receive
+		<where>
+			sns_msg_receive.type = 1
+			and sns_msg_receive.receiving_cusId =
+			#{e.receivingCusId}
+		</where>
+	</select>
+
+
+	<select id="queryGroupMessageCount" parameterType="java.util.HashMap"
+		resultType="int">
+		select count(1)
+		from sns_msg_receive
+		<where>
+			sns_msg_receive.type = 4
+			and sns_msg_receive.receiving_cusId =
+			#{e.receivingCusId}
+		</where>
+	</select>
+	
+	<update id="updateStatusReadLetterById" parameterType="java.util.HashMap">
+		UPDATE
+		sns_msg_receive SET status = #{status} WHERE id=#{id} and
+		sns_msg_receive.receiving_cusId = #{receivingCusId}
+	</update>
+
+	<update id="updateStatusReadLetterByCusIdAndReceivingCusId"
+		parameterType="java.util.HashMap">
+		UPDATE sns_msg_receive SET status = #{status} WHERE type
+		= 3 and cus_id =
+		#{cusId} and receiving_cusId = #{receivingCusId}
+	</update>
+
+	<insert id="addMsgReceiveBatch" parameterType="java.util.HashMap">
+		INSERT INTO sns_msg_receive (
+		<include refid="sns_msg_receive_columns" />
+		) VALUES
+		<foreach collection="list" index="index" item="letterList"
+			separator=",">
+			(#{letterList.id},
+			#{letterList.cusId},
+			#{letterList.addTime},
+			#{letterList.updateTime},
+			#{letterList.content},
+			#{letterList.type},
+			#{letterList.status},
+			#{letterList.receivingCusId},
+			#{letterList.groupId},
+			#{letterList.showname}
+			)
+		</foreach>
+	</insert>
+
+	<select id="queryMsgReceiveHistory" parameterType="java.util.HashMap"
+		resultMap="QueryMsgReceiveResult">
+		select
+		<include refid="sns_msg_receive_columns" />
+		from sns_msg_receive
+		<where>
+			sns_msg_receive.type = 2 and ((sns_msg_receive.cus_id =
+			#{e.cusId}
+			and sns_msg_receive.receiving_cusId = #{e.receivingCusId}) or 
+			(sns_msg_receive.cus_id =
+			#{e.receivingCusId}
+			and sns_msg_receive.receiving_cusId = #{e.cusId}))
+		</where>
+		order by sns_msg_receive.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+
+	<select id="queryMsgReceiveListById" parameterType="java.util.HashMap"
+		resultType="QueryMsgReceive">
+		select
+		<include refid="sns_msg_receive_columns" />
+		from sns_msg_receive
+		<where>
+			sns_msg_receive.id = #{id}
+		</where>
+	</select>
+
+	<select id="queryMsgReceiveHistoryCount" parameterType="java.util.HashMap"
+		resultType="int">
+		select count(1)
+		from sns_msg_receive
+		<where>
+			sns_msg_receive.type = 2 and ((sns_msg_receive.cus_id =
+			#{e.cusId}
+			and sns_msg_receive.receiving_cusId = #{e.receivingCusId}) or 
+			(sns_msg_receive.cus_id =
+			#{e.receivingCusId}
+			and sns_msg_receive.receiving_cusId = #{e.cusId}))
+		</where>
+	</select>
+
+	<select id="queryUnReadLetterNumByCusId" parameterType="java.util.HashMap"
+		resultMap="QueryMsgReceiveResult">
+		select
+		count(sns_msg_receive.type=1 or null) systemNum,
+		count(type=2 or null) letterNum,
+		count(type=3 or null) friNum,
+		count(type=4 or null) groupNum
+		from sns_msg_receive
+		where
+		sns_msg_receive.receiving_cusId = #{cusId} and sns_msg_receive.status
+		= 0
+	</select>
+	<!-- 更新站内信的状态 删除收件箱 -->
+	<update id="updateLetterStatusInbox" parameterType="java.util.HashMap">
+		UPDATE
+		sns_msg_receive SET status = #{status} WHERE id=#{id} and
+		sns_msg_receive.receiving_cusId = #{receivingCusId}
+	</update>
+	<!-- 更新站内信的状态 删除发件箱 -->
+	<update id="updateLetterStatusOutbox" parameterType="java.util.HashMap">
+		UPDATE
+		sns_msg_receive SET status = #{status} WHERE id=#{id} and
+		sns_msg_receive.cus_id = #{cusId}
+	</update>
+
+<delete id="delMsgReceivePast" parameterType="java.util.HashMap">
+		DELETE FROM
+		sns_msg_receive WHERE 
+		<![CDATA[sns_msg_receive.add_time<#{date}]]>
+	</delete>
+	
+	<delete id="delAllOutbox" parameterType="java.util.HashMap">
+		DELETE FROM
+		sns_msg_receive WHERE receiving_cusId = #{cusId}
+	</delete>
+	
+	<delete id="delAllMsgSys" parameterType="java.util.HashMap">
+		DELETE FROM
+		sns_msg_receive WHERE 
+		type = 1
+		and receiving_cusId = #{cusId}
+	</delete>
+	
+	<delete id="delMsgReceiveByids" parameterType="String">
+		DELETE FROM
+		sns_msg_receive WHERE 
+		id in (${value})
+	</delete>
+</mapper>

@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PlanMapper">
+
+    <resultMap id="PlanResult" type="Plan">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="beginTime" column="begin_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="releaseTime" column="release_time"/>
+        <result property="status" column="status"/>
+        <result property="isRepeat" column="is_repeat"/>
+        <result property="type" column="type"/>
+        <result property="submit" column="submit"/>
+        <result property="peopleNum" column="people_num" />
+        <result property="completeNum" column="complete_num" />
+    </resultMap>
+    <resultMap id="QueryPlanResult" type="QueryPlan" extends="PlanResult">
+    </resultMap>
+    <resultMap id="PlanDTOResult" type="PlanDTO" extends="PlanResult">
+        <result property="totalTime" column="totalTime"/>
+    </resultMap>
+    <sql id="edu_plan_columns">
+        edu_plan.id,
+        edu_plan.name,
+        edu_plan.begin_time,
+        edu_plan.end_time,
+        edu_plan.release_time,
+        edu_plan.status,
+        edu_plan.is_repeat,
+        edu_plan.type,
+        edu_plan.submit,
+        edu_plan.people_num,
+        edu_plan.complete_num
+    </sql>
+
+    <sql id="edu_plan_properties">
+        #{id},
+        #{name},
+        #{beginTime},
+        #{endTime},
+        #{releaseTime},
+        #{status},
+        #{isRepeat},
+        #{type},
+        #{submit},
+        #{peopleNum},
+        #{completeNum}
+    </sql>
+
+    <insert id="createPlan" parameterType="Plan" keyColumn="id"
+            keyProperty="id" useGeneratedKeys="true">
+        insert INTO edu_plan (
+        <include refid="edu_plan_columns"/>
+        ) VALUES (
+        <include refid="edu_plan_properties"/>
+        )
+    </insert>
+
+    <delete id="deletePlanById" parameterType="Long">
+        delete from edu_plan where edu_plan.id=#{value}
+    </delete>
+
+    <!-- 修改计划 -->
+    <update id="updatePlan" parameterType="Plan">
+        update edu_plan SET
+        name =#{name},
+        begin_time = #{beginTime},
+        end_time = #{endTime},
+        release_time = #{releaseTime},
+        status = #{status},
+        is_repeat = #{isRepeat},
+        type=#{type},
+        submit=#{submit},
+        people_num=#{peopleNum},
+        complete_num=#{completeNum}
+        where id=#{id}
+    </update>
+
+    <!-- 根据id查询计划 -->
+    <select id="getPlanById" resultMap="PlanResult" parameterType="Long">
+        select
+        <include refid="edu_plan_columns"/>
+        from edu_plan
+        where edu_plan.id=#{id}
+    </select>
+
+    <!-- 根据条件查询计划 -->
+    <select id="getPlan" parameterType="java.util.Map" resultMap="PlanResult">
+        select
+        <include refid="edu_plan_columns"/>
+        from edu_plan
+        <where>
+            edu_plan.status!=2
+            <if test="id!=null and id!=''">
+                and edu_plan.id =#{id}
+            </if>
+            <if test="type!=null">
+                and edu_plan.type =#{type}
+            </if>
+            <if test="status!=null and status!=''">
+                and edu_plan.status =#{status}
+            </if>
+            <if test="submit!=null and submit!=''">
+                and edu_plan.submit =#{submit}
+            </if>
+        </where>
+    </select>
+
+    <!-- 计划列表 -->
+    <select id="getPlanList" resultMap="QueryPlanResult" parameterType="java.util.Map">
+        select
+        <include refid="edu_plan_columns"/>
+        from edu_plan
+        <where>
+            <if test="e.type!=null and e.type!=-1">
+                and edu_plan.type =#{e.type}
+            </if>
+            <if test="e.status!=null and e.status!=-1">
+                and edu_plan.status =#{e.status}
+            </if>
+            <if test="e.status==null || e.status==-1">
+                and edu_plan.status!=2
+            </if>
+            <if test="e.submit!=null and e.submit!=''">
+                and edu_plan.submit =#{e.submit}
+            </if>
+            <if test="e.name!=null and e.name!=''">
+                and edu_plan.name LIKE CONCAT('%',#{e.name},'%')
+            </if>
+        </where>
+        <if test="e.orderNum==0">
+            ORDER by edu_plan.id DESC
+        </if>
+        <if test="e.orderNum==1">
+            ORDER by edu_plan.people_num DESC
+        </if>
+        <include refid="publicMapper.pageEnd"/>
+    </select>
+    <select id="getPlanListCount" resultType="int" parameterType="java.util.Map">
+        select
+        count(1)
+        from edu_plan
+        <where>
+            <if test="e.type!=null and e.type!=-1">
+                and edu_plan.type =#{e.type}
+            </if>
+            <if test="e.status!=null and e.status!=-1">
+                and edu_plan.status =#{e.status}
+            </if>
+            <if test="e.status==null || e.status==-1">
+                and edu_plan.status!=2
+            </if>
+            <if test="e.submit!=null and e.submit!=''">
+                and edu_plan.submit =#{e.submit}
+            </if>
+            <if test="e.name!=null and e.name!=''">
+                and edu_plan.name LIKE CONCAT('%',#{e.name},'%')
+            </if>
+        </where>
+    </select>
+    <select id="queryPlanById" resultMap="PlanDTOResult" parameterType="Long">
+        select
+        <include refid="edu_plan_columns"/>,
+        sum(edu_plan_phase_detail.hours) totalTime
+        from edu_plan
+        left join edu_plan_phase on edu_plan.id = edu_plan_phase.plan_id
+        left join edu_plan_phase_detail on edu_plan_phase.id = edu_plan_phase_detail.phase_id
+        where edu_plan.id=#{id}
+    </select>
+
+    <select id="queryPlanList" parameterType="java.util.HashMap" resultMap="PlanDTOResult">
+        select
+        <include refid="edu_plan_columns"/>,
+        sum(edu_plan_phase_detail.hours) totalTime
+        from edu_plan
+        left join edu_plan_phase on edu_plan.id = edu_plan_phase.plan_id
+        left join edu_plan_phase_detail on edu_plan_phase.id = edu_plan_phase_detail.phase_id
+        <where>
+            <if test="e.status!=null and e.status!=-1">
+                and edu_plan.status =#{e.status}
+            </if>
+        </where>
+        <if test="e.orderNum==1">
+            ORDER by edu_plan.people_num DESC
+        </if>
+        <include refid="publicMapper.pageEnd"/>
+    </select>
+
+    <select id="queryPlanListCount" parameterType="java.util.HashMap" resultType="int">
+        select
+        count(1)
+        from edu_plan
+        <where>
+            <if test="e.status!=null and e.status!=-1">
+                and edu_plan.status =#{e.status}
+            </if>
+        </where>
+        <if test="e.orderNum==1">
+            ORDER by edu_plan.people_num DESC
+        </if>
+    </select>
+
+    <!-- 增加计划完成人数 -->
+    <select id="updateCompleteNum" parameterType="Long">
+        UPDATE edu_plan SET edu_plan.complete_num = edu_plan.complete_num+1 WHERE edu_plan.id = #{value}
+    </select>
+</mapper>

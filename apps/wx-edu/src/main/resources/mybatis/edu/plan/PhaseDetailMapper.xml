@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PhaseDetailMapper">
+
+    <resultMap id="PhaseDetailResult" type="PhaseDetail">
+        <result property="id" column="id"/>
+        <result property="phaseId" column="phase_id"/>
+        <result property="otherId" column="other_id"/>
+        <result property="type" column="type"/>
+        <result property="detailName" column="detail_name"/>
+        <result property="hours" column="hours"/>
+        <result property="detailRank" column="detail_rank"/>
+    </resultMap>
+
+    <resultMap id="PhaseDetailDTOResult" extends="PhaseDetailResult" type="PhaseDetailDTO">
+        <result property="complete" column="complete" />
+        <result property="peopleNum" column="peopleNum"/>
+    </resultMap>
+
+    <sql id="edu_plan_phase_detail_columns">
+        edu_plan_phase_detail.id,
+        edu_plan_phase_detail.phase_id,
+        edu_plan_phase_detail.other_id,
+        edu_plan_phase_detail.type,
+        edu_plan_phase_detail.detail_name,
+        edu_plan_phase_detail.hours,
+        edu_plan_phase_detail.detail_rank
+    </sql>
+
+    <sql id="edu_plan_phase_detail_properties">
+        #{id},
+        #{phaseId},
+        #{otherId},
+        #{type},
+        #{detailName},
+        #{hours},
+        #{detailRank}
+    </sql>
+
+    <insert id="addPhaseDetailList" parameterType="java.util.List">
+        insert into
+        edu_plan_phase_detail
+        (<include refid="edu_plan_phase_detail_columns"/>)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.id},#{item.phaseId},#{item.otherId},#{item.type},#{item.detailName},#{item.hours},#{item.detailRank})
+        </foreach>
+    </insert>
+
+    <delete id="deletePhaseDetailById" parameterType="Long">
+        delete from edu_plan_phase_detail where edu_plan_phase_detail.id=#{id}
+    </delete>
+
+    <delete id="deletePhaseDetailByPhaseId" parameterType="Long">
+        delete from edu_plan_phase_detail where edu_plan_phase_detail.phase_id=#{id}
+    </delete>
+
+    <update id="updatePhaseDetail" parameterType="PhaseDetail">
+        update edu_plan_phase_detail set
+        phase_id =#{phaseId},
+        other_id =#{otherId},
+        type =#{type},
+        detail_name = #{detailName},
+        hours = #{hours},
+        detail_rank = #{detailRank}
+        where id=#{id}
+    </update>
+
+    <!-- 根据id查询学习阶段 -->
+    <select id="getPhaseDetailById" resultMap="PhaseDetailResult" parameterType="Long">
+        select
+        <include refid="edu_plan_phase_detail_columns"/>
+        from edu_plan_phase_detail
+        where edu_plan_phase_detail.id=#{id}
+    </select>
+
+    <!-- 查询学习阶段 -->
+    <select id="getPhaseDetail" resultMap="PhaseDetailResult" parameterType="PhaseDetail">
+        SELECT
+        <include refid="edu_plan_phase_detail_columns"/>
+        from edu_plan_phase_detail
+        <where>
+            <if test="id!=null and id!=0">
+                edu_plan_phase_detail.id=#{id}
+            </if>
+            <if test="phaseId!=null and phaseId!=0">
+                and edu_plan_phase_detail.phase_id=#{phaseId}
+            </if>
+            <if test="otherId!=null and otherId!=0">
+                and edu_plan_phase_detail.other_id=#{otherId}
+            </if>
+            <if test="type!=null and type!=0">
+                and edu_plan_phase_detail.type=#{type}
+            </if>
+            <if test="detailRank!=null and detailRank!=0">
+                and edu_plan_phase_detail.detail_rank=#{detailRank}
+            </if>
+        </where>
+    </select>
+
+    <select id="getPhaseDetailList" resultMap="PhaseDetailResult" parameterType="PhaseDetail">
+        SELECT
+        <include refid="edu_plan_phase_detail_columns"/>
+        from edu_plan_phase_detail
+        <where>
+            <if test="id!=null and id!=0">
+                edu_plan_phase_detail.id=#{id}
+            </if>
+            <if test="phaseId!=null and phaseId!=0">
+                and edu_plan_phase_detail.phase_id=#{phaseId}
+            </if>
+            <if test="otherId!=null and otherId!=0">
+                and edu_plan_phase_detail.other_id=#{otherId}
+            </if>
+            <if test="type!=null and type!=0">
+                and edu_plan_phase_detail.type=#{type}
+            </if>
+            <if test="detailRank!=null and detailRank!=0">
+                and edu_plan_phase_detail.detail_rank=#{detailRank}
+            </if>
+        </where>
+        order by edu_plan_phase_detail.detail_rank
+    </select>
+
+
+    <select id="getPhaseDetailDTOList" resultMap="PhaseDetailDTOResult" parameterType="java.util.HashMap">
+        SELECT
+        <include refid="edu_plan_phase_detail_columns"/>
+        from edu_plan_phase_detail
+        <where>
+            <if test="e.phaseId!=null and e.phaseId!=0">
+                and edu_plan_phase_detail.phase_id=#{e.phaseId}
+            </if>
+        </where>
+        order by edu_plan_phase_detail.detail_rank
+        <include refid="publicMapper.pageEnd"/>
+    </select>
+    <select id="getPhaseDetailDTOListCount" resultType="int" parameterType="java.util.HashMap">
+        SELECT count(1)
+        from edu_plan_phase_detail
+        <where>
+            <if test="e.phaseId!=null and e.phaseId!=0">
+                and edu_plan_phase_detail.phase_id=#{e.phaseId}
+            </if>
+        </where>
+    </select>
+
+    <select id="getPhaseDetailDTOByPhaseIdAndUserId" parameterType="java.util.HashMap" resultMap="PhaseDetailDTOResult">
+        SELECT <include refid="edu_plan_phase_detail_columns"/>,
+        1 as peopleNum,
+        sum(edu_plan_phase_detail_progress.complete) as complete
+        FROM edu_plan_phase_detail
+        left join edu_plan_phase_detail_progress on edu_plan_phase_detail.id = edu_plan_phase_detail_progress.phase_detail_id
+        WHERE edu_plan_phase_detail_progress.`phase_detail_id`=edu_plan_phase_detail.id AND edu_plan_phase_detail_progress.user_id = #{userId}
+        and edu_plan_phase_detail.phase_id = #{phaseId}
+        GROUP BY edu_plan_phase_detail.id
+    </select>
+
+    <select id="getPhaseTotalTime" resultType="Long" parameterType="PhaseDetail">
+        SELECT SUM(edu_plan_phase_detail.hours) FROM edu_plan_phase_detail
+        <where>
+            <if test="phaseId!=null and phaseId>0">
+                AND edu_plan_phase_detail.phase_id = #{phaseId}
+            </if>
+            <if test="id!=null and id>0">
+                AND edu_plan_phase_detail.id = #{phaseDetailId}
+            </if>
+        </where>
+    </select>
+</mapper>

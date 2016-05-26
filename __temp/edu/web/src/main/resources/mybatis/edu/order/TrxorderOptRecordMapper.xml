@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TrxorderOptRecordMapper">
+
+        <resultMap id="TrxorderOptRecordResult" type="TrxorderOptRecord">
+            <result property="id" column="id"/>
+            <result property="orderId" column="order_id"/>
+            <result property="type" column="type"/>
+            <result property="optuser" column="optuser"/>
+            <result property="optusername" column="optusername"/>
+            <result property="desc" column="description"/>
+            <result property="createtime" column="createtime"/>
+        </resultMap>
+
+        <sql id="edu_trxorder_opt_record_columns">
+            edu_trxorder_opt_record.id,
+            edu_trxorder_opt_record.trxorder_id,
+            edu_trxorder_opt_record.type,
+            edu_trxorder_opt_record.optuser,
+            edu_trxorder_opt_record.optusername,
+            edu_trxorder_opt_record.description,
+            edu_trxorder_opt_record.createtime
+        </sql>
+
+        <sql id="edu_trxorder_opt_record_properties">
+            #{id},
+            #{orderId},
+            #{type},
+            #{optuser},
+            #{optusername},
+            #{desc},
+            #{createtime}
+        </sql>
+
+        <insert id="createTrxorderOptRecord" parameterType="TrxorderOptRecord" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_trxorder_opt_record (<include refid="edu_trxorder_opt_record_columns"/>) VALUES (<include refid="edu_trxorder_opt_record_properties"/>)
+        </insert>
+
+        <delete id="deleteTrxorderOptRecordById" parameterType="Long">
+            delete from edu_trxorder_opt_record
+            where
+                id = #{value}
+
+
+
+
+
+
+        </delete>
+
+        <update id="updateTrxorderOptRecord" parameterType="TrxorderOptRecord">
+            update edu_trxorder_opt_record SET
+                id = #{id},
+                order_id = #{orderId},
+                type = #{type},
+                optuser = #{optuser},
+                optusername = #{optusername},
+                description = #{desc},
+                createtime = #{createtime}
+            where
+                id = #{id}
+
+
+
+
+
+
+        </update>
+
+        <select id="getTrxorderOptRecordById" resultMap="TrxorderOptRecordResult" parameterType="Long">
+            select
+            <include refid="edu_trxorder_opt_record_columns"/>
+            from edu_trxorder_opt_record
+            where
+                id = #{value}
+
+
+
+
+
+
+        </select>
+		
+        <select id="getTrxorderOptRecordList" resultMap="TrxorderOptRecordResult" parameterType="TrxorderOptRecord">
+            select
+            <include refid="edu_trxorder_opt_record_columns"/>
+            from edu_trxorder_opt_record
+        </select>
+        
+</mapper>

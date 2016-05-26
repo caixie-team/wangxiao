@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="WebsiteInstallMapper">
+	<resultMap type="WebsiteInstall" id="WebsiteInstallResult">
+		<result property="id" column="ID"/>
+		<result property="ip" column="ip"/>
+		<result property="brand" column="brand"/>
+		<result property="type" column="type"/>
+		<result property="size" column="size"/>
+		<result property="createTime" column="create_time"/>
+	</resultMap>
+
+	<sql id="app_website_install_columns">
+		app_website_install.id,
+		app_website_install.ip,
+		app_website_install.brand,
+		app_website_install.type,
+		app_website_install.size,
+		app_website_install.create_time
+	</sql>
+
+	<sql id="app_website_install_properties">
+		#{id},
+		#{ip},
+		#{brand},
+		#{type},
+		#{size},
+		#{createTime}
+	</sql>
+    <insert id="insertWebsiteInstall" parameterType="WebsiteInstall">
+        INSERT INTO app_website_install
+        (<include refid="app_website_install_columns"/>)
+        VALUES
+        (<include refid="app_website_install_properties"/>)
+    </insert>
+
+    <select id="getWebsiteInstallPage" resultMap="WebsiteInstallResult" parameterType="Map">
+        SELECT <include refid="app_website_install_columns"/>
+        FROM app_website_install
+        <where>
+            <if test="e.ip!=null and e.ip!='' ">
+                and app_website_install.ip like CONCAT('%',#{e.ip},'%')
+            </if>
+            <if test="e.brand!=null and e.brand!='' ">
+                and app_website_install.brand like CONCAT('%',#{e.brand},'%')
+            </if>
+            <if test="e.type!=null and e.type!='' ">
+                and app_website_install.type like CONCAT('%',#{e.type},'%')
+            </if>
+            <if test="e.size!=null and e.size!='' ">
+                and app_website_install.size like CONCAT('%',#{e.size},'%')
+            </if>
+            <if test="e.startTime!=null ">
+                and <![CDATA[ app_website_install.create_time>=#{e.startTime}]]>
+            </if>
+            <if test="e.endTime!=null ">
+                and <![CDATA[ app_website_install.create_time<=#{e.endTime}]]>
+            </if>
+        </where>
+        ORDER BY app_website_install.ID DESC
+        <include refid="publicMapper.pageEnd"/>
+    </select>
+    <select id="getWebsiteInstallPageCount" resultType="int" parameterType="Map">
+        SELECT COUNT(1)
+        FROM app_website_install
+
+        <where>
+
+            <if test="e.ip!=null and e.ip!='' ">
+                and app_website_install.ip like CONCAT('%',#{e.ip},'%')
+            </if>
+            <if test="e.brand!=null and e.brand!='' ">
+                and app_website_install.brand like CONCAT('%',#{e.brand},'%')
+            </if>
+            <if test="e.type!=null and e.type!='' ">
+                and app_website_install.type like CONCAT('%',#{e.type},'%')
+            </if>
+            <if test="e.size!=null and e.size!='' ">
+                and app_website_install.size like CONCAT('%',#{e.size},'%')
+            </if>
+            <if test="e.startTime!=null ">
+                and <![CDATA[ app_website_install.create_time>=#{e.startTime}]]>
+            </if>
+            <if test="e.endTime!=null ">
+                and <![CDATA[ app_website_install.create_time<=#{e.endTime}]]>
+            </if>
+        </where>
+    </select>
+
+
+</mapper>

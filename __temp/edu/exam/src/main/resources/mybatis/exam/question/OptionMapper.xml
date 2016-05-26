@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="OptionMapper" >
+
+    <resultMap id="OptionResult" type="QuestionOption">
+       <result property="id" column="id" />
+       <result property="qstId" column="QST_ID" />
+       <result property="optContent" column="OPT_CONTENT" />
+       <result property="optOrder" column="OPT_ORDER" />
+       <result property="optAnswer" column="OPT_ANSWER" />
+       <result property="addTime" column="ADDTIME" />
+    </resultMap>
+
+    <sql id="exam_options_columns">
+        exam_options.id,
+        exam_options.QST_ID,
+        exam_options.OPT_CONTENT,
+        exam_options.OPT_ORDER,
+        exam_options.OPT_ANSWER,
+        exam_options.ADDTIME
+    </sql>
+
+    <sql id="exam_options_properties">
+        #{id},
+        #{qstId},
+        #{optContent},
+        #{optOrder},
+        #{optAnswer},
+        #{addTime}
+    </sql>
+
+    <insert id="createOption" parameterType="QuestionOption" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO exam_options (<include refid="exam_options_columns"/>) VALUES (<include
+            refid="exam_options_properties"/>)
+    </insert>
+    
+    <insert id="addOptionBatch" parameterType="java.util.HashMap" >
+        INSERT INTO exam_options (<include refid="exam_options_columns"/>) VALUES 
+         <foreach collection="optionList" index="index" item="item" separator="," >
+        	 (#{item.id},#{item.qstId},#{item.optContent},
+        	 #{item.optOrder}, #{item.optAnswer},#{item.addTime})
+        </foreach>
+    </insert>
+
+	<select id="getOptionList" resultMap="OptionResult"  parameterType="java.util.HashMap">
+          SELECT
+          <include refid="exam_options_columns"/>
+          FROM exam_options
+             <where>
+            <if test="qstId!=null and qstId!=0">
+            and exam_options.QST_ID = #{qstId}
+            </if>
+              </where>
+      </select>
+      
+      <delete id="delOptionListBatch" parameterType="Long">
+ 		DELETE from exam_options 
+        WHERE
+        QST_ID = #{value} 
+    </delete>
+</mapper>

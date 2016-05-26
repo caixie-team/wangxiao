@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<decorators defaultdir="/WEB-INF/layouts/">
+
+	<excludes>
+		   <!-- 不走布局的页面 静态资源 文本编辑器 api -->
+           <pattern>/static/*</pattern>
+           <pattern>/kindeditor/*</pattern>
+           <pattern>/api/*</pattern>
+           <!-- ajax返回html -->
+           <pattern>/*/ajax/*</pattern>
+           <!-- 剔除后台iframe布局的路径 -->
+           <pattern>/admin</pattern>
+           <pattern>/admin/</pattern>
+           <pattern>/admin/sys/login</pattern>
+           <pattern>/admin/sys/topframe</pattern>
+           <pattern>/admin/sys/leftframe</pattern>
+           <pattern>/admin/sys/main</pattern>
+           <pattern>/admin/sys/rightframe</pattern>
+           <pattern>/admin/sys/bottomFrame</pattern>
+           <pattern>/admin/func/showchild</pattern>
+           
+           <!--
+           <pattern>/admin/**/*</pattern>
+           <pattern>/user/*</pattern>
+           <pattern>/group/*</pattern>
+           <pattern>/role/*</pattern>
+           <pattern>/func/*</pattern>
+           <pattern>/sys/*</pattern>
+           <pattern>/adminCus/*</pattern>-->
+           <pattern>/front/playkpoint*</pattern>
+           <pattern>/register</pattern><!-- 注册 -->
+      	   <pattern>/login</pattern>
+      	   
+           <!--  -->
+    </excludes>
+     <!-- 微端布局 -->
+    <decorator name="mobiledefault" page="mobile/default.jsp">
+       <pattern>/index</pattern>
+       <pattern>/mobile/*</pattern>
+       <pattern>/mobile/*/*</pattern>
+       <pattern>/mobile/index</pattern>
+       
+    </decorator> 
+  
+   
+
+    <!-- 后台管理布局 -->
+    <decorator name="admindefault" page="admin/default.jsp">
+        <pattern>/admin/*</pattern>
+		<pattern>/admin/**/*</pattern>
+		
+    </decorator>
+       
+</decorators>

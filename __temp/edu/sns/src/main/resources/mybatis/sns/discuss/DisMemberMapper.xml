@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DisMemberMapper">
+	<resultMap type="DisMember" id="DisMemberResult">
+		<result property="id" column="id" />
+		<result property="cusId" column="cus_id" />
+		<result property="groupId" column="dis_groupid" />
+		<result property="addTime" column="add_time" />
+		<result property="type" column="type" />
+		<result property="transferId" column="transferId" />
+		<result property="showName" column="showname"/>
+	</resultMap>
+	
+	<resultMap type="DisMember" id="QueryDisMemberResult" extends="DisMemberResult">
+		<result property="disName" column="name"/>
+		<result property="disImageUrl" column="image_url"/>
+	</resultMap>
+	<!-- 根据用户的id，群的Id添加成员 -->
+	<insert id="addDisMember" parameterType="DisMember"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		INSERT INTO
+		sns_dis_member
+		(id,
+		dis_groupid,
+		cus_id,
+		add_time,
+		type,
+		transferId,
+		showname
+
+		)VALUES(
+		#{id},
+		#{groupId},
+		#{cusId},
+		#{addTime},
+		#{type},
+		#{transferId},
+		#{showName}
+		)
+	</insert>
+	<!-- 加入群的时候 人员数增加sns_dis_group.memberNum -->
+	<update id="updateDisGroupMemberCount" parameterType="java.util.HashMap">
+		UPDATE
+		sns_dis_group
+		SET
+		sns_dis_group.memberNum=sns_dis_group.memberNum+#{count}
+		WHERE
+		sns_dis_group.id=#{groupId}
+	</update>
+	<!-- 退出群 时候 人员数减少sns_dis_group.memberNum -->
+	<update id="updateDisGroupExit" parameterType="java.lang.Long">
+		UPDATE
+		sns_dis_group
+		SET
+		sns_dis_group.memberNum=sns_dis_group.memberNum-1
+		WHERE
+		sns_dis_group.id=#{id}
+	</update>
+	<!-- 退出群删除该用户信息 -->
+	<delete id="deleteDisGroupExit" parameterType="DisMember">
+		DELETE FROM
+		sns_dis_member
+		WHERE sns_dis_member.cus_id=#{cusId} and sns_dis_member.dis_groupid=#{groupId}	
+	</delete>
+
+	<!--分页查询所有成员列表 -->
+	<select id="queryDisMemberByGroupId" resultMap="DisMemberMapper.QueryDisMemberResult"
+		parameterType="java.util.HashMap">
+		SELECT
+		sns_dis_member.id,
+		sns_dis_member.dis_groupid,
+		sns_dis_member.cus_id,
+		sns_dis_member.add_time,
+		sns_dis_member.type,
+		sns_dis_member.transferId,
+		sns_dis_member.showName,
+		sns_dis_group.name,
+		sns_dis_group.image_url
+		FROM
+		sns_dis_member
+		left join sns_dis_group on sns_dis_member.dis_groupid=sns_dis_group.id
+		WHERE
+		sns_dis_member.dis_groupid=#{e}
+		ORDER BY transferId,sns_dis_member.id DESC
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryDisMemberByGroupIdCount" resultType="int"
+		parameterType="java.util.HashMap">
+		SELECT COUNT(1)
+		FROM
+		sns_dis_member
+		WHERE
+		sns_dis_member.dis_groupid=#{e}
+	</select>
+	<!--按照时间显示群成员 -->
+	<select id="queryDisMemberByaddTime" resultMap="DisMemberMapper.DisMemberResult"
+		parameterType="java.lang.Long">
+		SELECT
+		sns_dis_member.id,
+		sns_dis_member.dis_groupid,
+		sns_dis_member.cus_id,
+		sns_dis_member.add_time,
+		sns_dis_member.transferId,
+		sns_dis_member.showName
+		FROM
+		sns_dis_member
+		WHERE
+		sns_dis_member.dis_groupid=#{id}
+		ORDER BY sns_dis_member.id DESC
+		limit 3
+	</select>
+		<select id="queryDisMemberAdministratorByGroup" resultMap="DisMemberMapper.DisMemberResult"
+		parameterType="java.util.HashMap">
+		SELECT
+		sns_dis_member.id,
+		sns_dis_member.dis_groupid,
+		sns_dis_member.cus_id,
+		sns_dis_member.add_time,
+		sns_dis_member.transferId,
+		sns_dis_member.showname
+		FROM
+		sns_dis_member
+		WHERE
+		sns_dis_member.dis_groupid=#{id}
+		and sns_dis_member.transferId = 0
+	</select>
+	<select id="queryDisMemberByGroupIdAndCusId" resultType="int" parameterType="java.util.HashMap">
+		SELECT
+		count(1)
+		FROM
+		sns_dis_member
+		WHERE
+		sns_dis_member.dis_groupid=#{groupId} and sns_dis_member.cus_Id=#{cusId}
+	</select>
+	<!-- 判断用户是否有权限操作转让群 -->
+	<select id="queryMemberTransferId" resultType="int">
+		SELECT
+		sns_dis_member.transferId
+		FROM sns_dis_member
+		WHERE sns_dis_member.cus_id=#{cusId}
+		AND sns_dis_member.dis_groupid=#{groupId}
+	</select>
+	<select id="querydisMemberByzr" resultMap="DisMemberMapper.DisMemberResult" parameterType="DisMember">
+	SELECT
+		sns_dis_member.id,
+		sns_dis_member.dis_groupid,
+		sns_dis_member.cus_id,
+		sns_dis_member.add_time,
+		sns_dis_member.transferId,
+		sns_dis_member.showName
+		FROM
+		sns_dis_member 
+		where sns_dis_member.dis_groupid=#{groupId} and sns_dis_member.transferId=0
+		<!-- <if test="cusId!=null and cusId!=''">
+		and sns_dis_member.cus_id like CONCAT('%',#{cusId},'%')
+		</if> -->
+		 order by sns_dis_member.id
+	</select>
+	<!-- 转让群 -->
+	<update id="updateMemberTransferId" parameterType="DisMember">
+		update 
+		sns_dis_member
+		set sns_dis_member.transferId=1,
+		sns_dis_member.type=0
+		where 
+		sns_dis_member.dis_groupid=#{groupId} and sns_dis_member.cus_id=#{cusId}
+	</update>
+	<!-- 更新用户状态 -->
+	<update id="updateCustomerType" parameterType="DisMember">
+	update 
+		sns_dis_member
+		set sns_dis_member.transferId=0,
+		    sns_dis_member.type=1
+		where 
+		sns_dis_member.dis_groupid=#{groupId} and sns_dis_member.cus_id=#{cusId}
+	</update>
+	<!-- 查询用户所属群id -->
+	<select id="queryGroupIdByCusId" resultMap="DisMemberMapper.DisMemberResult" parameterType="long">
+	SELECT
+		sns_dis_member.id,
+		sns_dis_member.dis_groupid,
+		sns_dis_member.cus_id,
+		sns_dis_member.add_time,
+		sns_dis_member.transferId,
+		sns_dis_member.showName
+		FROM
+		sns_dis_member 
+		where sns_dis_member.cus_id=#{cusId}
+	</select>
+	<!-- 查询单个详情 -->
+	<select id="queryDisMemebrDetail" resultMap="DisMemberMapper.DisMemberResult"
+	parameterType="DisMember">
+			SELECT
+			sns_dis_member.id,
+			sns_dis_member.dis_groupid,
+			sns_dis_member.cus_id,
+			sns_dis_member.add_time,
+			sns_dis_member.transferId,
+			sns_dis_member.type,
+			sns_dis_member.showName
+			FROM
+			sns_dis_group
+			left join sns_dis_member on sns_dis_group.id=sns_dis_member.dis_groupid
+			and sns_dis_member.cus_id = sns_dis_group.cus_id
+			WHERE
+			sns_dis_group.id=#{groupId} 
+	</select>
+	<select id="deleteAllMemberByGroupId" parameterType="java.lang.Long">
+		delete from 
+		sns_dis_member
+		where sns_dis_member.dis_groupid=#{groupId}
+	</select>
+	
+	<update id="updatePromoteUserTransfer" parameterType="DisMember">
+	update sns_dis_member
+	set sns_dis_member.transferId=#{transferId}
+	where 
+	 sns_dis_member.cus_id=#{cusId} and sns_dis_member.dis_groupid=#{groupId}
+	</update>
+</mapper>

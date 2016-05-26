@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AnswerReplyMapper">
+
+	<resultMap id="AnswerReplyResult" type="AnswerReply">
+		<result property="id" column="id" />
+		<result property="content" column="content"/>
+		<result property="answerId" column="answer_id"/>
+		<result property="userId" column="user_id"/>
+		<result property="showName" column="show_name"/>
+		<result property="addTime" column="add_time"/>
+		<result property="status" column="status"/>
+	</resultMap>
+
+	<sql id="edu_answer_Reply_columns">
+		edu_answer_reply.id,
+		edu_answer_reply.content,
+		edu_answer_reply.answer_id,
+		edu_answer_reply.user_id,
+		edu_answer_reply.show_name,
+		edu_answer_reply.add_time,
+		edu_answer_reply.status
+	</sql>
+
+	<sql id="edu_answer_Reply_properties">
+		#{id},
+		#{content},
+		#{answerId},
+		#{userId},
+		#{showName},
+		#{addTime},
+		#{status}
+	</sql>
+	
+	<insert id="addAnswerReply" parameterType="AnswerReply" keyColumn="id"
+		keyProperty="id" useGeneratedKeys="true">
+		insert into edu_answer_reply(<include refid="edu_answer_Reply_columns"/>)
+		values (<include refid="edu_answer_Reply_properties"/>)
+	</insert>
+	<update id="updateAnswerReply" parameterType="AnswerReply">
+		update edu_answer_reply set edu_answer_reply.content=#{content} where edu_answer_reply.id=#{id}
+	</update>
+	
+	<update id="updateAnswerReplyStatus" parameterType="AnswerReply">
+		update edu_answer_reply set edu_answer_reply.status=#{status} where edu_answer_reply.id=#{id}
+	</update>
+	<delete id="deleteReply" parameterType="Long">
+	 	delete from edu_answer_reply where edu_answer_reply.id=#{value}
+	</delete>
+	
+	<select id="queryReplyList" parameterType="Long" resultMap="AnswerReplyResult">
+		select 
+		edu_answer_reply.id,
+		edu_answer_reply.content,
+		edu_answer_reply.answer_id,
+		edu_answer_reply.user_id,
+		edu_answer_reply.show_name,
+		edu_answer_reply.add_time,
+		edu_answer_reply.status
+		from edu_answer_reply
+		where edu_answer_reply.status=0 and edu_answer_reply.answer_id=#{value}
+		order By edu_answer_reply.add_time desc
+	</select>
+	
+	<select id="queryAdminReplyList" parameterType="Long" resultMap="AnswerReplyResult">
+		select edu_answer_reply.id,
+		edu_answer_reply.content,
+		edu_answer_reply.answer_id,
+		edu_answer_reply.user_id,
+		edu_answer_reply.show_name,
+		edu_answer_reply.add_time,
+		edu_answer_reply.status
+		from edu_answer_reply
+		where edu_answer_reply.answer_id=#{value}
+		order By edu_answer_reply.add_time asc
+	</select>
+</mapper>

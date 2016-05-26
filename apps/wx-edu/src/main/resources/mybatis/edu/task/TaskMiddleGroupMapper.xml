@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TaskMiddleGroupMapper">
+
+	<resultMap id="TaskMiddleGroupResult" type="TaskMiddleGroup">
+		<result property="id" column="id" />
+		<result property="userGroupId" column="user_group_id" />
+		<result property="taskId" column="task_id" />
+	</resultMap>
+
+	<sql id="edu_task_middle_group_columns">
+		edu_task_middle_group.id,
+		edu_task_middle_group.user_group_id,
+		edu_task_middle_group.task_id
+	</sql>
+
+	<sql id="edu_task_middle_group_properties">
+		#{id},
+		#{userGroupId},
+		#{taskId}
+	</sql>
+
+	<insert id="createTaskMiddleGroup" parameterType="TaskMiddleGroup"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_task_middle_group (
+		<include refid="edu_task_middle_group_columns" />
+		) VALUES (
+		<include refid="edu_task_middle_group_properties" />
+		)
+	</insert>
+	<!-- 批量添加部门 -->
+	<insert id="batchAddTaskMiddleGroup" parameterType="list">
+		insert INTO edu_task_middle_group (
+		<include refid="edu_task_middle_group_columns" />
+		) VALUES
+		<foreach collection="list" item="itme" index="index"
+			separator=",">
+			(#{itme.id},#{itme.userGroupId},#{itme.taskId})
+		</foreach>
+	</insert>
+	<delete id="deleteTaskMiddleGroupById" parameterType="Long">
+		delete from edu_task_middle_group
+		where edu_task_middle_group.task_id=#{taskId}
+	</delete>
+
+	<update id="updateTaskMiddleGroup" parameterType="TaskMiddleGroup">
+		update edu_task_middle_group SET
+		id = #{id},
+		user_group_id = #{userGroupId},
+		task_id = #{taskId}
+	</update>
+
+	<select id="getTaskMiddleGroupById" resultMap="TaskMiddleGroupResult"
+		parameterType="Long">
+		select
+		<include refid="edu_task_middle_group_columns" />
+		from edu_task_middle_group
+	</select>
+
+	<select id="getTaskMiddleGroupList" resultMap="TaskMiddleGroupResult"
+		parameterType="TaskMiddleGroup">
+		select
+		<include refid="edu_task_middle_group_columns" />
+		from edu_task_middle_group
+	</select>
+	<!-- 任务下的部门 -->
+	<select id="getTaskGroupList" parameterType="TaskMiddleGroup"
+		resultMap="TaskMiddleGroupResult">
+		select
+		<include refid="edu_task_middle_group_columns" />
+		from edu_task_middle_group
+		<where>
+			<if test="taskId!=null and taskId!=0">
+				edu_task_middle_group.`task_id`=#{taskId}
+			</if>
+		</where>
+	</select>
+</mapper>

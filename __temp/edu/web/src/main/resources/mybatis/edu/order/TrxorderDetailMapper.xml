@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TrxorderDetailMapper">
+
+	<resultMap id="TrxorderDetailResult" type="TrxorderDetail">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="courseId" column="course_id" />
+		<result property="trxorderId" column="trxorder_id" />
+		<result property="membertype" column="membertype" />
+		<result property="losetype" column="losetype" />
+		<result property="loseAbsTime" column="lose_abs_time" />
+		<result property="loseTime" column="lose_time" />
+		<result property="authTime" column="auth_time" />
+		<result property="createTime" column="create_time" />
+		<result property="payTime" column="pay_time" />
+		<result property="sourcePrice" column="source_price" />
+		<result property="currentPrice" column="current_price" />
+		<result property="courseName" column="course_name" />
+		<result property="trxStatus" column="trx_status" />
+		<result property="authStatus" column="auth_status" />
+		<result property="requestId" column="request_id" />
+		<result property="description" column="description" />
+		<result property="version" column="version" />
+		<result property="lastUpdateTime" column="last_update_time" />
+	</resultMap>
+
+	<resultMap id="QueryTrxorderDetailResult" type="QueryTrxorderDetail"
+		extends="TrxorderDetailResult">
+		<result property="userName" column="nickname" />
+		<result property="email" column="email" />
+	</resultMap>
+
+
+	<resultMap type="TrxorderDetailDTO" id="QueryContractDetailReslt">
+		<result column="currentPrice" property="currentPirce" />
+		<result column="courseName" property="courseName" />
+		<result column="courseImgUr" property="logo" />
+		<result column="courseTitle" property="courseTitle" />
+		<result column="lessionNum" property="lessionNum" />
+	</resultMap>
+
+
+	<sql id="edu_trxorder_detail_columns">
+		edu_trxorder_detail.id,
+		edu_trxorder_detail.user_id,
+		edu_trxorder_detail.course_id,
+		edu_trxorder_detail.trxorder_id,
+		edu_trxorder_detail.membertype,
+		edu_trxorder_detail.losetype,
+		edu_trxorder_detail.lose_abs_time,
+		edu_trxorder_detail.lose_time,
+		edu_trxorder_detail.auth_time,
+		edu_trxorder_detail.create_time,
+		edu_trxorder_detail.pay_time,
+		edu_trxorder_detail.source_price,
+		edu_trxorder_detail.current_price,
+		edu_trxorder_detail.course_name,
+		edu_trxorder_detail.trx_status,
+		edu_trxorder_detail.auth_status,
+		edu_trxorder_detail.request_id,
+		edu_trxorder_detail.description,
+		edu_trxorder_detail.version,
+		edu_trxorder_detail.last_update_time
+	</sql>
+
+	<sql id="edu_trxorder_detail_properties">
+		#{id},
+		#{userId},
+		#{courseId},
+		#{trxorderId},
+		#{membertype},
+		#{losetype},
+		#{loseAbsTime},
+		#{loseTime},
+		#{authTime},
+		#{createTime},
+		#{payTime},
+		#{sourcePrice},
+		#{currentPrice},
+		#{courseName},
+		#{trxStatus},
+		#{authStatus},
+		#{requestId},
+		#{description},
+		#{version},
+		#{lastUpdateTime}
+	</sql>
+
+	<insert id="createTrxorderDetail" parameterType="TrxorderDetail"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_trxorder_detail (
+		<include refid="edu_trxorder_detail_columns" />
+		) VALUES (
+		<include refid="edu_trxorder_detail_properties" />
+		)
+	</insert>
+
+	<delete id="deleteTrxorderDetailById" parameterType="Long">
+		delete from
+		edu_trxorder_detail
+		where
+		id = #{value}
+	</delete>
+
+	<update id="updateTrxorderDetail" parameterType="TrxorderDetail">
+		update
+		edu_trxorder_detail SET
+		id = #{id},
+		user_id = #{userId},
+		course_id =
+		#{courseId},
+		trxorder_id = #{trxorderId},
+		membertype = #{membertype},
+		losetype = #{losetype},
+		lose_abs_time = #{loseAbsTime},
+		lose_time =
+		#{loseTime},
+		auth_time = #{authTime},
+		create_time = #{createTime},
+		pay_time = #{payTime},
+		source_price = #{sourcePrice},
+		current_price =
+		#{currentPrice},
+		course_name = #{courseName},
+		trx_status = #{trxStatus},
+		auth_status = #{authStatus},
+		request_id = #{requestId},
+		description =
+		#{description},
+		version = #{version},
+		last_update_time =
+		#{lastUpdateTime}
+		where
+		id = #{id}
+	</update>
+
+	<select id="getTrxorderDetailById" resultMap="TrxorderDetailResult"
+		parameterType="Long">
+		select
+		<include refid="edu_trxorder_detail_columns" />
+		from edu_trxorder_detail
+		where
+		id = #{value}
+	</select>
+
+	<!-- 根据条件查询流水列表 -->
+	<select id="getTrxorderDetailList" resultMap="TrxorderDetailResult"
+		parameterType="TrxorderDetail">
+		select
+		<include refid="edu_trxorder_detail_columns" />
+		from edu_trxorder_detail
+		<where>
+			<if test="requestId!=null and requestId!=''">
+				edu_trxorder_detail.request_id=#{requestId}
+			</if>
+			<if test="id!=null and id!=''">
+				edu_trxorder_detail.id=#{id}
+			</if>
+		</where>
+	</select>
+
+	<select id="getTrxorderDetailListBuy" resultMap="TrxorderDetailResult"
+		parameterType="TrxorderDetail">
+		select
+		<include refid="edu_trxorder_detail_columns" />
+		from edu_trxorder_detail
+		where
+		edu_trxorder_detail.user_id = #{userId}
+		and
+		edu_trxorder_detail.trx_status='SUCCESS' and auth_status='SUCCESS'
+		and edu_trxorder_detail.auth_time>now()
+	</select>
+
+	<insert id="addBatchTrxorderDetail" parameterType="TrxorderDetail">
+		insert INTO edu_trxorder_detail (
+		<include refid="edu_trxorder_detail_columns" />
+		) VALUES
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.id},
+			#{item.userId},
+			#{item.courseId},
+			#{item.trxorderId},
+			#{item.membertype},
+			#{item.losetype},
+			#{item.loseAbsTime},
+			#{item.loseTime},
+			#{item.authTime},
+			#{item.createTime},
+			#{item.payTime},
+			#{item.sourcePrice},
+			#{item.currentPrice},
+			#{item.courseName},
+			#{item.trxStatus},
+			#{item.authStatus},
+			#{item.requestId},
+			#{item.description},
+			#{item.version},
+			#{item.lastUpdateTime})
+		</foreach>
+	</insert>
+
+
+	<!-- 更新流水状态为成功，网银回调用 -->
+	<update id="updateTrxorderDetailStatusSuccess" parameterType="TrxorderDetail">
+		update edu_trxorder_detail
+		SET
+		pay_time = #{payTime},
+		trx_status =
+		#{trxStatus},
+		auth_status =
+		#{authStatus},
+		version = version+1,
+		last_update_time = now()
+		where
+		request_id = #{requestId}
+	</update>
+
+	<!-- 根据订单查询流水 -->
+
+	<!-- 根据条件分页查询流水列表 -->
+	<select id="getTrxorderDetailListByCondition" resultMap="QueryTrxorderDetailResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="edu_trxorder_detail_columns" />
+		,nickname,email
+		from edu_trxorder_detail
+		left join user_user on
+		edu_trxorder_detail.user_id=user_user.id
+		<where>
+			<if test="e.requestId!=null and e.requestId!=''">
+				edu_trxorder_detail.request_id=#{e.requestId}
+			</if>
+			<if test="e.id!=null and e.id!=''">
+				and edu_trxorder_detail.id=#{e.id}
+			</if>
+			<if test="e.startCreateTime!=null">
+				and <![CDATA[ edu_trxorder_detail.Create_Time>=#{e.startCreateTime}]]>
+			</if>
+			<if test="e.endCreateTime!=null ">
+				and <![CDATA[ edu_trxorder_detail.Create_Time<=#{e.endCreateTime}]]>
+			</if>
+			<if test="e.startPayTime!=null ">
+				and <![CDATA[ edu_trxorder_detail.pay_time>=#{e.startPayTime}]]>
+			</if>
+			<if test="e.endPayTime!=null ">
+				and <![CDATA[ edu_trxorder_detail.pay_time<=#{e.endPayTime}]]>
+			</if>
+			<if test="e.startAuthTime!=null ">
+				and <![CDATA[ edu_trxorder_detail.auth_time>=#{e.startAuthTime}]]>
+			</if>
+			<if test="e.endAuthTime!=null ">
+				and <![CDATA[ edu_trxorder_detail.auth_time<=#{e.endAuthTime}]]>
+			</if>
+			<if test="e.courseName!=null and e.courseName!=''">
+				and edu_trxorder_detail.course_name=#{e.courseName}
+			</if>
+			<if test="e.courseName!=null and e.courseName!=''">
+				and edu_trxorder_detail.course_name=#{e.courseName}
+			</if>
+			<if test="e.trxStatus!=null and e.trxStatus!=''">
+				and edu_trxorder_detail.trx_status=#{e.trxStatus}
+			</if>
+			<if test="e.courseId!=null and e.courseId!=''">
+				and edu_trxorder_detail.course_Id=#{e.courseId}
+			</if>
+			<if test="e.email!=null and e.email!=''">
+				and user_user.email=#{e.email}
+			</if>
+			<if test="e.userName!=null and e.userName!=''">
+				and user_user.nickname=#{e.userName}
+			</if>
+		</where>
+        order  by edu_trxorder_detail.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="getTrxorderDetailListByConditionCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select
+		count(1)
+		from edu_trxorder_detail
+		left join user_user on
+		edu_trxorder_detail.user_id=user_user.id
+			<where>
+			<if test="e.requestId!=null and e.requestId!=''">
+				edu_trxorder_detail.request_id=#{e.requestId}
+			</if>
+			<if test="e.id!=null and e.id!=''">
+				and edu_trxorder_detail.id=#{e.id}
+			</if>
+			<if test="e.startCreateTime!=null ">
+				and <![CDATA[ edu_trxorder_detail.Create_Time>=#{e.startCreateTime}]]>
+			</if>
+			<if test="e.endCreateTime!=null ">
+				and <![CDATA[ edu_trxorder_detail.Create_Time<=#{e.endCreateTime}]]>
+			</if>
+			<if test="e.startPayTime!=null ">
+				and <![CDATA[ edu_trxorder_detail.pay_time>=#{e.startPayTime}]]>
+			</if>
+			<if test="e.endPayTime!=null ">
+				and <![CDATA[ edu_trxorder_detail.pay_time<=#{e.endPayTime}]]>
+			</if>
+			<if test="e.startAuthTime!=null ">
+				and <![CDATA[ edu_trxorder_detail.auth_time>=#{e.startAuthTime}]]>
+			</if>
+			<if test="e.endAuthTime!=null ">
+				and <![CDATA[ edu_trxorder_detail.auth_time<=#{e.endAuthTime}]]>
+			</if>
+			<if test="e.courseName!=null and e.courseName!=''">
+				and edu_trxorder_detail.course_name=#{e.courseName}
+			</if>
+			<if test="e.trxStatus!=null and e.trxStatus!=''">
+				and edu_trxorder_detail.trx_status=#{e.trxStatus}
+			</if>
+			<if test="e.courseId!=null and e.courseId!=''">
+				and edu_trxorder_detail.course_Id=#{e.courseId}
+			</if>
+			<if test="e.email!=null and e.email!=''">
+				and user_user.email=#{e.email}
+			</if>
+			<if test="e.userName!=null and e.userName!=''">
+				and user_user.nickname=#{e.userName}
+			</if>
+		</where>
+	</select>
+
+	<!-- 查询流水详情 关联用户查询 根据流水id -->
+	<select id="getTrxorderDetailInfoById" resultMap="QueryTrxorderDetailResult"
+		parameterType="Long">
+		select
+		<include refid="edu_trxorder_detail_columns" />
+		,user_user.nickname,user_user.email
+		from edu_trxorder_detail
+		left join
+		user_user on
+		edu_trxorder_detail.user_id=user_user.id
+		where
+		edu_trxorder_detail.id = #{value}
+	</select>
+
+
+
+</mapper>

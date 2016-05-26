@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="BlogReplyMapper">
+
+	<resultMap id="BlogReplyResult" type="BlogReply">
+		<result property="id" column="id" />
+		<result property="cusId" column="cus_id" />
+		<result property="blogId" column="blog_id" />
+		<result property="content" column="content" />
+		<result property="addTime" column="addTime" />
+		<result property="showName" column="showname" />
+	</resultMap>
+
+	<sql id="sns_blog_reply_columns">
+		sns_blog_reply.id,
+		sns_blog_reply.cus_id,
+		sns_blog_reply.blog_id,
+		sns_blog_reply.content,
+		sns_blog_reply.addTime,
+		sns_blog_reply.showname
+	</sql>
+
+	<sql id="sns_blog_reply_properties">
+		#{id},
+		#{cusId},
+		#{blogId},
+		#{content},
+		#{addTime},
+		#{showName} 
+	</sql>
+	<!-- 添加博文回复 -->
+	<insert id="createBlogReply" parameterType="BlogReply" useGeneratedKeys="true"
+		keyColumn="id" keyProperty="id">
+		insert into sns_blog_reply (
+		<include refid="sns_blog_reply_columns" />
+		) VALUES (
+		<include refid="sns_blog_reply_properties" />
+		)
+	</insert>
+	<!-- 根据博文回复id删除 -->
+	<delete id="deleteBlogReplyById" parameterType="BlogReply">
+		delete from
+		sns_blog_reply
+		where
+		sns_blog_reply.id = #{id} and sns_blog_reply.blog_id=#{blogId}
+	</delete>
+	<!-- 根据博文id删除 -->
+	<delete id="deleteBlogReplyByBlogId" parameterType="Long">
+		delete from
+		sns_blog_reply
+		where
+		sns_blog_reply.blog_id=#{blogId}
+	</delete>
+	<!-- 更新回复内容 -->
+	<update id="updateBlogReply" parameterType="BlogReply">
+		update sns_blog_reply SET
+		content = #{content}
+		where
+		id = #{id}
+	</update>
+	<!-- 查询回复列表 -->
+	<select id="getBlogReplyById" resultMap="BlogReplyResult"
+		parameterType="long">
+		select
+		<include refid="sns_blog_reply_columns" />
+		from sns_blog_reply
+		where
+		id =#{id}
+	</select>
+	<select id="getBlogReplyList" resultMap="BlogReplyResult"
+		parameterType="BlogReply">
+		select
+		<include refid="sns_blog_reply_columns" />
+		from sns_blog_reply
+	</select>
+	<!-- 查询回复列表 -->
+	<select id="getBlogReplyByBlogId" resultMap="BlogReplyMapper.BlogReplyResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="sns_blog_reply_columns" />
+		from sns_blog_reply
+		where sns_blog_reply.blog_id=#{e}
+		order by sns_blog_reply.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getBlogReplyByBlogIdCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select count(1)
+		from sns_blog_reply
+		where
+		sns_blog_reply.blog_id=#{e}
+	</select>
+	<!--每回复回复数加1 -->
+	<update id="updateBlogReplyCount" parameterType="java.util.HashMap">
+		update sns_blog
+		set sns_blog.replyCount=sns_blog.replyCount+#{count}
+		where
+		sns_blog.id=#{id}
+	</update>
+	<!-- 判断删除回复是否是本人 -->
+	<select id="getBlogReplyIsMine" parameterType="BlogReply" resultType="int">
+		select count(1)
+		from sns_blog_reply
+		where sns_blog_reply.id=#{id} and 
+		sns_blog_reply.cus_id=#{cusId}
+	</select>
+</mapper>

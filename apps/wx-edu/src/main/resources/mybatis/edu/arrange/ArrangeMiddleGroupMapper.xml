@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ArrangeMiddleGroupMapper">
+
+	<resultMap id="ArrangeMiddleGroupResult" type="ArrangeMiddleGroup">
+		<result property="id" column="id" />
+		<result property="userGroupId" column="user_group_id" />
+		<result property="arrangeId" column="arrange_id" />
+	</resultMap>
+
+	<sql id="edu_arrange_middle_group_columns">
+		edu_arrange_middle_group.id,
+		edu_arrange_middle_group.user_group_id,
+		edu_arrange_middle_group.arrange_id
+	</sql>
+
+	<sql id="edu_arrange_middle_group_properties">
+		#{id},
+		#{userGroupId},
+		#{arrangeId}
+	</sql>
+
+	<insert id="createArrangeMiddleGroup" parameterType="ArrangeMiddleGroup"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_arrange_middle_group (
+		<include refid="edu_arrange_middle_group_columns" />
+		) VALUES (
+		<include refid="edu_arrange_middle_group_properties" />
+		)
+	</insert>
+	<!-- 批量添加部门 -->
+	<insert id="batchAddArrangeMiddleGroup" parameterType="list">
+		insert INTO edu_arrange_middle_group (
+		<include refid="edu_arrange_middle_group_columns" />
+		) VALUES
+		<foreach collection="list" item="itme" index="index"
+			separator=",">
+			(#{itme.id},#{itme.userGroupId},#{itme.arrangeId})
+		</foreach>
+	</insert>
+	<delete id="deleteArrangeMiddleGroupById" parameterType="Long">
+		delete from edu_arrange_middle_group
+		where edu_arrange_middle_group.arrange_id=#{arrangeId}
+	</delete>
+
+	<update id="updateArrangeMiddleGroup" parameterType="ArrangeMiddleGroup">
+		update edu_arrange_middle_group SET
+		id = #{id},
+		user_group_id = #{userGroupId},
+		arrange_id = #{arrangeId}
+	</update>
+
+	<select id="getArrangeMiddleGroupById" resultMap="ArrangeMiddleGroupResult"
+		parameterType="Long">
+		select
+		<include refid="edu_arrange_middle_group_columns" />
+		from edu_arrange_middle_group
+	</select>
+
+	<select id="getArrangeMiddleGroupList" resultMap="ArrangeMiddleGroupResult"
+		parameterType="ArrangeMiddleGroup">
+		select
+		<include refid="edu_arrange_middle_group_columns" />
+		from edu_arrange_middle_group
+		<where>
+			1=1
+			<if test="arrangeId!=null and arrangeId>0">
+				and edu_arrange_middle_group.arrange_id=#{arrangeId}
+			</if>
+		</where>
+	</select>
+	<!-- 任务下的部门 -->
+	<select id="getArrangeGroupList" parameterType="ArrangeMiddleGroup"
+		resultMap="ArrangeMiddleGroupResult">
+		select
+		<include refid="edu_arrange_middle_group_columns" />
+		from edu_arrange_middle_group
+		<where>
+			<if test="arrangeId!=null and arrangeId!=0">
+				edu_arrange_middle_group.`arrange_id`=#{arrangeId}
+			</if>
+		</where>
+	</select>
+</mapper>

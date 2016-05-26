@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+	<!-- ①：对web包中的所有类进行扫描，以完成Bean创建和自动依赖注入的功能 -->
+	 <context:component-scan base-package="com.atdld.os" use-default-filters="false">
+			<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+			<context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+	</context:component-scan>
+	
+	<mvc:annotation-driven content-negotiation-manager="contentNegotiationManager">
+			<mvc:message-converters register-defaults="true">
+			<!-- 将StringHttpMessageConverter的默认编码设为UTF-8 -->
+			<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+		    	<constructor-arg value="UTF-8" />
+			</bean>
+			<!-- 将Jackson2HttpMessageConverter的默认格式化输出设为true -->
+			<!-- <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+                <property name="prettyPrint" value="true"/>
+            </bean> -->
+             
+             <!-- spring-android中的类 -->
+            <bean class="com.atdld.os.core.util.json.GsonHttpMessageConverter">
+            </bean>
+  		</mvc:message-converters>
+	</mvc:annotation-driven>
+	<!-- <mvc:resources mapping="/static/**" location="/static/"/> -->
+	 <mvc:default-servlet-handler />
+	
+	<!-- ②：拦截器的配置 -->
+	  <mvc:interceptors>  
+	 	  <!--针对前台的路径进行拦截-->
+		  <mvc:interceptor>
+		  	
+	            <mvc:mapping path="/aaa/*"/>
+	            <!-- 考试 -->
+		    	<mvc:mapping path="/quest/*"/>
+		    	<mvc:mapping path="/paper/*"/>
+		    	<mvc:mapping path="/point/*"/> 
+		    	
+		    	<!-- 排除的路径 -->
+		    	<mvc:exclude-mapping path="/admin*"/>
+		    	<mvc:exclude-mapping path="/admin/**/**"/>
+
+			  <mvc:exclude-mapping path="/quest/exam"/>
+			  <mvc:exclude-mapping path="/quest/examitem"/>
+			  <mvc:exclude-mapping path="/quest/querySubject"/>
+
+	            <mvc:exclude-mapping path="/search/hotK*"/>
+	            <mvc:exclude-mapping path="/static/**/*"/>
+	            <mvc:exclude-mapping path="/kindeditor/**/*"/>
+	            <mvc:exclude-mapping path="/api/*"/>
+	            <mvc:exclude-mapping path="/api/**/*"/>
+	            
+	            <mvc:exclude-mapping path="/u/ajax/wbright"/>
+	            <mvc:exclude-mapping path="/u/ajax/cright"/>
+	            <bean class="com.atdld.os.common.intercepter.LimitIntercepterForWeb"></bean>
+	       </mvc:interceptor>
+	       
+	      <mvc:interceptor>
+		    	<mvc:mapping path="/**/*"/> 
+	            <mvc:exclude-mapping path="/static/**/*"/>
+	            <mvc:exclude-mapping path="/kindeditor/**/*"/>
+	            <bean class="com.atdld.os.common.intercepter.LimitIntercepterForWebsite">
+	            </bean>
+	      </mvc:interceptor> 
+		  <!--针对后台的路径进行拦截-->
+	      <mvc:interceptor>
+	            <mvc:mapping path="/admin*"/>
+	            <mvc:mapping path="/admin/**/*"/>
+	            <mvc:exclude-mapping path="/*/ajax/**"/>
+	            <mvc:exclude-mapping path="/api/*"/>
+	            <mvc:exclude-mapping path="/api/**/*"/>
+                <mvc:exclude-mapping path="/admin"/>
+                <mvc:exclude-mapping path="/admin"/>
+	            <mvc:exclude-mapping path="/admin/sys/login"/> 
+	            <mvc:exclude-mapping path="/admin/sys/logout"/> 
+	            <bean class="com.atdld.os.common.intercepter.LimitIntercepterForAdmin">
+	            </bean>
+	      </mvc:interceptor>
+        	<!-- 访问日志 -->
+	      <mvc:interceptor>
+		            <mvc:mapping path="/**/*"/> 
+		            <mvc:exclude-mapping path="/static/**/*"/>
+		            <mvc:exclude-mapping path="/kindeditor/**/*"/>
+		            <bean class="com.atdld.os.core.common.intercepter.LoggerFilter">
+		            </bean>
+	      </mvc:interceptor>
+    </mvc:interceptors>    
+	<!-- ③：对模型视图名称的解析，即在模型视图名称添加前后缀 -->
+		<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/view/"/>
+		<property name="suffix" value=".jsp"/>
+	 	<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+	</bean>
+	
+	<!-- <mvc:view-controller path="/" view-name="redirect:/index"/> -->
+	<!-- REST中根据URL后缀自动判定Content-Type及相应的View -->
+	  <bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
+	    <property name="mediaTypes" >
+	        <value>
+	            json=application/json
+	            xml=application/xml
+	        </value>
+	    </property>
+	</bean> 
+	
+	 <!-- 文件上传限制大小 -->
+     <bean id="multipartResolver"  
+           class="org.springframework.web.multipart.commons.CommonsMultipartResolver">  
+           <!-- set the max upload size 10MB -->  
+           <property name="maxUploadSize">  
+               <value>10485760</value>  
+           </property>  
+           <property name="maxInMemorySize">  
+               <value>4096</value>  
+           </property>  
+     </bean>  
+        
+	<!-- Spring MVC 内置处理json配置  添加jackson-mapper-asl-1.*.*.jar jackson-core-asl-1.*.*.jar这两个包实现-->
+	<bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+		 <property name="messageConverters">
+		  <list>
+		   <bean
+		    class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter" />
+		  </list>
+		 </property>
+	</bean>
+	 <!-- 将Controller抛出的异常转到特定View, 保持SiteMesh的装饰效果 -->
+     <bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">  
+           <property name="exceptionMappings">  
+                   <props>
+                         <prop key="org.apache.shiro.authz.UnauthorizedException">/WEB-INF/view/common/error/403</prop>
+                         <prop key="java.lang.Throwable">/WEB-INF/view/common/error</prop>
+       			</props>  
+           </property>
+    </bean>
+   
+</beans>

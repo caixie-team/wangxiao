@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AppIosCheckMapper">
+	
+	<!-- 查询返回结果 -->
+	<resultMap type="AppIosCheck" id="AppIosCheckResult">
+		<result property="id" column="id"/>
+		<result property="productId" column="product_id"/>
+		<result property="purchaseDate" column="purchase_date"/>
+		<result property="rReceipt" column="r_receipt"/>
+		<result property="md5Receipt" column="md5_receipt"/>
+	</resultMap>
+	
+	<sql id="app_ios_check_columns">
+		app_ios_check.id,
+		app_ios_check.product_id,
+		app_ios_check.purchase_date,
+		app_ios_check.r_receipt,
+		app_ios_check.md5_receipt
+	</sql>
+	<sql id="app_ios_check_properties">
+		#{id},
+		#{productId},
+		#{purchaseDate},
+		#{rReceipt},
+		#{md5Receipt}
+	</sql>
+	<!-- 添加 -->
+	<insert id="createAppIosCheck" parameterType="AppIosCheck" keyColumn="id"
+		keyProperty="id" useGeneratedKeys="true">
+		INSERT INTO app_ios_check 
+		(
+			<include refid="app_ios_check_columns"/>
+		) 
+		VALUES
+		(
+			<include refid="app_ios_check_properties"/>
+		)
+	</insert>
+	
+	<!-- 查询单个对象 -->
+	<select id="getAppCourseByMd5Receipt" resultMap="AppIosCheckResult" parameterType="String">
+		SELECT
+		<include refid="app_ios_check_columns"/>
+		FROM
+		app_ios_check
+		WHERE app_ios_check.md5_receipt = #{value}
+	</select>
+	
+</mapper>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AppTopicMapper">
+	
+	<!-- 查询课程返回结果 -->
+	<resultMap type="AppTopic" id="AppTopicResult">
+		<result property="topicId" column="TOPIC_ID"/>
+		<result property="topicTitle" column="TOPIC_TITLE"/>
+		<result property="userId" column="USER_ID"/>
+		<result property="topicContent" column="TOPIC_CONTENT"/>
+		<result property="createTime" column="CREATE_TIME"/>
+		<result property="states" column="STATES"/>
+		<result property="groupId" column="GROUP_ID"/>
+		<result property="imageUrl" column="IMAGE_URL"/>
+	</resultMap>
+	<!-- 查询课程返回结果 -->
+	<resultMap type="AppTopicDto" id="AppTopicDtoResult" extends="AppTopicResult">
+		<result property="userName" column="NICKNAME"/>
+	</resultMap>
+	<sql id="app_topic_columns">
+		APP_TOPIC.TOPIC_ID,
+		APP_TOPIC.TOPIC_TITLE,
+		APP_TOPIC.USER_ID,
+		APP_TOPIC.TOPIC_CONTENT,
+		APP_TOPIC.CREATE_TIME,
+		APP_TOPIC.STATES,
+		APP_TOPIC.GROUP_ID,
+		APP_TOPIC.IMAGE_URL
+	</sql>
+	<sql id="app_topic_properties">
+		#{topicId},
+		#{topicTitle},
+		#{userId},
+		#{topicContent},
+		#{createTime},
+		#{states},
+		#{groupId},
+		#{imageUrl}
+	</sql>
+	
+	<!-- 创建话题 -->
+	<insert id="createAppTopic" parameterType="AppTopic" keyColumn="TOPIC_ID"
+		keyProperty="topicId" useGeneratedKeys="true">
+		INSERT INTO APP_TOPIC (<include refid="app_topic_columns"/>)
+		VALUES(<include refid="app_topic_properties"/>)
+	</insert>
+	
+	<!-- 查询话题 -->
+	<select id="getAppTopicById" parameterType="Long" resultMap="AppTopicDtoResult">
+		SELECT <include refid="app_topic_columns"/>,USER_USER.NICKNAME
+		FROM APP_TOPIC
+		LEFT JOIN USER_USER ON USER_USER.ID=APP_TOPIC.USER_ID
+		WHERE TOPIC_ID=#{value}
+	</select>
+	<!-- 查询话题 -->
+	<select id="getAppTopic" parameterType="Long" resultMap="AppTopicResult">
+		SELECT <include refid="app_topic_columns"/>
+		FROM APP_TOPIC WHERE TOPIC_ID=#{value}
+	</select>
+	
+	<!-- 修改 -->
+	<update id="updateAppTopic" parameterType="AppTopic">
+		UPDATE APP_TOPIC SET 
+		USER_ID=#{userId},
+		TOPIC_CONTENT=#{topicContent},
+		TOPIC_TITLE=#{topicTitle},
+		CREATE_TIME=#{createTime},
+		STATES=#{states},
+		IMAGE_URL=#{imageUrl}
+		WHERE TOPIC_ID=#{topicId}
+	</update>
+	
+	<!-- App查询列表 -->
+    <select id="queryAppTopic" parameterType="java.util.Map" resultMap="AppTopicDtoResult">
+        SELECT
+        <include refid="app_topic_columns"/>,USER_USER.NICKNAME
+        FROM APP_TOPIC
+        LEFT JOIN USER_USER ON USER_USER.ID=APP_TOPIC.USER_ID
+        WHERE 1=1
+        <if test="e.topicTitle!=null and e.topicTitle!=''">
+        	AND APP_TOPIC.TOPIC_TITLE LIKE CONCAT('%',#{e.topicTitle},'%')
+        </if>
+        <if test="e.states!=null and e.states!=''">
+        	AND APP_TOPIC.STATES =#{e.states}
+        </if>
+        ORDER BY APP_TOPIC.TOPIC_ID DESC
+        <include refid="publicMapper.pageEnd" />
+    </select>
+    <select id="queryAppTopicCount"  parameterType="java.util.Map" resultType="int">
+        SELECT
+       	COUNT(1)
+        FROM APP_TOPIC
+        LEFT JOIN USER_USER ON USER_USER.ID=APP_TOPIC.USER_ID
+        WHERE 1=1
+        <if test="e.topicTitle!=null and e.topicTitle!=''">
+        	AND APP_TOPIC.TOPIC_TITLE LIKE CONCAT('%',#{e.topicTitle},'%')
+        </if>
+        <if test="e.states!=null and e.states!=''">
+        	AND APP_TOPIC.STATES =#{e.states}
+        </if>
+    </select>
+    
+   <delete id="delAppTopicById" parameterType="String">
+		DELETE FROM APP_TOPIC WHERE TOPIC_ID in (${value})
+	</delete>
+	<!-- app查询话题列表，开始 -->
+	<select id="queryAppTopicPage" parameterType="java.util.Map" resultType="java.util.HashMap">
+		SELECT 
+		APP_TOPIC.TOPIC_ID as topicId,
+		APP_TOPIC.TOPIC_TITLE as title,
+		APP_TOPIC.TOPIC_CONTENT as topicContent,
+		APP_TOPIC.CREATE_TIME as createTime,
+		APP_TOPIC.GROUP_ID as groupId,
+		APP_TOPIC.IMAGE_URL as imageUrl
+		FROM APP_TOPIC WHERE STATES='DEFAULT'
+		ORDER BY APP_TOPIC.TOPIC_ID DESC
+        <include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryAppTopicPageCount" parameterType="java.util.Map" resultType="int">
+		SELECT COUNT(1) FROM APP_TOPIC WHERE STATES='DEFAULT'
+	</select>
+	<!-- app查询话题列表，结束 -->
+    
+</mapper>

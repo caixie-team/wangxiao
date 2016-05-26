@@ -1,0 +1,322 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserGroupMapper">
+
+	<resultMap type="UserGroup" id="UserGroupResult">
+		<result column="id" property="id" />
+		<result column="name" property="name" />
+		 <result column="description" property="description" />
+		<result column="sort" property="sort" />
+		<result column="status" property="status" />
+		<result column="courseNum" property="courseNum"/>
+		<result column="studyTime" property="studyTime"/>
+	</resultMap>
+	
+	<resultMap type="UserGroup" id="UserGroupPart">
+		<result column="id" property="id" />
+		<result column="name" property="name" />
+	</resultMap>
+	
+	
+	<resultMap id="TaskResult" type="Task" extends="UserGroupPart">
+ 		    <result property="taskid" column="taskid" />
+			<result property="taskname" column="taskname"/> 
+			<result property="releaseTime" column="release_time"/>
+			<result property="taskstatus" column="taskstatus"/>
+	</resultMap>
+	
+	<resultMap type="UserGroup" id="CourseDtoListUserGroup">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<collection property="courseDtoArrayList" ofType="CourseDto">
+			<result property="id" column="courseId" />
+			<result property="name" column="cname" />
+			<result property="isavaliable" column="isavaliable" />
+			<result property="addtime" column="addtime" />
+			<result property="isPay" column="is_pay" />
+			<result property="sourceprice" column="sourceprice" />
+			<result property="currentprice" column="currentprice" />
+			<result property="title" column="title" />
+			<result property="lessionnum" column="lessionnum" />
+			<result property="coursetag" column="coursetag" />
+			<result property="logo" column="logo" />
+			<result property="updateTime" column="update_time" />
+			<result property="losetype" column="losetype" />
+			<result property="loseAbsTime" column="lose_abs_time" />
+			<result property="loseTime" column="lose_time" />
+			<result property="updateuser" column="updateuser" />
+			<result property="pageBuycount" column="page_buycount" />
+			<result property="pageViewcount" column="page_viewcount" />
+			<result property="freeurl" column="freeurl" />
+			<result column="recommendId" property="recommendId" />
+			<result column="buycount" property="buycount" />
+			<result column="viewcount" property="viewcount" />
+			<result column="commentcount" property="commentcount" />
+			<result column="questiongcount" property="questiongcount" />
+			<result column="notecount" property="notecount" />
+			<result column="playcount" property="playcount" />
+			<result property="sellType" column="sell_type" />
+			<result property="liveBeginTime" column="live_begin_time" />
+			<result property="liveEndTime" column="live_end_time" />
+			<result property="lectureTime" column="lecture_time" />
+			<result property="showType" column="show_type" />
+		</collection>
+	</resultMap>
+
+	<sql id="user_group_columns">
+		`user_group`.`id`,
+		`user_group`.`name`,
+		`user_group`.`description`,
+		`user_group`.`sort`,
+		`user_group`.`status`
+	</sql>
+
+	<sql id="user_group_properties">
+		#{id},
+		#{name},
+		#{description},
+		#{sort},
+		#{status}
+	</sql>
+
+
+	<insert id="addUserGroup" parameterType="UserGroup" keyColumn="id"
+		keyProperty="id" useGeneratedKeys="true">
+		insert into
+		user_group (
+		<include refid="user_group_columns" />
+		) values
+		(
+		<include refid="user_group_properties" />
+		)
+	</insert>
+
+	<update id="updateUserGroup" parameterType="UserGroup">
+		update
+		user_group
+		set
+		name = #{name},
+		description = #{description},
+		sort =#{sort},
+		status =
+		#{status}
+		where
+		id = #{id}
+	</update>
+
+	<select id="getUserGroupList" parameterType="UserGroup"
+		resultMap="UserGroupResult">
+		select
+		<include refid="user_group_columns" />
+		from
+		user_group
+		left join
+		`group_middle_user`
+		ON user_group.`id` =
+		group_middle_user.`group_id`
+		where
+		user_group.status = 0
+		<if test="userId!=0 and userId!=null">
+			and group_middle_user.`user_id` = #{userId}
+		</if>
+
+		<if test="id!=null and id!=0 ">
+			and user_group.`id` = #{id}
+		</if>
+
+		<if test="name!=null and name!=''">
+			and user_group.`name` = #{name}
+		</if>
+		ORDER BY CONVERT(user_group.`name` USING gbk) ASC
+	</select>
+
+
+	<select id="getUserGroupByIds" parameterType="list" resultMap="UserGroupResult">
+		select
+		<include refid="user_group_columns" />
+		from
+		user_group
+		where
+		user_group.status = 0
+		and user_group.`id` in
+		<foreach item="item" index="index" collection="list" open="("
+			separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+
+
+
+	<select id="getCourseDtoListByGroup" parameterType="Long"
+		resultMap="CourseDtoListUserGroup">
+
+		SELECT
+		`user_group`.`id`,
+		`user_group`.`name`,
+		edu_course.id as
+		courseId,
+		edu_course.name cname,
+		edu_course.isavaliable,
+		edu_course.addtime,
+		edu_course.is_pay,
+		edu_course.sourceprice,
+		edu_course.currentprice,
+		edu_course.title,
+		edu_course.lessionnum,
+		edu_course.coursetag,
+		edu_course.logo,
+		edu_course.update_time,
+		edu_course.losetype,
+		edu_course.lose_abs_time,
+		edu_course.lose_time,
+		edu_course.updateuser,
+		edu_course.page_buycount,
+		edu_course.page_viewcount,
+		edu_course.freeurl,
+		edu_course.sell_type,
+		edu_course.live_begin_time,
+		edu_course.live_end_time,
+		edu_course.lecture_time,
+		edu_course.company_sell_type,
+		IFNULL(edu_course_profile.buycount,0) buycount,
+		IFNULL(edu_course_profile.viewcount,0) viewcount,
+		IFNULL(edu_course_profile.commentcount,0) commentcount,
+		IFNULL(edu_course_profile.questiongcount,0) questiongcount,
+		IFNULL(edu_course_profile.notecount,0) notecount,
+		IFNULL(edu_course_profile.playcount,0) playcount
+		FROM
+		user_group
+		LEFT
+		JOIN `group_middle_user`
+		ON
+		user_group.`id` =
+		group_middle_user.`group_id`
+		LEFT JOIN
+		group_middle_course
+		ON
+		user_group.`id` = group_middle_course.`group_id`
+		LEFT JOIN edu_course
+		ON group_middle_course.course_id = edu_course.id
+		left join
+		edu_course_profile on
+		edu_course.id=edu_course_profile.course_Id
+		WHERE
+		group_middle_user.`user_id` = #{value}
+	</select>
+
+	<select id="selectUserGroupList" parameterType="java.util.HashMap"
+		resultMap="UserGroupResult">
+		select
+		<include refid="user_group_columns" />
+		from
+		user_group
+		<where>
+			user_group.status = 0
+			<if test="e.name!='' and e.name !=null">
+				and user_group.name like CONCAT('%',#{e.name},'%')
+			</if>
+		</where>
+		ORDER BY CONVERT(user_group.`name` USING gbk) ASC
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+
+	<select id="selectUserGroupListCount" parameterType="java.util.HashMap"
+		resultType="int">
+		select count(1)
+		from
+		user_group
+		<where>
+			user_group.status = 0
+			<if test="e.name!='' and e.name !=null">
+				and user_group.name like CONCAT('%',#{e.name},'%')
+			</if>
+		</where>
+	</select>
+
+
+	<select id="getUserGroupListStatistics" parameterType="java.util.HashMap"
+			resultMap="UserGroupResult">
+		select
+		<include refid="user_group_columns" />,
+		COUNT(DISTINCT edu_course_studyhistory.course_id) as courseNum,
+		SUM(edu_course_studyhistory.play_time) as studyTime
+		from
+		user_group
+		LEFT JOIN group_middle_course ON user_group.id = group_middle_course.group_id
+		LEFT JOIN edu_course_studyhistory ON group_middle_course.course_id = edu_course_studyhistory.course_id
+		<where>
+			user_group.status = 0
+			<if test="e.id !=null and e.id>0">
+				and user_group.id = #{e.id}
+			</if>
+			<if test="e.name!=null and e.name!=''">
+				and user_group.name like CONCAT('%',#{e.name},'%')
+			</if>
+		</where>
+		GROUP BY user_group.id
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+
+	<select id="getUserGroupListStatisticsCount" parameterType="java.util.HashMap"
+			resultType="int">
+		select COUNT(1)
+		from
+		user_group
+		<where>
+			user_group.status = 0
+			<if test="e.id !=null and e.id>0">
+				and user_group.id = #{e.id}
+			</if>
+			<if test="e.name!=null and e.name!=''">
+				and user_group.name like CONCAT('%',#{e.name},'%')
+			</if>
+		</where>
+	</select>
+
+	<select id="selectUserGroupById" parameterType="Long" resultMap="UserGroupResult">
+		select
+		<include refid="user_group_columns" />
+		from
+		user_group
+		where
+		id =#{value}
+	</select>
+	
+	
+	<delete id="delUserGroup" parameterType="Long" >
+		delete from user_group
+		where
+		id=#{value}
+	</delete>
+	
+	
+	
+
+    <select id="getGroupTaskRecord" resultMap="TaskResult" >
+	  SELECT 
+	  <include refid="user_group_columns" />,
+	  edu_task.`id` as taskid,
+	  edu_task.`name` as taskname, 
+	  edu_task.`release_time`, 
+	  edu_task.`status` as taskstatus
+	  FROM 
+	  user_group  
+	  LEFT JOIN  
+	  group_middle_user  
+	  ON  
+	  user_group.`id` = group_middle_user.`group_id` 
+	  LEFT JOIN  
+	  edu_task_middle_group  
+	  ON  
+	  group_middle_user.`group_id` = edu_task_middle_group.`user_group_id` 
+	  LEFT JOIN  
+	  edu_task 
+	  ON 
+	  edu_task_middle_group.`task_id` = edu_task.`id` 
+	  WHERE group_middle_user.`user_id` = ${value} 
+	</select>
+
+</mapper>

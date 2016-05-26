@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ErrorQuestionMapper" >
+
+	<resultMap id="QueryErrorQuestionResult" type="QueryErrorQuestion">
+       <result property="id" column="id" />
+       <result property="cusId" column="CUS_ID" />
+       <result property="paperId" column="paper_id" />
+       <result property="qstId" column="QST_ID" />
+       <result property="subjectId" column="subject_id" />
+       <result property="addTime" column="ADDTIME" />
+       <result property="paperRecordId" column="PAPER_RECORD_ID" />
+       <result property="placeNumber" column="PLACE_NUMBER" />
+    </resultMap>
+    
+ 	<sql id="exam_error_question_columns">
+	 	exam_error_question.Id,
+	 	exam_error_question.CUS_ID,
+	 	exam_error_question.paper_id,
+	 	exam_error_question.QST_ID,
+	 	exam_error_question.subject_id,
+	 	exam_error_question.ADDTIME,
+	 	exam_error_question.PAPER_RECORD_ID,
+	 	exam_error_question.PLACE_NUMBER
+    </sql>
+
+    <sql id="exam_error_question_properties">
+        #{id},
+        #{cusId},
+        #{paperId},
+        #{qstId},
+        #{subjectId},
+        #{addTime},
+        #{paperRecordId},
+        #{placeNumber}
+    </sql>
+	
+	 <insert id="insertQueryErrorQuestion" parameterType="java.util.HashMap" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO exam_error_question (<include refid="exam_error_question_columns"/>) VALUES 
+         <foreach collection="queryErrorQuestionList" index="index" item="item" separator="," >
+        	 (#{item.id},#{item.cusId},#{item.paperId},
+        	 #{item.qstId}, #{item.subjectId},#{item.addTime},
+        	 #{item.paperRecordId},#{item.placeNumber})
+        </foreach>
+    </insert>
+    
+    
+     <delete id="delQueryErrorQuestionByPaperRecordId" parameterType="java.util.HashMap">
+ 		DELETE from exam_error_question 
+        WHERE
+        PAPER_RECORD_ID = #{paperRecordId} 
+        and CUS_ID = #{cusId}
+		and paper_id = #{paperId}
+		and QST_ID = #{qstId}
+    </delete>
+    
+    <select id="queryErrorQuestionByQstId" parameterType="java.util.HashMap" resultMap="QueryErrorQuestionResult">
+	select <include refid="exam_error_question_columns"/>
+	from exam_error_question
+	<where>
+		exam_error_question.cus_id = #{cusId} and 
+		exam_error_question.qst_Id in (
+		 <foreach collection="queryErrorQuestionList" index="index" item="item" separator="," >
+        	 #{item.qstId}
+        </foreach>)
+	</where>
+	</select>
+    
+    <delete id="delQueryErrorQuestionBatchByQueryErrorQuestionList" parameterType="java.util.HashMap">
+ 		DELETE from exam_error_question 
+        <where>
+		exam_error_question.cus_id = #{cusId} and 
+		exam_error_question.qst_Id in (
+		 <foreach collection="queryErrorQuestionList" index="index" item="item" separator="," >
+        	 #{item.qstId}
+        </foreach>)
+		</where>
+    </delete>
+</mapper>

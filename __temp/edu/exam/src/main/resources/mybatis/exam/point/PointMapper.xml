@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PointMapper" >
+
+    <resultMap id="PointResult" type="exampoint">
+       <result property="id" column="id" />
+       <result property="parentId" column="parent_id" />
+       <result property="name" column="name" />
+       <result property="addTime" column="add_TIME" />
+       <result property="updateTime" column="UPDATE_TIME" />
+       <result property="subjectId" column="subject_id" />
+       <result property="examFrequency" column="exam_frequency" />
+       <result property="info" column="info" />
+       <result property="level" column="level" />
+       <result property="qstCount" column="qstCount" />
+    </resultMap>
+
+    <sql id="exam_point_columns">
+        exam_point.id,
+        exam_point.parent_id,
+        exam_point.name,
+        exam_point.add_TIME,
+        exam_point.UPDATE_TIME,
+        exam_point.subject_id,
+        exam_point.exam_frequency,
+        exam_point.info,
+        exam_point.level
+    </sql>
+
+    <sql id="exam_point_properties">
+        #{id},
+        #{parentId},
+        #{name},
+        #{addTime},
+        #{updateTime},
+        #{subjectId},
+        #{examFrequency},
+        #{info},
+        #{level}
+    </sql>
+
+    <insert id="createPoint" parameterType="exampoint" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO exam_point (<include refid="exam_point_columns"/>) VALUES (<include
+            refid="exam_point_properties"/>)
+    </insert>
+
+	 <insert id="addPointBatch" parameterType="java.util.HashMap" >
+        INSERT INTO exam_point (<include refid="exam_point_columns"/>) VALUES 
+         <foreach collection="pointList" index="index" item="item" separator="," >
+        	 (  #{item.id},
+		        #{item.parentId},
+		        #{item.name},
+		        #{item.addTime},
+		        #{item.updateTime},
+		        #{item.subjectId},
+		        #{item.examFrequency},
+		        #{item.info},
+		        #{item.level})
+        </foreach>
+    </insert>
+    
+    <select id="queryPointMaxId" resultType="int">
+	select IFNULL(max(id),0)
+	from exam_point 
+	</select>
+	
+	<!-- 根据id查询Point -->
+	
+	<select id="getPointListByPointId" parameterType="exampoint" resultMap="PointResult">
+	select <include refid="exam_point_columns"/>
+	from exam_point 
+	<where>
+		<!-- 状态为1时显示为2时为删除 -->
+		<if test="state!=0">
+		exam_point.state = 1
+		</if>
+		<if test="subjectId!=null and subjectId!=0">
+			and exam_point.subject_id = #{subjectId}
+		</if>
+		<if test="id!=null and id!=0">
+			and exam_point.id = #{id}
+		</if>
+		<if test="parentId!=null and parentId!=0">
+			and exam_point.parent_id = #{parentId}
+		</if>
+	</where>
+	</select>
+	
+	
+	
+	
+	
+	
+	<!--  通过in获得pointList -->
+	<select id="getPointListByInId" parameterType="java.util.HashMap" resultMap="PointResult">
+	select <include refid="exam_point_columns"/>
+	from exam_point 
+	<where>
+        id in 
+        <foreach collection="array" item="item" open="(" close=")" separator=",">
+        	#{item}
+        </foreach>
+	</where>
+	</select>
+	
+   	<!--  批量删除 -->
+ 	<update id="deletePointByidBatch">
+ 		update exam_point set state = 2 
+        WHERE
+        id in 
+        <foreach collection="array" item="item" open="(" close=")" separator=",">
+        	#{item}
+        </foreach>
+    </update>
+ 	
+ 	<update id="updatePointByid" parameterType="java.util.HashMap" >
+ 		update exam_point set parent_id=#{parentId},name=#{name},subject_id=#{subjectId},exam_frequency=#{examFrequency},info=#{info},level=#{level} where id=#{id,jdbcType=INTEGER}
+ 	</update>
+ 	
+ 	<update id="updatePointBysubjectId" parameterType="java.util.HashMap" >
+ 		update exam_point set subject_id=#{subjectNew} where subject_id=#{subjectOld,jdbcType=INTEGER}
+ 	</update>
+ 	
+ 	<!-- 查询所有考点下的试题数量 -->
+ 	
+ 	<select id="queryAllPointQstCount" parameterType="exampoint" resultType="PointExtend">
+ 	    SELECT point.id,
+	        point.parent_id parentId,
+	        point.name,
+	        point.add_TIME ADDTIME,
+	        point.UPDATE_TIME updateTime,
+	        point.subject_id subjectId,
+	        point.exam_frequency examFrequency,
+	        point.info,
+	        point.level,
+			COUNT(qst.id) qstCount
+		FROM exam_point POINT
+		LEFT JOIN exam_question qst ON 
+		point.subject_id=qst.subject_id AND 
+			point.id=qst.point_id  AND qst.QST_TYPE!=4	AND qst.status != 2 
+		WHERE point.subject_id=#{subjectId} AND point.state!=2
+		GROUP BY point.id
+ 	</select>
+ 	
+ 	<select id="getPointList" parameterType="java.util.HashMap" resultMap="PointResult">
+	select <include refid="exam_point_columns"/>
+	from exam_point 
+	<where>
+		<!-- 状态为1时显示为2时为删除 -->
+		<if test="state!=0">
+		exam_point.state = 1
+		</if>
+		<if test="subjectId!=null and subjectId!=0">
+			and exam_point.subject_id = #{subjectId}
+		</if>
+		<if test="id!=null and id!=0">
+			and exam_point.id = #{id}
+		</if>
+		<if test="parentId!=null and parentId!=-1">
+			and exam_point.parent_id = #{parentId}
+		</if>
+	</where>
+	</select>
+	
+	<select id="queryPointAndQuestionRecordListByCusId" parameterType="QueryPoint" resultType="PointExtend">
+		SELECT 
+		  point.id,
+		  point.parent_id parentId,
+		  point.name,
+		  point.add_TIME ADDTIME,
+		  point.UPDATE_TIME updateTime,
+		  point.subject_id subjectId,
+		  point.exam_frequency examFrequency,
+		  point.info,
+		  point.level,
+		  qstRecord.qst_id,
+		  COUNT(qstRecord.Id) qstCount,
+		  COUNT(IF(qstRecord.status =0,TRUE,NULL))  cusRightQstNum 
+		FROM  exam_point POINT
+		LEFT JOIN exam_question_record qstRecord  ON point.id=qstRecord.point_id AND 
+		qstRecord.cus_id = #{cusId}
+		<if test="paperRecordId">
+			and qstRecord.paper_record_id=#{paperRecordId}
+		</if>
+		WHERE point.subject_id=#{subjectId} AND point.state!=2
+		GROUP BY point.id
+ 	</select>
+</mapper>

@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PaperRecordMapper">
+
+	<resultMap id="PaperRecordResult" type="PaperRecord">
+		<result property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="userScore" column="user_score"/>
+		<result property="accuracy" column="accuracy"/>
+		<result property="cusId" column="CUS_ID"/>
+		<result property="epId" column="ep_id"/>
+		<result property="addTime" column="add_time" />
+		<result property="testTime" column="test_time"/>
+		<result property="qstCount" column="qst_count"/>
+		<result property="correctNum" column="correct_num"/>
+		<result property="subjectId" column="subject_id"/>
+		<result property="type" column="type"/>
+		<result property="status" column="status"/>
+		<result property="paperName" column="paper_Name"/>
+		<result property="subjectiveScore" column="subjective_score"/>
+		<result property="objectiveScore" column="objective_score"/>
+	</resultMap>
+	<resultMap id="QueryPaperRecordResult" type="QueryPaperRecord" extends="PaperRecordResult">
+		<result property="name" column="NAME"/>
+		<result property="questionStatus" column="questionStatus"/>
+		<result property="sumUserScore" column="sumUserScore"/>
+		<result property="num" column="num"/>
+		<result property="qstId" column="qst_id"/>
+		<result property="userAnswer" column="userAnswer"/>
+		<result property="qstrcdId" column="qstrcdId"/>
+		<result property="qstContent" column="QST_CONTENT"/>
+		<result property="qstrdScore" column="qstrdScore"/>
+		<result property="state" column="state"/>
+		
+	</resultMap>
+	
+	<sql id="EXAM_EXAMPAPERRECORD_TBL_columns">
+		exam_exampaper_record.id,
+		exam_exampaper_record.user_score,
+		exam_exampaper_record.accuracy,
+		exam_exampaper_record.CUS_ID,
+		exam_exampaper_record.EP_ID,
+		exam_exampaper_record.add_time,
+		exam_exampaper_record.TEST_TIME,
+		exam_exampaper_record.QST_COUNT,
+		exam_exampaper_record.correct_num,
+		exam_exampaper_record.subject_id,
+		exam_exampaper_record.type,
+		exam_exampaper_record.status,
+		exam_exampaper_record.paper_name,
+		exam_exampaper_record.subjective_score,
+		exam_exampaper_record.objective_score
+	</sql>
+	
+	<sql id="EXAM_EXAMPAPERRECORD_TBL_properties">
+		#{id},
+		#{userScore},
+		#{accuracy},
+		#{cusId},
+		#{epId},
+		#{addTime},
+		#{testTime},
+		#{qstCount},
+		#{correctNum},
+		#{subjectId},
+		#{type},
+		#{status},
+		#{paperName},
+		#{subjectiveScore},
+		#{objectiveScore}
+	</sql>
+	
+	 <insert id="createPaperRecord" parameterType="exampaper" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO exam_exampaper_record (<include refid="EXAM_EXAMPAPERRECORD_TBL_columns"/>) VALUES (<include
+            refid="EXAM_EXAMPAPERRECORD_TBL_properties"/>)
+    </insert>
+    
+    <insert id="addExamPaperRecordBatch" parameterType="java.util.List">
+        INSERT INTO exam_exampaper_record (  <include refid="EXAM_EXAMPAPERRECORD_TBL_columns"/>) VALUES  
+        <foreach collection="paperRecordList" item="item"  separator="," >
+           (#{item.id},
+			#{item.userScore},
+			#{item.accuracy},
+			#{item.cusId},
+			#{item.epId},
+			#{item.addTime},
+			#{item.testTime},
+			#{item.qstCount},
+			#{item.correctNum},
+			#{item.subjectId},
+			#{item.type},
+			#{item.status})
+        </foreach>
+    </insert>
+    
+   	<!-- 查询收藏的试卷 -->
+	<update id="updateExamPaperRecordById" parameterType="java.util.HashMap" >
+ 		update exam_exampaper_record set 
+		user_score=#{userScore},
+		accuracy=#{accuracy},
+		CUS_ID=#{cusId},
+		EP_ID=#{epId},
+		TEST_TIME=#{testTime},
+		QST_COUNT=#{qstCount},
+		correct_num=#{correctNum},
+		subject_id=#{subjectId},
+		type=#{type},
+		status=#{status}
+ 		where id=#{id,jdbcType=INTEGER}
+	</update>
+	
+    <select id="queryPaperRecordById" parameterType="java.util.HashMap" resultMap="PaperRecordResult">
+	select <include refid="EXAM_EXAMPAPERRECORD_TBL_columns"/>
+	from exam_exampaper_record 
+	<where>
+	exam_exampaper_record.id=#{id}
+	</where>
+	</select>
+	
+	 <select id="queryPaperRecordByIdAndCusId" parameterType="java.util.HashMap" resultMap="PaperRecordResult">
+	select <include refid="EXAM_EXAMPAPERRECORD_TBL_columns"/>
+	from exam_exampaper_record 
+	<where>
+	 exam_exampaper_record.id=#{id} and exam_exampaper_record.cus_id=#{cusId}
+	</where>
+	</select>
+	
+	<select id="queryExamPaperRecordList" resultMap="QueryPaperRecordResult"  parameterType="java.util.HashMap">
+          SELECT
+          <include refid="EXAM_EXAMPAPERRECORD_TBL_columns"/>
+          FROM exam_exampaper_record 
+            <where>
+            exam_exampaper_record.CUS_ID = #{e.cusId} AND
+            exam_exampaper_record.subject_id = #{e.subjectId}
+                /*app练习记录只取专项练习 这里只用于app*/
+            <if test="e.paperName=='专项智能练习'">
+                and exam_exampaper_record.paper_name ='专项智能练习'
+            </if>
+             </where>
+			order by exam_exampaper_record.add_time desc            
+          <include refid="publicMapper.pageEnd"/>
+      </select>
+        
+      <select id="queryExamPaperRecordListCount" resultType="int" parameterType="java.util.HashMap">
+          SELECT COUNT(1)
+          FROM exam_exampaper_record 
+          left join exam_exampaper on exam_exampaper.id = exam_exampaper_record.EP_ID
+            <where>
+            exam_exampaper_record.CUS_ID = #{e.cusId}  AND
+            exam_exampaper_record.subject_id = #{e.subjectId}
+            /*app练习记录只取专项练习 这里只用于app*/
+            <if test="e.paperName=='专项智能练习'">
+                and exam_exampaper_record.paper_name ='专项智能练习'
+            </if>
+             </where>
+      </select>
+      
+      <select id="queryExamPaperRecordListByCusId" resultMap="QueryPaperRecordResult"  parameterType="java.util.HashMap">
+          SELECT
+          <include refid="EXAM_EXAMPAPERRECORD_TBL_columns"/>,
+          exam_exampaper.NAME
+          FROM exam_exampaper_record 
+          left join exam_exampaper on exam_exampaper.id = exam_exampaper_record.EP_ID
+            <where>
+            exam_exampaper_record.CUS_ID = #{cusId} AND 
+                exam_exampaper_record.subject_id = #{subjectId}
+             </where>
+			order by exam_exampaper_record.add_time desc    
+			limit 4        
+      </select>
+      
+      <select id="checkPaperResult" resultMap="PaperRecordResult" parameterType="java.util.HashMap">
+      		SELECT <include refid="EXAM_EXAMPAPERRECORD_TBL_columns"/>
+      		FROM exam_exampaper_record 
+      		WHERE exam_exampaper_record .id=#{id}
+      		and exam_exampaper_record .CUS_ID=#{cusId}
+      </select>
+      
+       <select id="queryPaperRecordByCusIdNewest" resultMap="QueryPaperRecordResult" parameterType="java.util.HashMap">
+      		SELECT <include refid="EXAM_EXAMPAPERRECORD_TBL_columns"/>,
+      		exam_exampaper.name
+      		FROM exam_exampaper_record left join exam_exampaper on exam_exampaper_record.Ep_id = exam_exampaper.id
+      		WHERE
+      		exam_exampaper_record.CUS_ID=#{cusId} and exam_exampaper_record.subject_id = #{subjectId}
+      		ORDER BY exam_exampaper_record.add_time DESC
+      		limit 1
+      </select>
+  <select id="getExamPaperReport" resultMap="QueryPaperRecordResult" parameterType="java.util.HashMap">
+	SELECT 
+		<include refid="EXAM_EXAMPAPERRECORD_TBL_columns"/>,
+         exam_question_record.status questionStatus
+	     FROM exam_question_record
+         LEFT JOIN exam_exampaper_record 
+         on  exam_question_record.paper_record_id=exam_exampaper_record.id
+         where exam_question_record.paper_id =#{epId} 
+         and exam_question_record.cus_id = #{cusId}
+         and exam_question_record.paper_record_id = #{id}
+	</select>    
+	
+	<select id="queryPaperRecordAverageScore" resultType="int" parameterType="java.util.HashMap">
+	SELECT IFNULL(SUM(user_score)/COUNT(1),0) FROM exam_exampaper_record 
+	WHERE cus_id = #{cusId} AND subject_id= #{subjectId} and type = 2<!-- type=2后台组卷的卷子 -->
+	</select>    
+      
+    <select id="queryExamPaperRecordScoreRanking" resultType="int" parameterType="java.util.HashMap">
+	SELECT count(1) FROM `exam_exampaper_record` WHERE cus_id =#{cusId} and 
+	subject_id =#{subjectId} and EP_ID =#{epId}  
+	AND <![CDATA[ user_score >=#{userScore} ]]>
+	order by user_score desc
+	</select>    
+	<select id="queryExamPaperRecordCorrectNumRanking" resultType="int" parameterType="java.util.HashMap">
+	SELECT count(1) FROM `exam_exampaper_record` WHERE cus_id =#{cusId} and 
+	subject_id =#{subjectId} and EP_ID =#{epId}  
+	AND <![CDATA[ correct_num >=#{correctNum} ]]>
+	order by correct_num desc,add_time
+	</select>    
+	
+	 <select id="queryExamPaperRecordGroupByEPId" resultMap="QueryPaperRecordResult" parameterType="java.util.HashMap">
+	SELECT 
+		exam_exampaper_record.EP_ID,
+         sum(exam_exampaper_record.user_score) sumUserScore,
+         count(1) num
+	     FROM exam_exampaper_record
+         where exam_exampaper_record.update_time>#{lastUpdateRecord}
+         and exam_exampaper_record.type = 2 
+         and status = 0
+         group by exam_exampaper_record.ep_id
+	</select>    
+	
+	<select id="queryExamPaperRecordMaxId" resultType="int" parameterType="java.util.HashMap">
+	SELECT IFNULL(max(id),0) FROM `exam_exampaper_record` 
+	</select>  
+	
+	<select id="queryExamPaperRecordMaxUpdate" resultType="Date" parameterType="java.util.HashMap">
+	SELECT max(update_time) FROM `exam_exampaper_record` 
+	</select>   
+	
+	
+	 <select id="queryExamPaperRecordAllList" resultMap="QueryPaperRecordResult" parameterType="java.util.HashMap">
+		SELECT 
+		<include refid="EXAM_EXAMPAPERRECORD_TBL_columns"/>
+	     FROM exam_exampaper_record
+	     <where>
+	     exam_exampaper_record.status = 0
+	     <if test="e.cusId!=null and  e.cusId>0">
+		and exam_exampaper_record.cus_Id =#{e.cusId}
+		</if>
+		<if test="e.paperName!=null and  e.paperName!=''">
+		and exam_exampaper_record.paper_name like CONCAT('%',#{e.paperName},'%' )
+		</if>
+		<if test="e.type!=null and  e.type!=0">
+		and exam_exampaper_record.type=#{e.type}
+		</if>
+		<if test="e.startTime!=null and  e.startTime!=''">
+		<![CDATA[ and exam_exampaper_record.add_time>=#{e.startTime}]]>
+		</if>
+		<if test="e.endTime!=null and  e.endTime!=''">
+		<![CDATA[ and exam_exampaper_record.add_time<=#{e.endTime}]]>
+		</if>
+         <if test="e.userScore!=null and  e.userScore!=0 ">
+             <![CDATA[ and exam_exampaper_record.user_score>=#{e.userScore}]]>
+         </if>
+	     </where>
+	     order by exam_exampaper_record.add_time desc 
+	     <include refid="publicMapper.pageEnd"/>
+	</select>    
+	
+	<select id="queryExamPaperRecordAllListCount" resultType="int" parameterType="java.util.HashMap">
+		SELECT 
+		count(1)
+	     FROM exam_exampaper_record 
+	     <where>
+	     exam_exampaper_record.status = 0
+	     <if test="e.cusId!=null and  e.cusId>0">
+		and exam_exampaper_record.cus_Id =#{e.cusId}
+		</if>
+		<if test="e.paperName!=null and  e.paperName!=''">
+		and exam_exampaper_record.paper_name like CONCAT('%',#{e.paperName},'%' )
+		</if>
+		<if test="e.type!=null and  e.type!=0">
+		and exam_exampaper_record.type=#{e.type}
+		</if>
+		<if test="e.startTime!=null and  e.startTime!=''">
+		<![CDATA[ and exam_exampaper_record.add_time>=#{e.startTime}]]>
+		</if>
+		<if test="e.endTime!=null and  e.endTime!=''">
+		<![CDATA[ and exam_exampaper_record.add_time<=#{e.endTime}]]>
+		</if>
+         <if test="e.userScore!=null and  e.userScore!=0 ">
+             <![CDATA[ and exam_exampaper_record.user_score>=#{e.userScore}]]>
+         </if>
+	     </where>
+	</select>    
+	
+	 <select id="queryExamPaperRecordAllListBySubjective" resultMap="QueryPaperRecordResult" parameterType="java.util.HashMap">
+		SELECT 
+		<include refid="EXAM_EXAMPAPERRECORD_TBL_columns"/>,
+		min(exam_question_record.state) state
+	     FROM exam_exampaper_record
+	     left join exam_question_record
+	     on exam_exampaper_record.id = exam_question_record.paper_record_id
+	     <where>
+	     exam_exampaper_record.status = 0
+	     and exam_question_record.qst_type = 6
+		<if test="e.paperName!=null and  e.paperName!=''">
+		and exam_exampaper_record.paper_name like CONCAT('%',#{e.paperName},'%' )
+		</if>
+		<if test="e.type!=null and  e.type!=0">
+		and exam_exampaper_record.type=#{e.type}
+		</if>
+		<if test="e.startTime!=null and  e.startTime!=''">
+		<![CDATA[ and exam_exampaper_record.add_time>=#{e.startTime}]]>
+		</if>
+		<if test="e.endTime!=null and  e.endTime!=''">
+		<![CDATA[ and exam_exampaper_record.add_time<=#{e.endTime}]]>
+		</if>
+	     </where>
+	     group by exam_exampaper_record.id
+	     order by exam_exampaper_record.add_time desc 
+	     <include refid="publicMapper.pageEnd"/>
+	</select>    
+	
+	 <select id="queryExamPaperRecordAllListBySubjectiveCount" resultType="int" parameterType="java.util.HashMap">
+		SELECT 
+		count(distinct exam_exampaper_record.id)
+	     FROM exam_exampaper_record 
+	     left join exam_question_record
+	     on exam_exampaper_record.id = exam_question_record.paper_record_id
+	     <where>
+	     exam_exampaper_record.status = 0
+	     and exam_question_record.qst_type = 6
+		<if test="e.paperName!=null and  e.paperName!=''">
+		and exam_exampaper_record.paper_name like CONCAT('%',#{e.paperName},'%' )
+		</if>
+		<if test="e.type!=null and  e.type!=0">
+		and exam_exampaper_record.type=#{e.type}
+		</if>
+		<if test="e.startTime!=null and  e.startTime!=''">
+		<![CDATA[ and exam_exampaper_record.add_time>=#{e.startTime}]]>
+		</if>
+		<if test="e.endTime!=null and  e.endTime!=''">
+		<![CDATA[ and exam_exampaper_record.add_time<=#{e.endTime}]]>
+		</if>
+	     </where>
+	</select>   
+	
+	
+	<select id="queryPaperMiddleMap" resultType="QueryPaperMiddle" parameterType="java.util.HashMap">
+		select 
+		exam_paper_middle.score,
+		exam_qstmiddle.QST_ID qstId
+		from exam_paper_middle
+		left join exam_qstmiddle on 
+		exam_paper_middle.id = exam_qstmiddle.papermiddle_id
+		where exam_paper_middle.paper_id = #{paperId}
+	</select>    
+	
+	<update id="updateExamPaperRecordForScore" parameterType="java.util.HashMap" >
+ 		update exam_exampaper_record set 
+		user_score=user_score${score},
+		subjective_score=subjective_score${score}
+ 		where id=#{id,jdbcType=INTEGER}
+	</update>
+	
+</mapper>

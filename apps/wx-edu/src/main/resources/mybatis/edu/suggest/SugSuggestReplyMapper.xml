@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SugSuggestReplyMapper">
+
+	<resultMap id="SugSuggestReplyResult" type="SugSuggestReply">
+		<result property="id" column="id" />
+		<result property="cusId" column="cus_id" />
+		<result property="suggestId" column="suggest_id" />
+		<result property="content" column="content" />
+		<result property="type" column="type" />
+		<result property="isbest" column="isbest" />
+		<result property="addtime" column="addtime" />
+		<result property="showname" column="showname" />
+	</resultMap>
+
+	<sql id="edu_sug_suggest_reply_columns">
+		edu_sug_suggest_reply.id,
+		edu_sug_suggest_reply.cus_id,
+		edu_sug_suggest_reply.suggest_id,
+		edu_sug_suggest_reply.content,
+		edu_sug_suggest_reply.type,
+		edu_sug_suggest_reply.isbest,
+		edu_sug_suggest_reply.addtime,
+		edu_sug_suggest_reply.showname
+	</sql>
+
+	<sql id="edu_sug_suggest_reply_properties">
+		#{id},
+		#{cusId},
+		#{suggestId},
+		#{content},
+		#{type},
+		#{isbest},
+		#{addtime},
+		#{showname}
+	</sql>
+
+	<insert id="createSugSuggestReply" parameterType="SugSuggestReply"
+		keyColumn="id" keyProperty="id">
+		insert INTO edu_sug_suggest_reply (
+		<include refid="edu_sug_suggest_reply_columns" />
+		) VALUES (
+		<include refid="edu_sug_suggest_reply_properties" />
+		)
+	</insert>
+
+	<delete id="deleteSugSuggestReplyById" parameterType="long">
+		delete from
+		edu_sug_suggest_reply
+		where
+		id = #{value}
+	</delete>
+	
+	<delete id="deleteSugSuggestReplyBySuggestId" parameterType="long">
+		delete from
+		edu_sug_suggest_reply
+		where
+		suggest_id = #{value}
+	</delete>
+
+
+	<update id="updateSugSuggestReply" parameterType="SugSuggestReply">
+		update
+		edu_sug_suggest_reply SET
+		id = #{id},
+		cus_id = #{cusId},
+		suggest_id =
+		#{suggestId},
+		content = #{content},
+		type = #{type},
+		isBest = #{isbest},
+		addTime = #{addtime}
+		where
+		id = #{id}
+	</update>
+
+	<select id="getSugSuggestReplyById" resultMap="SugSuggestReplyResult"
+		parameterType="long">
+		select
+		<include refid="edu_sug_suggest_reply_columns" />
+		from edu_sug_suggest_reply
+		where
+		id = #{value}
+	</select>
+
+	<select id="getSugSuggestReplyList" resultMap="SugSuggestReplyResult"
+		parameterType="SugSuggestReply">
+		select
+		<include refid="edu_sug_suggest_reply_columns" />
+		from edu_sug_suggest_reply
+		<where>
+			<if test="suggestId!=null and suggestId>0">
+				AND edu_sug_suggest_reply.suggest_id = #{suggestId}
+			</if>
+			<if test="isbest!=null and isbest>0">
+				AND edu_sug_suggest_reply.isBest = #{isbest}
+			</if>
+		</where>
+	</select>
+
+
+	<select id="querySugSuggestReplyListBySuggestId" resultMap="SugSuggestReplyResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="edu_sug_suggest_reply_columns" />
+		from edu_sug_suggest_reply
+		where edu_sug_suggest_reply.suggest_id =
+		#{e.suggestId}
+		<if test="e.isbest != -1" >  
+		and edu_sug_suggest_reply.isBest = #{e.isbest}
+		</if>
+		order by edu_sug_suggest_reply.addTime desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="querySugSuggestReplyListBySuggestIdCount"
+		resultType="int" parameterType="java.util.HashMap">
+		select
+		count(1)
+		from edu_sug_suggest_reply
+		where edu_sug_suggest_reply.suggest_id =
+		#{e.suggestId}
+		<if test="e.isbest != -1" >  
+		and edu_sug_suggest_reply.isBest = #{e.isbest}
+		</if>
+	</select>
+
+	<select id="querySugSuggestReplyAllListBySuggestId" resultMap="SugSuggestReplyResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="edu_sug_suggest_reply_columns" />
+		from edu_sug_suggest_reply
+		where edu_sug_suggest_reply.suggest_id =
+		#{suggestId}
+		<if test="isbest != 0" >  
+		and edu_sug_suggest_reply.isBest = #{isbest}
+		</if>
+		order by edu_sug_suggest_reply.addTime desc
+	</select>
+
+	<update id="updateSugSuggestReplyBySugSuggestReplyIdForIsBest">
+		update edu_sug_suggest_reply SET
+		isBest = #{isbest}
+		where
+		id = #{id}
+	</update>
+
+	<!-- 二级回复开始 -->
+	<resultMap id="SecondReplyResult" type="SecondReply">
+		<result column="id" property="id" />
+		<result column="reply_id" property="replyId" />
+		<result column="content" property="content" />
+		<result column="create_time" property="createTime" />
+		<result column="user_id" property="userId" />
+
+		<result column="nickname" property="nickname" />
+		<result column="email" property="email" />
+		<result column="mobile" property="mobile" />
+		<result column="avatar" property="avatar" />
+	</resultMap>
+	<sql id="edu_sug_suggest_second_reply_columns">
+		edu_sug_suggest_second_reply.id,
+		edu_sug_suggest_second_reply.reply_id,
+		edu_sug_suggest_second_reply.content,
+		edu_sug_suggest_second_reply.create_time,
+		edu_sug_suggest_second_reply.user_id
+	</sql>
+	<sql id="edu_sug_suggest_second_reply_properties">
+		#{id},
+		#{replyId},
+		#{content},
+		#{createTime},
+		#{userId}
+	</sql>
+	<!-- 添加二级回复 -->
+	<insert id="createSecondReply" parameterType="SecondReply">
+		INSERT INTO edu_sug_suggest_second_reply(<include refid="edu_sug_suggest_second_reply_columns" />) VALUES (<include refid="edu_sug_suggest_second_reply_properties" />)
+	</insert>
+	<!-- 查询二级回复 -->
+	<select id="getSecondReplyList" parameterType="java.util.HashMap" resultMap="SecondReplyResult">
+		SELECT
+		<include refid="edu_sug_suggest_second_reply_columns" />,
+		user_user.nickname AS nickname,
+		user_user.email AS email,
+		user_user.mobile AS mobile,
+		user_expand.avatar
+		FROM edu_sug_suggest_second_reply
+		LEFT JOIN user_user ON edu_sug_suggest_second_reply.user_id = user_user.id
+		LEFT JOIN user_expand ON user_user.id = user_expand.user_id
+		<where>
+			<if test="e.replyId!=null and e.replyId>0">
+				AND edu_sug_suggest_second_reply.reply_id = #{e.replyId}
+			</if>
+		</where>
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getSecondReplyListCount" parameterType="java.util.HashMap" resultType="int">
+		SELECT
+		count(1)
+		FROM edu_sug_suggest_second_reply
+		<where>
+			<if test="e.replyId!=null and e.replyId>0">
+				AND edu_sug_suggest_second_reply.reply_id = #{e.replyId}
+			</if>
+		</where>
+	</select>
+	<!-- 二级回复结束 -->
+</mapper>

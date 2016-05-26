@@ -1,0 +1,1389 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserMapper">
+
+	<resultMap id="UserResult" type="User">
+		<result property="id" column="id" />
+		<result property="nickname" column="nickname" />
+		<result property="email" column="email" />
+		<result property="emailIsavalible" column="email_isavalible" />
+		<result property="mobile" column="mobile" />
+		<result property="mobileIsavalible" column="mobile_isavalible" />
+		<result property="password" column="password" />
+		<result property="isavalible" column="isavalible" />
+		<result property="customerkey" column="customerkey" />
+		<result property="createdate" column="createdate" />
+		<result property="userip" column="userip" />
+		<result property="sysUserId" column="sys_user_id" />
+		<result property="level" column="level" />
+		<result property="sysGroupId" column="sys_group_id"/>
+	</resultMap>
+	<resultMap id="UserFromResult" type="User" extends="UserResult">
+		<result property="registerFrom" column="register_from" />
+		<result property="studyTime" column="studyTime"/>
+		<result property="courseNum" column="courseNum"/>
+		<result property="realname" column="realname"/>
+		<result property="sysGroupName" column="sysGroupName"/>
+	</resultMap>
+	<resultMap type="UserChart" id="UserChartResult">
+		<result property="dateTime" column="dT" />
+		<result property="orderNum" column="allOrders" />
+		<result property="payOrderNum" column="payOrders" />
+		<result property="amountNum" column="amountOrders" />
+		<result property="allStudentNum" column="allStudent" />
+	</resultMap>
+	<resultMap type="UserFromStatistics" id="UserFromStatisticsResult">
+		<result property="userNum" column="user_num"/>
+		<result property="registerNum" column="register_num"/>
+		<result property="adminNum" column="admin_num"/>
+		<result property="userCardNum" column="usercard_num"/>
+		<result property="appNum" column="app_num"/>
+		<result property="qqNum" column="qq_num"/>
+		<result property="weixinNum" column="weixin_num"/>
+		<result property="weiboNum" column="weibo_num"/>
+		<result property="mobileNum" column="mobile_num"/>
+
+		<result property="date" column="date" />
+	</resultMap>
+
+	<sql id="user_columns">
+		user_user.id,
+		user_user.nickname,
+		user_user.email,
+		user_user.email_isavalible,
+		user_user.mobile,
+		user_user.mobile_isavalible,
+		user_user.password,
+		user_user.isavalible,
+		user_user.customerkey,
+		user_user.createdate,
+		user_user.userip,
+		user_user.sys_user_id,
+		user_user.level,
+		user_user.sys_group_id
+	</sql>
+
+	<sql id="user_properties">
+		#{id},
+		#{nickname},
+		#{email},
+		#{emailIsavalible,jdbcType=SMALLINT},
+		#{mobile},
+		#{mobileIsavalible,jdbcType=SMALLINT},
+		#{password},
+		#{isavalible,jdbcType=SMALLINT},
+		#{customerkey},
+		#{createdate},
+		#{userip},
+		#{sysUserId},
+		#{level},
+		#{sysGroupId}
+	</sql>
+
+	<insert id="createUser" parameterType="User" keyColumn="id"
+		keyProperty="id" useGeneratedKeys="true">
+		insert INTO user_user (
+		<include refid="user_columns" />
+		) VALUES (
+		<include refid="user_properties" />
+		)
+	</insert>
+
+	<delete id="deleteUserById" parameterType="long">
+		delete from user_user
+		where
+		id = #{value}
+	</delete>
+	
+    <select id="getUserByLoginName" resultMap="UserResult" parameterType="string">
+            select
+            <include refid="user_columns"/>
+            from user_user  where nickname = #{value} 
+   </select>
+        
+    <select id="getUserByLoginEmail" resultMap="UserResult" parameterType="string">
+            select
+            <include refid="user_columns"/>
+            from user_user  where email = #{value}
+     </select>
+     
+	  <select id="getUserByLoginMobile" resultMap="UserResult" parameterType="string">
+            select
+            <include refid="user_columns"/>
+            from user_user  where mobile = #{value}
+     </select>
+	<!-- 批量刪除 -->
+	<delete id="delUserBatch">
+		delete from user_user
+		where user_user.id in
+		<foreach collection="array" item="item" separator="," open="(" close=")"> 
+		#{item}
+		</foreach> 
+	</delete>
+
+	<update id="updateUserForIsavalibleById" parameterType="User">
+		update
+		user_user SET
+		isavalible = #{isavalible,jdbcType=SMALLINT}
+		where
+		id =
+		#{id}
+	</update>
+	<update id="updateUser" parameterType="User">
+		update
+		user_user
+		<set>
+			<if test="updateEmail=='YES'">
+				email=#{email},
+			</if>
+			<if test="nickname!=null and nickname!=''">
+				nickname = #{nickname},
+			</if>
+			<if test="level > -1">
+				level =#{level},
+			</if>
+			<if test="mobile!=null and mobile!=''">
+				mobile = #{mobile},
+			</if>
+			<if test="sysGroupId!=null and sysGroupId>0">
+				sys_group_id = #{sysGroupId}
+			</if>
+		</set>
+		where
+		id = #{id}
+	</update>
+	<update id="updatePwdById" parameterType="User">
+		update user_user SET
+		password = #{password},
+		customerkey=#{customerkey}
+		where
+		id = #{id}
+	</update>
+
+
+	<select id="getUserById" resultMap="UserFromResult" parameterType="Long">
+		select
+		<include refid="user_columns" />,
+		sys_group.`group_name` as sysGroupName,
+		user_expand.realname 
+		from user_user
+		left join user_expand on user_user.id = user_expand.user_id
+		LEFT JOIN `sys_group` ON sys_group.`group_id`=user_user.`sys_group_id`
+		where
+		user_user.id = #{value}
+	</select>
+
+	<select id="getUserList" resultMap="UserResult" parameterType="User">
+		select
+		<include refid="user_columns" />
+		from user_user
+		where user_user.email = #{email}
+	</select>
+
+	<select id="getUserListForLogin" resultMap="UserResult"
+		parameterType="User">
+		select
+		<include refid="user_columns" />
+		from user_user
+		<where>
+			email = #{email} and isavalible= 0
+		</where>
+	</select>
+
+	<select id="getUserListForTelLogin" resultMap="UserResult"
+		parameterType="User">
+		select
+		<include refid="user_columns" />
+		from user_user
+		<where>
+			mobile = #{email} and isavalible= 0
+		</where>
+	</select>
+  <!--  学习统计>学员列表 -->
+	<select id="getUserListByCondition" resultMap="UserFromResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="user_columns" />,
+		sys_group.`group_name` as sysGroupName
+		,
+	    GROUP_CONCAT(user_group.`name`) AS groupnames,
+		COUNT(DISTINCT edu_course_studyhistory.course_id) AS courseNum,
+	    user_expand.`realname`,
+		user_expand.register_from,
+		SUM(edu_course_studyhistory.play_time) AS studyTime
+		from user_user
+		left join user_expand on user_user.id = user_expand.user_id
+		left join group_middle_user on user_user.`id` = group_middle_user.`user_id`
+		left join user_group on user_group.`id` = group_middle_user.`group_id`
+		left join edu_course_studyhistory on user_user.id = edu_course_studyhistory.user_id
+		LEFT JOIN `sys_group` ON sys_group.`group_id`=user_user.`sys_group_id`
+		<where>
+			<if test="e.email !=null and e.email !='' ">
+				and user_user.email like CONCAT('%',#{e.email},'%')
+			</if>		
+			<if test="e.id !=null and e.id >0 ">
+				and user_user.id = #{e.id}
+			</if>
+			<if test="e.nickname !=null and e.nickname !='' ">
+				and user_user.nickname like CONCAT('%',#{e.nickname},'%')
+			</if>
+			<if test="e.name !=null and e.name !='' ">
+				and user_group.`name` LIKE CONCAT('%',#{e.name},'%')
+			</if>
+			<if test="e.mobile !=null and e.mobile !='' ">
+				and user_user.mobile like CONCAT('%',#{e.mobile},'%')
+			</if>
+			<if test="e.startDate!=null and e.startDate!='' ">
+				and<![CDATA[ user_user.createdate >=]]>CONCAT(#{e.startDate},'00:00:00')
+			</if>
+			<if test="e.endDate!=null and e.endDate!='' ">
+				and<![CDATA[ user_user.createdate <=]]>CONCAT(#{e.endDate},'23:59:59')
+			</if>
+			<if test="e.level !=null and e.level !=0 ">
+				and user_user.level = #{e.level}
+			</if>
+			<if test="e.registerFrom !=null and e.registerFrom !='' ">
+				and user_expand.register_from = #{e.registerFrom}
+			</if>
+			<if test="e.groupId !=null and e.groupId > 0 and e.notInGroup==null">
+				and user_group.id = #{e.groupId}
+			</if>
+			<if test="e.sysGroupId!=null and e.sysGroupId>0">
+				and user_user.sys_group_id=#{e.sysGroupId}
+			</if>
+			<if test="e.notInGroup!=null and e.notInGroup==1">
+				and user_user.id not in (select group_middle_user.user_id from group_middle_user where group_middle_user.group_id = #{e.groupId})
+			</if>
+		</where>
+		GROUP BY user_user.id
+		ORDER BY user_user.`id` DESC
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	
+	<select id="getUserListByConditionCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select COUNT(distinct(user_user.id))
+		from user_user
+		left join user_expand on user_user.id = user_expand.user_id
+		left join group_middle_user on user_user.`id` = group_middle_user.`user_id`
+		left join user_group on user_group.`id` = group_middle_user.`group_id`
+		LEFT JOIN `sys_group` ON sys_group.`group_id`=user_user.`sys_group_id`
+		<where>
+			<if test="e.email !=null and e.email !='' ">
+				and user_user.email like CONCAT('%',#{e.email},'%')
+			</if>
+			<if test="e.id !=null and e.id >0 ">
+				and user_user.id = #{e.id}
+			</if>
+			<if test="e.nickname !=null and e.nickname !='' ">
+				and user_user.nickname like CONCAT('%',#{e.nickname},'%')
+			</if>
+			<if test="e.name !=null and e.name !='' ">
+				and user_group.`name` LIKE CONCAT('%',#{e.name},'%')
+			</if>
+			<if test="e.mobile !=null and e.mobile !='' ">
+				and user_user.mobile like CONCAT('%',#{e.mobile},'%')
+			</if>
+			<if test="e.startDate!=null and e.startDate!='' ">
+				and<![CDATA[ user_user.createdate >=]]>CONCAT(#{e.startDate},'00:00:00')
+			</if>
+			<if test="e.endDate!=null and e.endDate!='' ">
+				and<![CDATA[ user_user.createdate <=]]>CONCAT(#{e.endDate},'23:59:59')
+			</if>
+			<if test="e.level !=null and e.level !=0 ">
+				and user_user.level = #{e.level}
+			</if>
+			<if test="e.registerFrom !=null and e.registerFrom !='' ">
+				and user_expand.register_from = #{e.registerFrom}
+			</if>
+			<if test="e.groupId !=null and e.groupId > 0 and e.notInGroup==null">
+				and user_group.id = #{e.groupId}
+			</if>
+			<if test="e.sysGroupId!=null and e.sysGroupId>0">
+				and user_user.sys_group_id=#{e.sysGroupId}
+			</if>
+			<if test="e.notInGroup!=null and e.notInGroup==1">
+				and user_user.id not in (select group_middle_user.user_id from group_middle_user where group_middle_user.group_id = #{e.groupId})
+			</if>
+		</where>
+	</select>
+	
+	  <!--  用户管理>用户列表 -->
+	<select id="getGroupUserList" resultMap="UserFromResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="user_columns" />,
+		sys_group.`group_name` as sysGroupName	,
+		GROUP_CONCAT(user_group.`name`) AS groupnames,
+		user_expand.`realname`,
+		user_expand.register_from
+		FROM user_user
+		LEFT JOIN user_expand
+		ON
+		user_user.id = user_expand.user_id
+		LEFT JOIN group_middle_user
+		ON
+		user_user.`id` = group_middle_user.`user_id`
+		LEFT JOIN user_group
+		ON
+		user_group.`id` = group_middle_user.`group_id`
+		LEFT JOIN `sys_group` ON sys_group.`group_id`=user_user.`sys_group_id`
+		<where>
+			<if test="e.email !=null and e.email !='' ">
+				and user_user.email like CONCAT('%',#{e.email},'%')
+			</if>		
+			<if test="e.id !=null and e.id >0 ">
+				and user_user.id = #{e.id}
+			</if>
+			<if test="e.nickname !=null and e.nickname !='' ">
+				and user_user.nickname like CONCAT('%',#{e.nickname},'%')
+			</if>
+			<if test="e.realname !=null and e.realname !='' ">
+				and user_expand.realname like CONCAT('%',#{e.realname},'%')
+			</if>
+			<if test="e.name !=null and e.name !='' ">
+				and user_group.`name` LIKE CONCAT('%',#{e.name},'%')
+			</if>
+			<if test="e.mobile !=null and e.mobile !='' ">
+				and user_user.mobile like CONCAT('%',#{e.mobile},'%')
+			</if>
+			<if test="e.startDate!=null and e.startDate!='' ">
+				and<![CDATA[ user_user.createdate >=]]>CONCAT(#{e.startDate},'00:00:00')
+			</if>
+			<if test="e.endDate!=null and e.endDate!='' ">
+				and<![CDATA[ user_user.createdate <=]]>CONCAT(#{e.endDate},'23:59:59')
+			</if>
+			<if test="e.level !=null and e.level !=0 ">
+				and user_user.level = #{e.level}
+			</if>
+			
+			<if test="e.registerFrom !=null and e.registerFrom !='' ">
+				and user_expand.register_from = #{e.registerFrom}
+			</if>
+			<if test="e.groupId !=null and e.groupId > 0">
+				and user_group.id = #{e.groupId}
+			</if>
+			<if test="e.sysGroupId!=null and e.sysGroupId>0">
+				and user_user.sys_group_id=#{e.sysGroupId}
+			</if>
+		</where>
+		GROUP BY user_user.id
+		ORDER BY user_user.`id` DESC
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	
+		<select id="getGroupUserListCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select COUNT(distinct(user_user.id))
+		from user_user
+		left join user_expand on user_user.id = user_expand.user_id
+		left join group_middle_user on user_user.`id` = group_middle_user.`user_id`
+		left join user_group on user_group.`id` = group_middle_user.`group_id`
+		LEFT JOIN `sys_group` ON sys_group.`group_id`=user_user.`sys_group_id`
+		<where>
+			<if test="e.email !=null and e.email !='' ">
+				and user_user.email like CONCAT('%',#{e.email},'%')
+			</if>		
+			<if test="e.id !=null and e.id >0 ">
+				and user_user.id = #{e.id}
+			</if>
+			<if test="e.nickname !=null and e.nickname !='' ">
+				and user_user.nickname like CONCAT('%',#{e.nickname},'%')
+			</if>
+			<if test="e.realname !=null and e.realname !='' ">
+				and user_expand.realname like CONCAT('%',#{e.realname},'%')
+			</if>
+			<if test="e.name !=null and e.name !='' ">
+				and user_group.`name` LIKE CONCAT('%',#{e.name},'%')
+			</if>
+			<if test="e.mobile !=null and e.mobile !='' ">
+				and user_user.mobile like CONCAT('%',#{e.mobile},'%')
+			</if>
+			<if test="e.startDate!=null and e.startDate!='' ">
+				and<![CDATA[ user_user.createdate >=]]>CONCAT(#{e.startDate},'00:00:00')
+			</if>
+			<if test="e.endDate!=null and e.endDate!='' ">
+				and<![CDATA[ user_user.createdate <=]]>CONCAT(#{e.endDate},'23:59:59')
+			</if>
+			<if test="e.level !=null and e.level !=0 ">
+				and user_user.level = #{e.level}
+			</if>
+			
+			<if test="e.registerFrom !=null and e.registerFrom !='' ">
+				and user_expand.register_from = #{e.registerFrom}
+			</if>
+			<if test="e.groupId !=null and e.groupId > 0">
+				and user_group.id = #{e.groupId}
+			</if>
+			<if test="e.sysGroupId!=null and e.sysGroupId>0">
+				and user_user.sys_group_id=#{e.sysGroupId}
+			</if>
+		</where>
+	</select>
+	
+	
+	
+
+
+	<select id="getUserListAndCourse" resultMap="UserResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="user_columns" />
+		from user_user
+		LEFT JOIN edu_trxorder_detail
+		ON
+		edu_trxorder_detail.`user_id`=user_user.`id`
+		LEFT JOIN edu_course
+		ON
+		edu_course.`id`=edu_trxorder_detail.`course_id`
+		<where>
+			<if test="e.email !=null and e.email !='' ">
+				email like CONCAT('%',#{e.email},'%')
+			</if>
+			<if test="e.id !=null and e.id !='' ">
+				and id = #{e.id}
+			</if>
+			<if test="e.nickname !=null and e.nickname !='' ">
+				and nickname like CONCAT('%',#{e.nickname},'%')
+			</if>
+			<if test="e.mobile !=null and e.mobile !='' ">
+				and mobile like CONCAT('%',#{e.mobile},'%')
+			</if>
+			<if test="e.startDate!=null and e.startDate!='' ">
+				and<![CDATA[ user_user.createdate >=]]>CONCAT(#{e.startDate},'00:00:00')
+			</if>
+			<if test="e.endDate!=null and e.endDate!='' ">
+				and<![CDATA[ user_user.createdate <=]]>CONCAT(#{e.endDate},'23:59:59')
+			</if>
+			<if test="e.courseName !=null and e.courseName !='' ">
+				and edu_course.name like CONCAT('%',#{e.courseName},'%')
+			</if>
+		</where>
+		GROUP BY user_user.`id`
+		order by user_user.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getUserListAndCourseCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select count(1) from
+		( select count(1)
+		from user_user
+		LEFT JOIN
+		edu_trxorder_detail
+		ON edu_trxorder_detail.`user_id`=user_user.`id`
+		LEFT JOIN edu_course
+		ON edu_course.`id`=edu_trxorder_detail.`course_id`
+		<where>
+			<if test="e.email !=null and e.email !='' ">
+				email like CONCAT('%',#{e.email},'%')
+			</if>
+			<if test="e.id !=null and e.id !='' ">
+				and id = #{e.id}
+			</if>
+			<if test="e.nickname !=null and e.nickname !='' ">
+				and nickname like CONCAT('%',#{e.nickname},'%')
+			</if>
+			<if test="e.mobile !=null and e.mobile !='' ">
+				and mobile like CONCAT('%',#{e.mobile},'%')
+			</if>
+			<if test="e.startDate!=null and e.startDate!='' ">
+				and<![CDATA[ user_user.createdate >=]]>CONCAT(#{e.startDate},'00:00:00')
+			</if>
+			<if test="e.endDate!=null and e.endDate!='' ">
+				and<![CDATA[ user_user.createdate <=]]>CONCAT(#{e.endDate},'23:59:59')
+			</if>
+			<if test="e.courseName !=null and e.courseName !='' ">
+				and edu_course.name like CONCAT('%',#{e.courseName},'%')
+			</if>
+		</where>
+		GROUP BY user_user.`id`) a;
+	</select>
+
+
+	<select id="getUserIsExsitByEmail" parameterType="java.util.List"
+		resultType="User">
+		select
+		<include refid="user_columns" />
+		from user_user
+		where user_user.email in
+		<foreach collection="list" open="(" close=")" separator=","
+			item="item">
+			#{item}
+		</foreach>
+	</select>
+
+	<select id="getUserIsExsitByOneEmail" parameterType="User"
+		resultType="User">
+		select
+		<include refid="user_columns" />
+		from user_user
+		where user_user.email = #{e.email}
+
+	</select>
+
+
+	<insert id="addUsers" parameterType="java.util.List"
+		useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into
+		user_user
+		(id,email,password,createdate,customerkey,userip)
+		values
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(#{item.id},#{item.email},#{item.password},#{item.createdate},#{item.customerkey},#{item.userip})
+		</foreach>
+	</insert>
+
+	<!-- 手机验证 -->
+	<select id="getUserByMobile" parameterType="User" resultType="int">
+		select count(1)
+		from user_user
+		where user_user.mobile =#{mobile}
+	</select>
+
+	<select id="getUserListByYear" parameterType="UserExpandDto"
+		resultMap="UserChartResult">
+		SELECT
+		temp1.s AS dT,
+		IFNULL(temp2.allStudent,0) as
+		allStudent
+		FROM
+		(
+		SELECT
+		01 AS s
+		UNION
+		ALL
+		SELECT
+		02
+		UNION
+		ALL
+		SELECT
+		03
+		UNION
+		ALL
+		SELECT
+		04
+		UNION
+		ALL
+		SELECT
+		05
+		UNION
+		ALL
+		SELECT
+		06
+		UNION
+		ALL
+		SELECT
+		07
+		UNION
+		ALL
+		SELECT
+		08
+		UNION
+		ALL
+		SELECT
+		09
+		UNION
+		ALL
+		SELECT
+		10
+		UNION
+		ALL
+		SELECT
+		11
+		UNION
+		ALL
+		SELECT
+		12
+		) AS temp1
+		LEFT JOIN
+		(SELECT
+		DATE_FORMAT(tt.createdate, '%m') AS rt,
+		SUM(1) AS
+		allStudent
+		FROM
+		(SELECT
+		user_user.`createdate`
+		FROM
+		`user_user`
+		WHERE
+		DATE_FORMAT(createdate, '%Y') = #{nowYear}) AS tt
+		GROUP BY
+		DATE_FORMAT(tt.createdate, '%Y-%m')) AS temp2
+		ON temp1.s = temp2.rt
+	</select>
+
+
+
+	<select id="getOrderListByYear" parameterType="UserExpandDto"
+		resultMap="UserChartResult">
+		SELECT
+		temp1.s AS dT,
+		IFNULL(temp2.allOrders,0) as allOrders,
+		IFNULL(temp3.payOrders,0) as payOrders,
+		IFNULL(temp4.amountOrders,0) as
+		amountOrders
+		FROM
+		(
+		SELECT
+		01 AS s
+		UNION
+		ALL
+		SELECT
+		02
+		UNION
+		ALL
+		SELECT
+		03
+		UNION
+		ALL
+		SELECT
+		04
+		UNION
+		ALL
+		SELECT
+		05
+		UNION
+		ALL
+		SELECT
+		06
+		UNION
+		ALL
+		SELECT
+		07
+		UNION
+		ALL
+		SELECT
+		08
+		UNION
+		ALL
+		SELECT
+		09
+		UNION
+		ALL
+		SELECT
+		10
+		UNION
+		ALL
+		SELECT
+		11
+		UNION
+		ALL
+		SELECT
+		12
+		) AS temp1
+		LEFT JOIN
+		(SELECT
+		DATE_FORMAT(tt.CREATE_TIME, '%m') AS
+		gt,
+		SUM(1) AS 'allOrders'
+		FROM
+		(SELECT
+		edu_trxorder.`create_time`,
+		edu_trxorder.`id`
+		FROM
+		`edu_trxorder`
+		WHERE (
+		edu_trxorder.`trx_status` =
+		'init'
+		OR edu_trxorder.`trx_status` = 'success'
+		)
+		AND DATE_FORMAT(
+		edu_trxorder.create_time,
+		'%Y'
+		) =#{nowYear}
+		GROUP BY edu_trxorder.id) AS
+		tt
+		GROUP BY DATE_FORMAT(tt.CREATE_TIME, '%Y-%m')) AS temp2
+		ON temp1.s =
+		temp2.gt
+		LEFT JOIN
+		(SELECT
+		DATE_FORMAT(tt.CREATE_TIME, '%m') AS gt,
+		SUM(1) AS 'payOrders'
+		FROM
+		(SELECT
+		edu_trxorder.`create_time`,
+		edu_trxorder.`id`
+		FROM
+		`edu_trxorder`
+		WHERE edu_trxorder.`trx_status` =
+		'success'
+		AND DATE_FORMAT(
+		edu_trxorder.`pay_time`,
+		'%Y'
+		) = #{nowYear}
+		GROUP BY edu_trxorder.id) AS tt
+		GROUP BY DATE_FORMAT(tt.CREATE_TIME,
+		'%Y-%m')) AS temp3
+		ON temp1.s = temp3.gt
+
+		LEFT JOIN
+		(SELECT
+		DATE_FORMAT(tt.CREATE_TIME, '%m') AS gt,
+		SUM(tt.amount) AS
+		'amountOrders'
+		FROM
+		(SELECT
+		edu_trxorder.`create_time`,
+		edu_trxorder.`amount`
+		FROM
+		`edu_trxorder`
+		WHERE edu_trxorder.`trx_status`
+		=
+		'success'
+		AND DATE_FORMAT(
+		edu_trxorder.`pay_time`,
+		'%Y'
+		) = #{nowYear}
+		GROUP BY edu_trxorder.id) AS tt
+		GROUP BY DATE_FORMAT(tt.CREATE_TIME,
+		'%Y-%m')) AS temp4
+		ON temp1.s = temp4.gt
+	</select>
+
+
+
+
+
+	<select id="getUserListByMonth" parameterType="UserExpandDto"
+		resultMap="UserChartResult">
+		SELECT
+		DATE_FORMAT(temp1.dT, '%d') as dT,
+		temp2.allStudent
+		FROM
+		(SELECT
+		(#{nowTime} - INTERVAL
+		DAY(#{nowTime}) DAY) + INTERVAL s DAY AS dT
+		FROM
+		(SELECT
+		1 AS s
+		UNION
+		ALL
+		SELECT
+		2
+		UNION
+		ALL
+		SELECT
+		3
+		UNION
+		ALL
+		SELECT
+		4
+		UNION
+		ALL
+		SELECT
+		5
+		UNION
+		ALL
+		SELECT
+		6
+		UNION
+		ALL
+		SELECT
+		7
+		UNION
+		ALL
+		SELECT
+		8
+		UNION
+		ALL
+		SELECT
+		9
+		UNION
+		ALL
+		SELECT
+		10
+		UNION
+		ALL
+		SELECT
+		11
+		UNION
+		ALL
+		SELECT
+		12
+		UNION
+		ALL
+		SELECT
+		13
+		UNION
+		ALL
+		SELECT
+		14
+		UNION
+		ALL
+		SELECT
+		15
+		UNION
+		ALL
+		SELECT
+		16
+		UNION
+		ALL
+		SELECT
+		17
+		UNION
+		ALL
+		SELECT
+		18
+		UNION
+		ALL
+		SELECT
+		19
+		UNION
+		ALL
+		SELECT
+		20
+		UNION
+		ALL
+		SELECT
+		21
+		UNION
+		ALL
+		SELECT
+		22
+		UNION
+		ALL
+		SELECT
+		23
+		UNION
+		ALL
+		SELECT
+		24
+		UNION
+		ALL
+		SELECT
+		25
+		UNION
+		ALL
+		SELECT
+		26
+		UNION
+		ALL
+		SELECT
+		27
+		UNION
+		ALL
+		SELECT
+		28
+		UNION
+		ALL
+		SELECT
+		29
+		UNION
+		ALL
+		SELECT
+		30
+		UNION
+		ALL
+		SELECT
+		31) m
+		WHERE <![CDATA[ s<=day(LAST_DAY(#{nowTime}))) ]]>
+		AS temp1
+		LEFT JOIN
+		(SELECT
+		DATE_FORMAT(tt.createdate, '%Y-%m-%d') AS rt,
+		SUM(1) AS allStudent
+		FROM
+		(SELECT
+		user_user.`createdate`
+		FROM
+		`user_user`
+		WHERE
+		DATE_FORMAT(createdate, '%Y-%m') = #{nowMonth}) AS tt
+		GROUP BY
+		DATE_FORMAT(tt.createdate, '%Y-%m-%d')) AS temp2
+		ON temp1.dT = temp2.rt
+	</select>
+
+
+
+
+
+	<select id="getOrderListByMonth" parameterType="UserExpandDto"
+		resultMap="UserChartResult">
+		SELECT DATE_FORMAT(temp1.dT, '%d') AS dT,
+		temp2.allOrders,
+		temp3.payOrders,
+		IFNULL(temp4.amountOrders,0) as amountOrders
+		FROM
+		(
+		SELECT
+		(#{nowTime} - INTERVAL
+		DAY(#{nowTime}) DAY) + INTERVAL s DAY AS
+		dT
+		FROM
+		(
+		SELECT
+		1 AS s UNION ALL
+		SELECT
+		2 UNION ALL
+		SELECT
+		3 UNION ALL
+		SELECT
+		4 UNION ALL
+		SELECT
+		5 UNION ALL
+		SELECT
+		6 UNION ALL
+		SELECT
+		7 UNION ALL
+		SELECT
+		8
+		UNION ALL
+		SELECT
+		9 UNION ALL
+		SELECT
+		10 UNION ALL
+		SELECT
+		11 UNION ALL
+		SELECT
+		12 UNION ALL
+		SELECT
+		13 UNION ALL
+		SELECT
+		14 UNION ALL
+		SELECT
+		15 UNION ALL
+		SELECT
+		16 UNION ALL
+		SELECT
+		17 UNION ALL
+		SELECT
+		18 UNION ALL
+		SELECT
+		19 UNION
+		ALL
+		SELECT
+		20 UNION ALL
+		SELECT
+		21 UNION ALL
+		SELECT
+		22 UNION ALL
+		SELECT
+		23
+		UNION ALL
+		SELECT
+		24 UNION ALL
+		SELECT
+		25 UNION ALL
+		SELECT
+		26 UNION ALL
+		SELECT
+		27 UNION ALL
+		SELECT
+		28 UNION ALL
+		SELECT
+		29 UNION ALL
+		SELECT
+		30 UNION ALL
+		SELECT
+		31) m
+		WHERE <![CDATA[ s<= DAY(LAST_DAY(#{nowTime}))) ]]>
+		AS temp1
+		LEFT JOIN
+		(
+		SELECT DATE_FORMAT(tt.CREATE_TIME, '%Y-%m-%d') AS
+		gt, SUM(1) AS 'allOrders'
+		FROM
+		(
+		SELECT
+		edu_trxorder.`create_time`,
+		edu_trxorder.`id`
+		FROM
+		`edu_trxorder`
+		WHERE
+		(edu_trxorder.`trx_status`='init' OR
+		edu_trxorder.`trx_status`='success') AND DATE_FORMAT(
+		edu_trxorder.create_time,
+		'%Y-%m'
+		) = #{nowMonth}
+		GROUP BY
+		edu_trxorder.id) AS tt
+		GROUP BY DATE_FORMAT(tt.CREATE_TIME,
+		'%Y-%m-%d')) AS temp2 ON temp1.dT = temp2.gt
+		LEFT JOIN
+		(
+		SELECT
+		DATE_FORMAT(tt.CREATE_TIME, '%Y-%m-%d') AS gt, SUM(1) AS 'payOrders'
+		FROM
+		(
+		SELECT
+		edu_trxorder.`create_time`,
+		edu_trxorder.`id`
+		FROM
+		`edu_trxorder`
+		WHERE edu_trxorder.`trx_status`='success' AND
+		DATE_FORMAT(
+		edu_trxorder.`pay_time`,
+		'%Y-%m'
+		) = #{nowMonth}
+		GROUP BY
+		edu_trxorder.id) AS tt
+		GROUP BY DATE_FORMAT(tt.CREATE_TIME,
+		'%Y-%m-%d')) AS temp3 ON temp1.dT = temp3.gt
+		LEFT JOIN
+		(
+		SELECT
+		DATE_FORMAT(tt.CREATE_TIME, '%Y-%m-%d') AS gt, SUM(tt.amount) AS
+		'amountOrders'
+		FROM
+		(
+		SELECT
+		edu_trxorder.`create_time`,
+		edu_trxorder.`amount`
+		FROM
+		`edu_trxorder`
+		WHERE
+		edu_trxorder.`trx_status`='success' AND DATE_FORMAT(
+		edu_trxorder.`pay_time`,
+		'%Y-%m'
+		) = #{nowMonth}
+		GROUP BY
+		edu_trxorder.id) AS tt
+		GROUP BY DATE_FORMAT(tt.CREATE_TIME,
+		'%Y-%m-%d')) AS temp4 ON temp1.dT = temp4.gt
+	</select>
+	<!-- 获得网站所有注册用户注册数 -->
+	<select id="getWebsiteRegNumber" resultType="int">
+		select count(1) from
+		user_user
+	</select>
+	<!-- 添加用户总操作记录 -->
+	<sql id="user_opt_record_columns">
+		user_opt_record.id,
+		user_opt_record.user_id,
+		user_opt_record.type,
+		user_opt_record.optuser,
+		user_opt_record.optusername,
+		user_opt_record.biz_id,
+		user_opt_record.description,
+		user_opt_record.create_time
+	</sql>
+	<sql id="user_opt_record_properties">
+		#{id},
+		#{userId},
+		#{type},
+		#{optuser},
+		#{optusername},
+		#{bizId},
+		#{description},
+		#{createTime}
+	</sql>
+	<resultMap type="UserOptRecord" id="UserOptRecordResult">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="type" column="type" />
+		<result property="optuser" column="optuser" />
+		<result property="optusername" column="optusername" />
+		<result property="bizId" column="biz_id" />
+		<result property="description" column="description" />
+		<result property="createTime" column="create_time" />
+	</resultMap>
+	<insert id="addUserOptRecord" parameterType="UserOptRecord"
+		useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		insert into user_opt_record (
+		<include refid="user_opt_record_columns" />
+		) values(
+		<include refid="user_opt_record_properties" />
+		)
+	</insert>
+	<select id="getUserOptRecordListByCondition" parameterType="Map"
+		resultMap="UserOptRecordResult">
+		select
+		<include refid="user_opt_record_columns" />
+		from user_opt_record
+		<where>
+			<if test="e.userId !=null and e.userId>0 ">
+				and user_opt_record.user_id = #{e.userId}
+			</if>
+			<if test="e.type !=null and e.type !='' ">
+				and user_opt_record.type = #{e.type}
+			</if>
+			<if test="e.optusername !=null and e.optusername !='' ">
+				and user_opt_record.optusername like
+				CONCAT('%',#{e.optusername},'%')
+			</if>
+			<if test="e.bizId !=null and e.bizId>0">
+				and user_opt_record.biz_id = #{e.bizId}
+			</if>
+			<if test="e.startDate!=null and e.startDate!='' ">
+				and<![CDATA[ user_opt_record.create_time >=]]>CONCAT(#{e.startDate},'00:00:00')
+			</if>
+			<if test="e.endDate!=null and e.endDate!='' ">
+				and<![CDATA[ user_opt_record.create_time <=]]>CONCAT(#{e.endDate},'23:59:59')
+			</if>
+		</where>
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getUserOptRecordListByConditionCount" parameterType="Map"
+		resultType="int">
+		select count(1)
+		from user_opt_record
+		<where>
+			<if test="e.userId !=null and e.userId>0 ">
+				and user_opt_record.user_id = #{e.userId}
+			</if>
+			<if test="e.type !=null and e.type !='' ">
+				and user_opt_record.type = #{e.type}
+			</if>
+			<if test="e.optusername !=null and e.optusername !='' ">
+				and user_opt_record.optusername like
+				CONCAT('%',#{e.optusername},'%')
+			</if>
+			<if test="e.bizId !=null and e.bizId>0">
+				and user_opt_record.biz_id = #{e.bizId}
+			</if>
+			<if test="e.startDate!=null and e.startDate!='' ">
+				and<![CDATA[ user_opt_record.create_time >=]]>CONCAT(#{e.startDate},'00:00:00')
+			</if>
+			<if test="e.endDate!=null and e.endDate!='' ">
+				and<![CDATA[ user_opt_record.create_time <=]]>CONCAT(#{e.endDate},'23:59:59')
+			</if>
+		</where>
+	</select>
+
+
+
+	<!-- 根据组id获取学员列表 -->
+	<select id="getUserListByGroupId" resultMap="UserResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="user_columns" />
+		from user_user
+		left join group_middle_user on group_middle_user.user_id
+		= user_user.id
+		<where>
+			<if test="e.groupId !=null and e.groupId >0 ">
+				and group_middle_user.group_id = #{e.groupId}
+			</if>
+			<if test="e.id !=null and e.id >0 ">
+				and user_user.id = #{e.id}
+			</if>
+			<if test="e.nickname !=null and e.nickname !='' ">
+				and user_user.nickname like CONCAT('%',#{e.nickname},'%')
+			</if>
+
+			<if test="e.mobile !=null and e.mobile !='' ">
+				and user_user.mobile like CONCAT('%',#{e.mobile},'%')
+			</if>
+			<if test="e.email !=null and e.email !='' ">
+				and user_user.email like CONCAT('%',#{e.email},'%')
+			</if>
+		</where>
+		order by user_user.id DESC
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getUserListByGroupIdCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select
+		count(1)
+		from user_user
+		left join group_middle_user on
+		group_middle_user.user_id = user_user.id
+		<where>
+			<if test="e.groupId !=null and e.groupId >0 ">
+				and group_middle_user.group_id = #{e.groupId}
+			</if>
+			<if test="e.id !=null and e.id >0 ">
+				and user_user.id = #{e.id}
+			</if>
+			<if test="e.nickname !=null and e.nickname !='' ">
+				and user_user.nickname like CONCAT('%',#{e.nickname},'%')
+			</if>
+
+			<if test="e.mobile !=null and e.mobile !='' ">
+				and user_user.mobile like CONCAT('%',#{e.mobile},'%')
+			</if>
+			<if test="e.email !=null and e.email !='' ">
+				and user_user.email like CONCAT('%',#{e.email},'%')
+			</if>
+		</where>
+	</select>
+
+
+	<!-- 按员工部门筛选 -->
+	<select id="queryGroupByid" parameterType="java.util.HashMap"
+		resultMap="UserResult">
+		SELECT
+		<include refid="user_columns" />
+		FROM
+		USER_USER
+		<where>
+			USER_USER.level=1 and isavalible=0
+			<if test="e.id !=null and e.id >0 ">
+				and user_user.id = #{e.id}
+			</if>
+			<if test="e.nickname !=null and e.nickname !='' ">
+				and user_user.nickname like CONCAT('%',#{e.nickname},'%')
+			</if>
+		</where>
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<!-- 按员工部门筛选 -->
+	<select id="queryGroupByidCount" resultType="int"
+		parameterType="java.util.HashMap">
+		SELECT
+		COUNT(1)
+		FROM
+		USER_USER
+		<where>
+			USER_USER.level=1 and isavalible=0
+			<if test="e.id !=null and e.id >0 ">
+				and user_user.id = #{e.id}
+			</if>
+			<if test="e.nickname !=null and e.nickname !='' ">
+				and user_user.nickname like CONCAT('%',#{e.nickname},'%')
+			</if>
+		</where>
+	</select>
+	
+	<select id="queryGroupUserIds" resultMap="UserResult" parameterType="String">
+		select
+		<include refid="user_columns" />
+		from user_user
+		<where>
+			user_user.id in (${value})
+		</where>
+	</select>
+	
+	
+	<select id="getUserByNickName" resultMap="UserResult" parameterType="String">
+		select
+		<include refid="user_columns" />
+		from user_user
+		<where>
+			user_user.nickname =#{nickname}
+		</where>
+	</select>
+	
+	<select id="getUserFromStatistics" resultMap="UserFromStatisticsResult">
+		select
+		count(1) user_num,
+		count(case when register_from='registerFrom' then id end) register_num,
+		count(case when register_from='adminFrom' then id end) admin_num,
+		count(case when register_from='userCardFrom' then id end) usercard_num,
+		count(case when register_from='appFrom' then id end) app_num,
+		count(case when register_from='qqFrom' then id end) qq_num,
+		count(case when register_from='weixinFrom' then id end) weixin_num,
+		count(case when register_from='weiboFrom' then id end) weibo_num,
+		count(case when register_from='mobileFrom' then id end) mobile_num
+		from user_expand
+	</select>
+
+
+	<!-- 获取用户集合 -->
+	<select id="queryUserListByIds" resultMap="UserResult" parameterType="list">
+		SELECT <include refid="user_columns" /> FROM user_user WHERE user_user.id in(
+			<foreach collection="array" item="item" separator=",">
+				#{item}
+			</foreach>
+		)
+	</select>
+
+
+	<!-- 按年查询注册来源 -->
+	<select id="getRegisterFromByYear" resultMap="UserFromStatisticsResult" parameterType="Map">
+		SELECT
+		year.m AS date,register_num,admin_num,usercard_num,app_num,qq_num,weixin_num,weibo_num,mobile_num FROM
+		(SELECT 12 AS m UNION ALL
+		SELECT 11 UNION ALL
+		SELECT 10 UNION ALL
+		SELECT 09 UNION ALL
+		SELECT 08 UNION ALL
+		SELECT 07 UNION ALL
+		SELECT 06 UNION ALL
+		SELECT 05 UNION ALL
+		SELECT 04 UNION ALL
+		SELECT 03 UNION ALL
+		SELECT 02 UNION ALL
+		SELECT 01) AS year
+		LEFT JOIN (
+		SELECT DATE_FORMAT(user_user.createdate,'%m') AS m,
+		count(case when user_expand.register_from='registerFrom' then 0 end) register_num,
+		count(case when user_expand.register_from='adminFrom' then 0 end) admin_num,
+		count(case when user_expand.register_from='userCardFrom' then 0 end) usercard_num,
+		count(case when user_expand.register_from='appFrom' then 0 end) app_num,
+		count(case when user_expand.register_from='qqFrom' then 0 end) qq_num,
+		count(case when user_expand.register_from='weixinFrom' then 0 end) weixin_num,
+		count(case when user_expand.register_from='weiboFrom' then 0 end) weibo_num,
+		count(case when user_expand.register_from='mobileFrom' then 0 end) mobile_num
+		FROM user_expand
+		LEFT JOIN user_user on user_expand.user_id = user_user.id
+		WHERE DATE_FORMAT(user_user.createdate,'%Y')=#{year}
+		GROUP BY DATE_FORMAT(user_user.createdate,'%Y-%m')
+		) AS user_expand
+		ON year.m = user_expand.m
+	</select>
+	<!-- 按月查询注册来源 -->
+	<select id="getRegisterFromByMonth" resultMap="UserFromStatisticsResult" parameterType="Map">
+		SELECT
+		month.d AS date,register_num,admin_num,usercard_num,app_num,qq_num,weixin_num,weibo_num,mobile_num FROM
+		(SELECT 31 AS d UNION ALL
+		SELECT 30 UNION ALL
+		SELECT 29 UNION ALL
+		SELECT 28 UNION ALL
+		SELECT 27 UNION ALL
+		SELECT 26 UNION ALL
+		SELECT 25 UNION ALL
+		SELECT 24 UNION ALL
+		SELECT 23 UNION ALL
+		SELECT 22 UNION ALL
+		SELECT 21 UNION ALL
+		SELECT 20 UNION ALL
+		SELECT 19 UNION ALL
+		SELECT 18 UNION ALL
+		SELECT 17 UNION ALL
+		SELECT 16 UNION ALL
+		SELECT 15 UNION ALL
+		SELECT 14 UNION ALL
+		SELECT 13 UNION ALL
+		SELECT 12 UNION ALL
+		SELECT 11 UNION ALL
+		SELECT 10 UNION ALL
+		SELECT 09 UNION ALL
+		SELECT 08 UNION ALL
+		SELECT 07 UNION ALL
+		SELECT 06 UNION ALL
+		SELECT 05 UNION ALL
+		SELECT 04 UNION ALL
+		SELECT 03 UNION ALL
+		SELECT 02 UNION ALL
+		SELECT 01 ) AS month
+		LEFT JOIN (
+		SELECT DATE_FORMAT(user_user.createdate,'%d') AS d,
+		count(case when user_expand.register_from='registerFrom' then 0 end) register_num,
+		count(case when user_expand.register_from='adminFrom' then 0 end) admin_num,
+		count(case when user_expand.register_from='userCardFrom' then 0 end) usercard_num,
+		count(case when user_expand.register_from='appFrom' then 0 end) app_num,
+		count(case when user_expand.register_from='qqFrom' then 0 end) qq_num,
+		count(case when user_expand.register_from='weixinFrom' then 0 end) weixin_num,
+		count(case when user_expand.register_from='weiboFrom' then 0 end) weibo_num,
+		count(case when user_expand.register_from='mobileFrom' then 0 end) mobile_num
+		FROM user_expand
+		LEFT JOIN user_user on user_expand.user_id = user_user.id
+		WHERE DATE_FORMAT(user_user.createdate,'%Y-%m')=#{yearAndMonth}
+		GROUP BY DATE_FORMAT(user_user.createdate,'%Y-%m-%d')
+		) AS user_user
+		ON month.d = user_user.d
+	</select>
+	<!-- 前台修改个人信息 -->
+	<update id="updateWebUser" parameterType="User">
+		update
+		user_user
+		<set>
+			<if test="updateEmail=='YES'">
+				email=#{email},
+			</if>
+			<if test="nickname!=null and nickname!=''">
+				nickname = #{nickname},
+			</if>
+			<if test="mobile!=null and mobile!=''">
+				mobile = #{mobile}
+			</if>
+		</set>
+		where
+		id = #{id}
+	</update>
+</mapper>

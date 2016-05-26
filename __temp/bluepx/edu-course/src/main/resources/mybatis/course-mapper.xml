@@ -1,0 +1,487 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="co.bluepx.edu.course.dao.CourseDao">
+    <resultMap id="TeacherCourseResult" type="co.bluepx.edu.course.entity.Course">
+        <result property="name" column="name"/>
+        <result property="id" column="id"/>
+        <result property="logo" column="logo"/>
+    </resultMap>
+    <resultMap id="CourseResult" type="co.bluepx.edu.course.entity.Course">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="isavaliable" column="isavaliable"/>
+        <result property="addtime" column="addtime"/>
+        <result property="isPay" column="is_pay"/>
+        <result property="sourceprice" column="sourceprice"/>
+        <result property="currentprice" column="currentprice"/>
+        <result property="title" column="title"/>
+        <result property="context" column="context"/>
+        <result property="lessionnum" column="lessionnum"/>
+        <result property="coursetag" column="coursetag"/>
+        <result property="logo" column="logo"/>
+        <result property="mobileLogo" column="mobile_logo"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="losetype" column="losetype"/>
+        <result property="loseAbsTime" column="lose_abs_time"/>
+        <result property="loseTime" column="lose_time"/>
+        <result property="updateuser" column="updateuser"/>
+        <result property="pageBuycount" column="page_buycount"/>
+        <result property="pageViewcount" column="page_viewcount"/>
+        <result property="freeurl" column="freeurl"/>
+        <result property="sellType" column="sell_type"/>
+        <result property="liveBeginTime" column="live_begin_time"/>
+        <result property="liveEndTime" column="live_end_time"/>
+        <result property="orderNum" column="order_num"/>
+    </resultMap>
+
+    <resultMap id="CouponSubjectCourseResult" type="co.bluepx.edu.course.entity.Course">
+        <result property="id" column="id"/>
+        <result property="currentprice" column="currentprice"/>
+    </resultMap>
+
+
+    <sql id="edu_course_columns">
+        edu_course.id,
+        edu_course.name,
+        edu_course.isavaliable,
+        edu_course.addtime,
+        edu_course.is_pay,
+        edu_course.sourceprice,
+        edu_course.currentprice,
+        edu_course.title,
+        edu_course.context,
+        edu_course.lessionnum,
+        edu_course.coursetag,
+        edu_course.logo,
+        edu_course.mobile_logo,
+        edu_course.update_time,
+        edu_course.losetype,
+        edu_course.lose_abs_time,
+        edu_course.lose_time,
+        edu_course.updateuser,
+        edu_course.page_buycount,
+        edu_course.page_viewcount,
+        edu_course.freeurl,
+        edu_course.sell_type,
+        edu_course.live_begin_time,
+        edu_course.live_end_time
+    </sql>
+
+    <sql id="edu_course_properties">
+        #{id},
+        #{name},
+        #{isavaliable},
+        #{addtime},
+        #{isPay},
+        #{sourceprice},
+        #{currentprice},
+        #{title},
+        #{context},
+        #{lessionnum},
+        #{coursetag},
+        #{logo},
+        #{mobileLogo},
+        #{updateTime},
+        #{losetype},
+        #{loseAbsTime},
+        #{loseTime},
+        #{updateuser},
+        #{pageBuycount},
+        #{pageViewcount},
+        #{freeurl},
+        #{sellType},
+        #{liveBeginTime},
+        #{liveEndTime}
+    </sql>
+    <!-- 首页课程展示  把大字段context剔除了放memcache缓存-->
+    <resultMap type="co.bluepx.edu.course.entity.Teacher" id="teachersResult">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+    </resultMap>
+    <resultMap type="co.bluepx.edu.course.entity.CourseDto" id="WebSiteCourseResult">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="isavaliable" column="isavaliable"/>
+        <result property="addtime" column="addtime"/>
+        <result property="isPay" column="is_pay"/>
+        <result property="sourceprice" column="sourceprice"/>
+        <result property="currentprice" column="currentprice"/>
+        <result property="title" column="title"/>
+        <result property="lessionnum" column="lessionnum"/>
+        <result property="coursetag" column="coursetag"/>
+        <result property="logo" column="logo"/>
+        <result property="mobileLogo" column="mobile_logo"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="losetype" column="losetype"/>
+        <result property="loseAbsTime" column="lose_abs_time"/>
+        <result property="loseTime" column="lose_time"/>
+        <result property="updateuser" column="updateuser"/>
+        <result property="pageBuycount" column="page_buycount"/>
+        <result property="pageViewcount" column="page_viewcount"/>
+        <result property="freeurl" column="freeurl"/>
+        <result column="recommendId" property="recommendId"/>
+        <result column="buycount" property="buycount"/>
+        <result column="viewcount" property="viewcount"/>
+        <result column="commentcount" property="commentcount"/>
+        <result column="questiongcount" property="questiongcount"/>
+        <result column="notecount" property="notecount"/>
+        <result column="playcount" property="playcount"/>
+        <result property="sellType" column="sell_type"/>
+        <result property="liveBeginTime" column="live_begin_time"/>
+        <result property="liveEndTime" column="live_end_time"/>
+        <result property="subjectName" column="SUBJECT_NAME"/>
+        <collection property="teacherList" column="id" javaType="ArrayList" ofType="co.bluepx.edu.course.entity.Teacher"
+                    select="findTeachersByCourseId"/>
+
+    </resultMap>
+
+    <resultMap type="co.bluepx.edu.course.entity.CourseDto" id="CourseDtoResult" extends="WebSiteCourseResult">
+        <result property="context" column="context"/>
+        <result property="studyhistoryNum" column="studyhistoryNum"/>
+        <association property="kpointNum" column="id" javaType="long"
+                     select="findCountKpointByCourseId"/>
+    </resultMap>
+
+    <!-- 统计课程章节数量 -->
+    <select id="findCountKpointByCourseId" parameterType="long"
+            resultType="long">
+		SELECT COUNT(DISTINCT ck.id) FROM edu_course_kpoint ck WHERE type=0 and status=0 and course_id= #{value}
+    </select>
+
+    <!-- 根据教师 id 查询关联课程 -->
+    <select id="findCourseByTeacherId" resultMap="TeacherCourseResult" parameterType="Long">
+        SELECT
+        edu_course.id,
+        edu_course.name,
+        edu_course.logo,
+        edu_course.is_pay,
+        edu_course.sourcePrice,
+        edu_course.currentPrice,
+        edu_course.page_buycount,
+        edu_course.page_viewcount
+        FROM edu_course
+        WHERE
+        ISAVALIABLE=0
+        AND edu_course.sell_type!='LIVE' AND id IN
+          (SELECT ct.course_id from edu_course_teacher as ct WHERE ct.teacher_id=#{teacherId})
+        ORDER BY edu_course.update_time DESC
+    </select>
+    <!-- 首页根据推荐模块获得课程列表 -->
+    <select id="findRecommendCourses" parameterType="Long" resultMap="CourseDtoResult">
+        select
+        edu_course.id,
+        edu_course.name,
+        edu_course.isavaliable,
+        edu_course.addtime,
+        edu_course.is_pay,
+        edu_course.sourceprice,
+        edu_course.currentprice,
+        edu_course.title,
+        edu_course.lessionnum,
+        edu_course.coursetag,
+        edu_course.logo,
+        edu_course.mobile_logo,
+        edu_course.update_time,
+        edu_course.losetype,
+        edu_course.lose_abs_time,
+        edu_course.lose_time,
+        edu_course.updateuser,
+        edu_course.page_buycount,
+        edu_course.page_viewcount,
+        edu_course.freeurl,
+        edu_course.sell_type,
+        edu_course.live_begin_time,
+        edu_course.live_end_time,
+        edu_website_course_detail.recommendId,
+        IFNULL(edu_course_profile.buycount,0) buycount,
+        IFNULL(edu_course_profile.viewcount,0) viewcount,
+        IFNULL(edu_course_profile.commentcount,0) commentcount,
+        IFNULL(edu_course_profile.questiongcount,0) questiongcount,
+        IFNULL(edu_course_profile.notecount,0) notecount,
+        IFNULL(edu_course_profile.playcount,0) playcount
+        from edu_website_course_detail
+        join edu_course on edu_website_course_detail.course_id=edu_course.id
+        left join edu_course_profile on edu_course.id=edu_course_profile.course_Id
+        <where>
+            <if test="recommendId!=0">
+                edu_website_course_detail.recommendId=#{recommendId}
+            </if>
+        </where>
+        order by edu_website_course_detail.recommendId,edu_website_course_detail.orderNum
+        desc,edu_website_course_detail.id
+    </select>
+
+
+    <!-- 查询多个课程的信息 -->
+    <select id="findCourseListByCourseIds" parameterType="java.util.HashMap" resultMap="CourseDtoResult">
+        SELECT DISTINCT
+        edu_course.id,
+        edu_course.name,
+        edu_course.isavaliable,
+        edu_course.addtime,
+        edu_course.is_pay,
+        edu_course.sourceprice,
+        edu_course.currentprice,
+        edu_course.title,
+        edu_course.lessionnum,
+        edu_course.coursetag,
+        edu_course.logo,
+        edu_course.mobile_logo,
+        edu_course.update_time ,
+        edu_course.losetype,
+        edu_course.lose_abs_time ,
+        edu_course.lose_time ,
+        edu_course.updateuser,
+        edu_course.context,
+        edu_course.page_buycount ,
+        edu_course.page_viewcount ,
+        edu_course.freeurl,
+        edu_course.sell_type ,
+        edu_course.live_begin_time,
+        edu_course.live_end_time,
+        IFNULL(temp.studyhistoryNum,0) studyhistoryNum,
+        IFNULL(edu_course_profile.buycount,0) buycount,
+        IFNULL(edu_course_profile.viewcount,0) viewcount,
+        IFNULL(edu_course_profile.commentcount,0) commentcount,
+        IFNULL(edu_course_profile.questiongcount,0) questiongcount,
+        IFNULL(edu_course_profile.notecount,0) notecount,
+        IFNULL(edu_course_profile.playcount,0) playcount
+
+        FROM edu_course
+        LEFT JOIN edu_course_profile ON edu_course.id=edu_course_profile.course_id
+        left join (
+        select course_id,count(1) studyhistoryNum
+        from edu_course_studyhistory
+        <where>
+            <if test="userId!=null and userId>0">
+                edu_course_studyhistory.user_id=#{userId}
+            </if>
+        </where>
+        group by course_id
+        ) temp on temp.course_id = edu_course.id
+        WHERE
+        1=1
+        <if test="sellType!=null and sellType!=''">
+            <if test="sellType=='NOLIVE'">
+                AND edu_course.sell_type!='LIVE'
+            </if>
+            <if test="sellType!='NOLIVE'">
+                AND edu_course.sell_type=#{sellType}
+            </if>
+        </if>
+        and edu_course.id in
+        <foreach collection="ids" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        order by edu_course.id desc
+    </select>
+
+
+    <select id="findTeachersByCourseId" parameterType="long" resultType="co.bluepx.edu.course.entity.Teacher">
+        SELECT
+          t.id, t.name from edu_teacher as t LEFT JOIN edu_course_teacher AS ct ON ct.teacher_id = t.id
+        WHERE ct.course_id = #{courseId}
+
+    </select>
+
+    <select id="findTeacherNamesByCourseIds" parameterType="list" resultMap="teachersResult">
+        SELECT
+        t.id,t.name
+        FROM edu_teacher AS t
+        LEFT JOIN edu_course_teacher AS ct ON ct.teacher_id = t.id
+        WHERE
+        ct.course_id IS NOT NULL and ct.course_id in
+        <foreach collection="courseIds" open="(" separator="," close=")" item="courseId">
+            #{courseId}
+        </foreach>
+        GROUP BY ct.course_id
+    </select>
+
+
+
+    <!-- 查询课程列表 -->
+    <select id="findCourseListByPage" resultMap="WebSiteCourseResult" parameterType="co.bluepx.edu.course.entity.QueryCourse">
+        select
+        DISTINCT
+        edu_course.id,
+        edu_course.name,
+        edu_course.isavaliable,
+        edu_course.addtime,
+        edu_course.is_pay,
+        edu_course.sourceprice,
+        edu_course.currentprice,
+        edu_course.title,
+        edu_course.lessionnum,
+        edu_course.coursetag,
+        edu_course.logo,
+        edu_course.mobile_logo,
+        edu_course.update_time,
+        edu_course.losetype,
+        edu_course.lose_abs_time,
+        edu_course.lose_time,
+        edu_course.updateuser,
+        edu_course.page_buycount,
+        edu_course.page_viewcount,
+        edu_course.freeurl,
+        edu_course.sell_type,
+        edu_course.live_begin_time,
+        edu_course.live_end_time,
+        sys_subject.SUBJECT_NAME,
+        IFNULL(edu_course_profile.buycount,0) buycount,
+        IFNULL(edu_course_profile.viewcount,0) viewcount,
+        IFNULL(edu_course_profile.commentcount,0) commentcount,
+        IFNULL(edu_course_profile.questiongcount,0) questiongcount,
+        IFNULL(edu_course_profile.notecount,0) notecount,
+        IFNULL(edu_course_profile.playcount,0) playcount
+        from edu_course
+        left join edu_course_subject on edu_course.id=edu_course_subject.course_id
+        left join sys_subject on edu_course_subject.SUBJECT_ID=sys_subject.SUBJECT_ID
+        left join edu_course_profile on edu_course.id=edu_course_profile.course_Id
+        left join edu_course_teacher on edu_course.id =	edu_course_teacher.course_id
+        <where>
+            <if test="e.membertype!=null and e.membertype>0 ">
+                and edu_course.id in (select cm.course_id from edu_course_member as cm where cm.memberType_id = #{e.membertype})
+            </if>
+            <if test="e.teacherId!=null and e.teacherId!=0 ">
+                <![CDATA[  and edu_course_teacher.teacher_id = #{e.teacherId} ]]>
+            </if>
+            <if test="e.name!=null and e.name!=''">
+                <![CDATA[ and edu_course.name LIKE CONCAT('%',#{e.name},'%') ]]>
+            </if>
+            <if test="e.id!=null and e.id!=''">
+                and edu_course.id = #{e.id}
+            </if>
+            <if test="e.subjectId!=null and e.subjectId!=0">
+                AND (edu_course_subject.subject_id=#{e.subjectId} or sys_subject.parent_id=#{e.subjectId})
+            </if>
+            <if test="e.sellType!=null and e.sellType!=''">
+                <if test="e.sellType=='NOLIVE'">
+                    AND edu_course.sell_type!='LIVE'
+                </if>
+                <if test="e.sellType!='NOLIVE'">
+                    AND edu_course.sell_type=#{e.sellType}
+                </if>
+            </if>
+            <if test="e.isavaliable!=null and e.isavaliable!=-1">
+                AND edu_course.isavaliable=#{e.isavaliable}
+            </if>
+            <if test="e.isPay!=null and e.isPay>=0">
+                and edu_course.is_pay = #{e.isPay}
+            </if>
+            <if test="e.status!=null and e.status>0">
+                <if test="e.status==1"><!-- 直播未开始 -->
+                    AND <![CDATA[edu_course.live_begin_time>now()]]>
+                </if>
+                <if test="e.status==2"><!-- 直播进行中-->
+                    AND <![CDATA[edu_course.live_begin_time<now() and edu_course.live_end_time>now()]]>
+                </if>
+                <if test="e.status==3"><!-- 直播已结束-->
+                    AND <![CDATA[edu_course.live_end_time<now()]]>
+                </if>
+            </if>
+        </where>
+        <if test="e.order==1 or e.order==0">
+            order by edu_course_profile.viewcount desc
+        </if>
+        <if test="e.order==2">
+            order by edu_course.addTime desc
+        </if>
+        <if test="e.order==3">
+            order by edu_course.currentPrice asc
+        </if>
+        <if test="e.order==4">
+            order by edu_course.live_begin_time desc
+        </if>
+        <!--<include refid="publicMapper.pageEnd" />-->
+    </select>
+
+    <!-- 获取套餐下 课程详细信息 -->
+    <select id="findCourseListPackage" parameterType="list" resultType="co.bluepx.edu.course.entity.CourseDto">
+        SELECT	DISTINCT
+        edu_course.id,
+        edu_course.name,
+        edu_course.isavaliable,
+        edu_course.addtime,
+        edu_course.is_pay,
+        edu_course.sourceprice,
+        edu_course.currentprice,
+        edu_course.title,
+        edu_course.lessionnum,
+        edu_course.coursetag,
+        edu_course.logo,
+        edu_course.mobile_logo,
+        edu_course.update_time,
+        edu_course.losetype,
+        edu_course.lose_abs_time,
+        edu_course.lose_time,
+        edu_course.updateuser,
+        edu_course.page_buycount,
+        edu_course.page_viewcount,
+        edu_course.freeurl,
+        edu_course.sell_type,
+        edu_course_package.order_num
+        FROM edu_course LEFT JOIN
+        edu_course_package ON edu_course.id=edu_course_package.course_id
+        WHERE edu_course_package.main_course_id in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+        ORDER BY edu_course_package.id DESC
+    </select>
+
+    <!-- 获得专业下课程 ,传courseId时查询某课程同专业下的课程-->
+    <select id="findSubjectCourseList" parameterType="java.util.HashMap" resultMap="WebSiteCourseResult">
+        select
+        DISTINCT
+        edu_course.id,
+        edu_course.name,
+        edu_course.isavaliable,
+        edu_course.addtime,
+        edu_course.is_pay,
+        edu_course.sourceprice,
+        edu_course.currentprice,
+        edu_course.title,
+        edu_course.lessionnum,
+        edu_course.coursetag,
+        edu_course.logo,
+        edu_course.mobile_logo,
+        edu_course.update_time,
+        edu_course.losetype,
+        edu_course.lose_abs_time,
+        edu_course.lose_time,
+        edu_course.updateuser,
+        edu_course.page_buycount,
+        edu_course.page_viewcount,
+        edu_course.freeurl,
+        edu_course.sell_type,
+        IFNULL(edu_course_profile.buycount,0) buycount,
+        IFNULL(edu_course_profile.viewcount,0) viewcount,
+        IFNULL(edu_course_profile.commentcount,0) commentcount,
+        IFNULL(edu_course_profile.questiongcount,0) questiongcount,
+        IFNULL(edu_course_profile.notecount,0) notecount,
+        IFNULL(edu_course_profile.playcount,0) playcount
+        from edu_course
+        left join edu_course_subject on edu_course.id=edu_course_subject.course_id
+        left join sys_subject on edu_course_subject.SUBJECT_ID=sys_subject.SUBJECT_ID
+        left join edu_course_profile on edu_course.id=edu_course_profile.course_Id
+        <where>
+            ISAVALIABLE=0
+            and edu_course.sell_type!='LIVE'
+            <if test="subjectId!=null and subjectId!=0">
+                and (edu_course_subject.subject_id=#{subjectId} or sys_subject.parent_id=#{subjectId})
+            </if>
+            <if test="courseId!=null and courseId!=0">
+                and edu_course_subject.subject_id IN
+                (SELECT
+                edu_course_subject.subject_id
+                FROM
+                edu_course
+                LEFT JOIN edu_course_subject  ON edu_course.id = edu_course_subject.course_id
+                WHERE edu_course.id = #{courseId} )
+                AND edu_course.id != #{courseId}
+            </if>
+        </where>
+        order by edu_course.update_time DESC
+        limit #{num}
+    </select>
+</mapper>

@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CourseNoteMapper">
+
+        <resultMap id="CourseNoteResult" type="CourseNote">
+            <result property="id" column="id"/>
+             <result property="courseId" column="course_id"/>
+            <result property="kpointId" column="kpoint_id"/>
+            <result property="userId" column="user_id"/>
+            <result property="content" column="content"/>
+            <result property="updateTime" column="update_time"/>
+            <result property="status" column="status"/>
+        </resultMap>
+		
+		<resultMap type="QueryCourseNote" id="QueryCourseNoteResult" extends="CourseNoteResult">
+			<result property="nickname" column="nickname"/>
+			<result property="email" column="email"/>
+			<result property="pointName" column="pointName"/>
+		</resultMap>
+		<resultMap type="QueryCourseNote" id="QueryUserCourseNoteResult" extends="CourseNoteResult">
+			<result property="pointName" column="pointName"/>
+			<result property="courseName" column="courseName"/>
+		</resultMap>
+        <sql id="edu_course_note_columns">
+            edu_course_note.id,
+            edu_course_note.course_id,
+            edu_course_note.kpoint_id,
+            edu_course_note.user_id,
+            edu_course_note.content,
+            edu_course_note.update_time,
+            edu_course_note.status
+        </sql>
+
+        <sql id="edu_course_note_properties">
+            #{id},
+            #{courseId},
+            #{kpointId},
+            #{userId},
+            #{content},
+            #{updateTime},
+            #{status}
+        </sql>
+
+        <insert id="createCourseNote" parameterType="CourseNote" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_course_note (<include refid="edu_course_note_columns"/>) VALUES (<include refid="edu_course_note_properties"/>)
+        </insert>
+
+        <delete id="deleteCourseNoteById" parameterType="Long">
+            delete from edu_course_note
+            where
+                id = #{value}
+        </delete>
+
+        <update id="updateCourseNote" parameterType="CourseNote">
+            update edu_course_note SET
+            	course_id = #{courseId},
+                kpoint_id = #{kpointId},
+                user_id = #{userId},
+                content = #{content},
+                update_time = #{updateTime}
+            where
+                kpoint_id = #{kpointId}
+                and user_id = #{userId}
+        </update>
+
+        <select id="getCourseNoteById" resultMap="CourseNoteResult" parameterType="Long">
+            select
+            <include refid="edu_course_note_columns"/>
+            from edu_course_note
+            where
+                id = #{value}
+        </select>
+		
+        <select id="getCourseNoteList" resultMap="CourseNoteResult" parameterType="CourseNote">
+            select
+            <include refid="edu_course_note_columns"/>
+            from edu_course_note
+        </select>
+        
+         <select id="getCourseNoteByKpointIdAndUserId" resultMap="CourseNoteResult" parameterType="Map">
+            select
+            <include refid="edu_course_note_columns"/>
+            from edu_course_note
+            <where>
+            kpoint_id = #{kpointId} and
+            user_id = #{userId} and
+            status=0
+            </where>
+        </select>
+        <!-- 查询课程笔记列表 后台 -->
+        <select id="getCourseNoteListPage" parameterType="Map" resultMap="QueryCourseNoteResult">
+	        select <include refid="edu_course_note_columns"/>,
+	        user_user.nickname,
+	        user_user.email,
+	        edu_course_kpoint.name pointName,
+            edu_course.name courseName
+	        from edu_course_note
+	        left join user_user on edu_course_note.user_id = user_user.id
+	        left join edu_course_kpoint on edu_course_note.kpoint_id=edu_course_kpoint.id and edu_course_kpoint.status=0
+            left join edu_course on edu_course_note.course_id= edu_course.id
+	        <where>
+	        <if test="e.pointName != null and e.pointName!=''">
+	        edu_course_kpoint.name like CONCAT('%',#{e.pointName},'%')
+	        </if>
+	        <if test="e.keyword !=null and e.keyword!=''">
+	        and (user_user.nickname like CONCAT('%',#{e.keyword},'%') or user_user.email like CONCAT('%',#{e.keyword},'%'))
+	        </if>
+	        <if test="e.startDate!=null and e.startDate!='' ">
+       			and<![CDATA[ edu_course_note.update_time >=]]>CONCAT(#{e.startDate},'00:00:00')
+       		</if>
+       		<if test="e.endDate!=null and e.endDate!='' ">
+       			and<![CDATA[ edu_course_note.update_time <=]]>CONCAT(#{e.endDate},'23:59:59')
+       		</if>
+	        </where>
+	        order by edu_course_note.id desc
+	        <include refid="publicMapper.pageEnd" />
+        </select>
+        <select id="getCourseNoteListPageCount" parameterType="Map" resultType="int">
+        	select count(1) from edu_course_note
+        	left join user_user on edu_course_note.user_id = user_user.id
+	        left join edu_course_kpoint on edu_course_note.kpoint_id=edu_course_kpoint.id and edu_course_kpoint.status=0 
+        	 <where>
+	        <if test="e.pointName != null and e.pointName!=''">
+	        edu_course_kpoint.name like CONCAT('%',#{e.pointName},'%')
+	        </if>
+	        <if test="e.keyword !=null and e.keyword!=''">
+	        and (user_user.nickname like CONCAT('%',#{e.keyword},'%') or user_user.email like CONCAT('%',#{e.keyword},'%'))
+	        </if>
+	        <if test="e.startDate!=null and e.startDate!='' ">
+       			and<![CDATA[ edu_course_note.update_time >=]]>CONCAT(#{e.startDate},'00:00:00')
+       		</if>
+       		<if test="e.endDate!=null and e.endDate!='' ">
+       			and<![CDATA[ edu_course_note.update_time <=]]>CONCAT(#{e.endDate},'23:59:59')
+       		</if>
+	        </where>
+        </select>
+        <!-- 更新显示隐藏状态 -->
+        <update id="updateCourseNoteListStatus" parameterType="CourseNote">
+	        update edu_course_note 
+	        set edu_course_note.status=#{status}
+	        where edu_course_note.id=#{id}
+        </update>
+        <select id="getQueryCourseNoteById" parameterType="Long" resultMap="QueryCourseNoteResult">
+         select <include refid="edu_course_note_columns"/>,
+	        user_user.nickname,
+	        user_user.email,
+	        edu_course_kpoint.name pointName
+	        from edu_course_note
+	        left join user_user on edu_course_note.user_id = user_user.id
+	        left join edu_course_kpoint on edu_course_note.kpoint_id=edu_course_kpoint.id and edu_course_kpoint.status=0
+	        where  edu_course_note.id=#{id}
+        </select>
+        <select id="getUserCourseNoteByUserId" parameterType="Map" resultMap="QueryUserCourseNoteResult">
+	        select <include refid="edu_course_note_columns"/>,
+	        edu_course_kpoint.name pointName,
+	        edu_course.name courseName
+	        from edu_course_note
+	        left join edu_course_kpoint on edu_course_note.kpoint_id=edu_course_kpoint.id and edu_course_kpoint.status=0
+	        left join edu_course on edu_course_note.course_id=edu_course.id
+	        where edu_course_note.user_id=#{e} and edu_course_note.status=0
+        	order by edu_course_note.id desc
+        	<include refid="publicMapper.pageEnd" />
+        </select>
+        <select id="getUserCourseNoteByUserIdCount" parameterType="Map" resultType="int">
+	        select count(1)
+	        from edu_course_note
+	        where edu_course_note.user_id=#{e} and edu_course_note.status=0
+        </select>
+</mapper>

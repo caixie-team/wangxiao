@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CourseHandoutMapper">
+
+	<resultMap id="CourseHandoutResult" type="CourseHandout">
+		<result property="id" column="id" />
+		<result property="courseId" column="course_id" />
+		<result property="name" column="name" />
+		<result property="path" column="path" />
+		<result property="createTime" column="create_time" />
+	</resultMap>
+
+	<sql id="edu_course_handout_columns">
+		edu_course_handout.id,
+		edu_course_handout.course_id,
+		edu_course_handout.name,
+		edu_course_handout.path,
+		edu_course_handout.create_time
+	</sql>
+
+	<sql id="edu_course_handout_properties">
+		#{id},
+		#{courseId},
+		#{name},
+		#{path},
+		#{createTime}
+	</sql>
+
+	<!-- 添加讲义 -->
+	<insert id="addCourseHandout" parameterType="CourseHandout">
+		INSERT INTO edu_course_handout(<include refid="edu_course_handout_columns" /> ) VALUES (<include refid="edu_course_handout_properties"/> )
+	</insert>
+
+	<!-- 删除讲义 -->
+	<delete id="deleteCourseHandout" parameterType="list">
+		DELETE FROM edu_course_handout WHERE edu_course_handout.id IN(
+		<foreach collection="array" separator="," item="id">
+			#{id}
+		</foreach>
+		)
+	</delete>
+
+	<!-- 修改讲义 -->
+	<update id="updateCourseHandout" parameterType="CourseHandout">
+		UPDATE edu_course_handout SET
+			edu_course_handout.name = #{name},
+			edu_course_handout.path = #{path}
+		WHERE
+			edu_course_handout.id = #{id}
+	</update>
+
+	<!-- 根据id查询讲义 -->
+	<select id="getCourseHandoutById" parameterType="Long" resultMap="CourseHandoutResult">
+		SELECT <include refid="edu_course_handout_columns" /> FROM edu_course_handout WHERE edu_course_handout.id = #{value}
+	</select>
+
+	<!-- 查询讲义列表 -->
+	<select id="getCourseHandoutList" parameterType="CourseHandout" resultMap="CourseHandoutResult">
+		SELECT <include refid="edu_course_handout_columns" /> FROM edu_course_handout
+		<where>
+			<if test="courseId!=null and courseId>0">
+				AND edu_course_handout.course_id = #{courseId}
+			</if>
+		</where>
+	</select>
+
+	<!-- 查询讲义列表page -->
+	<select id="getCourseHandoutListPage" parameterType="java.util.HashMap" resultMap="CourseHandoutResult">
+		SELECT <include refid="edu_course_handout_columns" /> FROM edu_course_handout
+		<where>
+			<if test="e.courseId!=null and e.courseId>0">
+				AND edu_course_handout.course_id = #{e.courseId}
+			</if>
+			<if test="e.startTime!=null and e.startTime!=''">
+				AND <![CDATA[ edu_course_handout.create_time >= #{e.startTime} ]]>
+			</if>
+			<if test="e.endTime!=null and e.endTime!=''">
+				AND <![CDATA[ edu_course_handout.create_time <= #{e.endTime} ]]>
+			</if>
+		</where>
+		ORDER BY edu_course_handout.id DESC
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getCourseHandoutListPageCount" parameterType="java.util.HashMap" resultType="int">
+		SELECT COUNT(1) FROM edu_course_handout
+		<where>
+			<if test="e.courseId!=null and e.courseId>0">
+				AND edu_course_handout.course_id = #{e.courseId}
+			</if>
+			<if test="e.startTime!=null and e.startTime!=''">
+				AND <![CDATA[ edu_course_handout.create_time >= #{e.startTime} ]]>
+			</if>
+			<if test="e.endTime!=null and e.endTime!=''">
+				AND <![CDATA[ edu_course_handout.create_time <= #{e.endTime} ]]>
+			</if>
+		</where>
+	</select>
+</mapper>

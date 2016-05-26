@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="WebsiteUseMapper">
+	<resultMap type="WebsiteUse" id="WebsiteUseResult">
+		<result property="id" column="ID"/>
+		<result property="ip" column="ip"/>
+		<result property="brand" column="brand"/>
+		<result property="type" column="type"/>
+		<result property="size" column="size"/>
+		<result property="createTime" column="create_time"/>
+		<result property="userId" column="user_id"/>
+        <result property="beginTime" column="begin_time"/>
+        <result property="endTime" column="end_time"/>
+	</resultMap>
+    <resultMap type="WebsiteUse" id="queryWebsiteUseResult" extends="WebsiteUseResult">
+        <result property="email" column="email"/>
+    </resultMap>
+	<sql id="app_webstie_use_columns">
+		app_webstie_use.id,
+		app_webstie_use.ip,
+		app_webstie_use.brand,
+		app_webstie_use.type,
+		app_webstie_use.size,
+		app_webstie_use.create_time,
+		app_webstie_use.user_id,
+		app_webstie_use.begin_time,
+		app_webstie_use.end_time
+	</sql>
+  
+	<sql id="app_webstie_use_properties">
+		#{id},
+		#{ip},
+		#{brand},
+		#{type},
+		#{size},
+		#{createTime},
+		#{userId},
+		#{beginTime},
+		#{endTime}
+	</sql>
+    <insert id="insertWebsiteUse" parameterType="WebsiteUse">
+        INSERT INTO app_webstie_use
+        (<include refid="app_webstie_use_columns"/>)
+        VALUES
+        (<include refid="app_webstie_use_properties"/>)
+    </insert>
+
+    <update id="updateWebsiteUseForEndtime" parameterType="WebsiteUse">
+        update app_webstie_use SET
+        end_time = #{endTime}
+        where
+        brand = #{brand}
+        and type = #{type}
+        and size = #{size}
+        and user_id = #{userId}
+        and end_time is null
+    </update>
+
+    <select id="getWebsiteUsePage" resultMap="queryWebsiteUseResult" parameterType="Map">
+        SELECT <include refid="app_webstie_use_columns"/>,
+        user_user.email
+        FROM app_webstie_use
+        left join  user_user
+        on app_webstie_use.user_id = user_user.id
+        <where>
+            <if test="e.email!=null and e.email!='' ">
+                and user_user.email like CONCAT('%',#{e.email},'%')
+            </if>
+            <if test="e.ip!=null and e.ip!='' ">
+                and app_webstie_use.ip like CONCAT('%',#{e.ip},'%')
+            </if>
+            <if test="e.brand!=null and e.brand!='' ">
+                and app_webstie_use.brand like CONCAT('%',#{e.brand},'%')
+            </if>
+            <if test="e.type!=null and e.type!='' ">
+                and app_webstie_use.type like CONCAT('%',#{e.type},'%')
+            </if>
+            <if test="e.size!=null and e.size!='' ">
+                and app_webstie_use.size like CONCAT('%',#{e.size},'%')
+            </if>
+            <if test="e.startTime!=null ">
+                and <![CDATA[ app_webstie_use.create_time>=#{e.startTime}]]>
+            </if>
+            <if test="e.overTime!=null ">
+                and <![CDATA[ app_webstie_use.create_time<=#{e.overTime}]]>
+            </if>
+        </where>
+        ORDER BY app_webstie_use.ID DESC
+        <include refid="publicMapper.pageEnd"/>
+    </select>
+    <select id="getWebsiteUsePageCount" resultType="int" parameterType="Map">
+        SELECT COUNT(1)
+        FROM app_webstie_use
+        left join  user_user
+        on app_webstie_use.user_id = user_user.id
+        <where>
+            <if test="e.email!=null and e.email!='' ">
+                and user_user.email like CONCAT('%',#{e.email},'%')
+            </if>
+            <if test="e.ip!=null and e.ip!='' ">
+                and app_webstie_use.ip like CONCAT('%',#{e.ip},'%')
+            </if>
+            <if test="e.brand!=null and e.brand!='' ">
+                and app_webstie_use.brand like CONCAT('%',#{e.brand},'%')
+            </if>
+            <if test="e.type!=null and e.type!='' ">
+                and app_webstie_use.type like CONCAT('%',#{e.type},'%')
+            </if>
+            <if test="e.size!=null and e.size!='' ">
+                and app_webstie_use.size like CONCAT('%',#{e.size},'%')
+            </if>
+            <if test="e.startTime!=null ">
+                and <![CDATA[ app_webstie_use.create_time>=#{e.startTime}]]>
+            </if>
+            <if test="e.overTime!=null ">
+                and <![CDATA[ app_webstie_use.create_time<=#{e.overTime}]]>
+            </if>
+        </where>
+    </select>
+
+
+</mapper>

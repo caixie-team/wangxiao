@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MemberTypeMapper">
+
+        <resultMap id="MemberTypeResult" type="MemberType">
+            <result property="id" column="id"/>
+            <result property="title" column="title"/>
+            <result property="status" column="status"/>
+        </resultMap>
+		
+        <sql id="edu_member_type_columns">
+            edu_member_type.id,
+            edu_member_type.title,
+            edu_member_type.status
+        </sql>
+
+        <sql id="edu_member_type_properties">
+            #{id},
+            #{title},
+            #{status}
+        </sql>
+        <!-- 添加会员类型 -->
+        <insert id="addMemberType" parameterType="MemberType">
+        	insert into edu_member_type(<include refid="edu_member_type_columns"/>) values(<include refid="edu_member_type_properties"/>)
+        </insert>
+        
+		<!-- 更新会员类型 -->
+        <update id="updateMemberType" parameterType="MemberType">
+            update edu_member_type SET
+            	title=#{title}
+            where
+                id = #{id}
+        </update>
+        <!-- 停用启用会员 -->
+        <update id="updateMemberTypeStatus" parameterType="MemberType">
+        	update edu_member_type set status=#{status} where id=#{id}
+        </update>
+        
+		<!-- id查询会员类型 -->
+        <select id="getMemberTypeById" resultMap="MemberTypeResult" parameterType="Long">
+            select
+            <include refid="edu_member_type_columns"/>
+            from edu_member_type
+            where id = #{value}
+        </select>
+      	<!-- 查询会员类型 集合-->
+        <select id="getMemberTypes" resultMap="MemberTypeResult">
+            select
+            <include refid="edu_member_type_columns"/>
+            from edu_member_type
+        </select>
+        <!-- web查询会员类型 集合-->
+        <select id="getWebMemberTypes" resultMap="MemberTypeResult">
+            select
+            <include refid="edu_member_type_columns"/>
+            from edu_member_type where status=0
+        </select>
+        <!-- 课程的会员类型 集合-->
+        <select id="getMemberTypesBycourse" resultMap="MemberTypeResult" parameterType="Long">
+            select
+            <include refid="edu_member_type_columns"/>
+            from edu_member_type 
+            where edu_member_type.status=0 and edu_member_type.id in (select ec.memberType_id from edu_course_member as ec where ec.course_Id=#{value})
+        </select>
+</mapper>

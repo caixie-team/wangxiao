@@ -1,0 +1,298 @@
+import org.apache.tools.ant.taskdefs.condition.Os
+/**
+ * 用于执行 grunt 任务
+ *
+ * 来自:
+ * http://blog.crisp.se/2013/04/30/yassalsundman/test-driving-javascript-grunt-with-gradle
+ */
+class GruntTask extends Exec {
+    private String gruntExecutable = Os.isFamily(Os.FAMILY_WINDOWS) ? "grunt.cmd" : "grunt"
+    def gruntArgs = ""
+
+    public GruntTask() {
+        super()
+        this.setExecutable(gruntExecutable)
+    }
+
+    public void setGruntArgs(String gruntArgs) {
+        this.args = "$gruntArgs".trim().split(" ") as List
+    }
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Settings
+
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+apply plugin: 'eclipse-wtp'
+apply plugin: 'war'
+//apply plugin: 'maven'
+//
+// 引入jar包定义
+// 这个文件中定义的jar包可以直接在子项目中使用，不需要再次使用 apply from 这个语句
+//
+apply from: 'dependency.gradle'
+allprojects {
+    //apply plugin: 'license'
+}
+subprojects { subproj ->
+    //group = project_group
+    // 这儿置为空值，否则 idea 生成的依赖包命名以此值开始
+    // 与 gradle 的打包规则有冲突
+    group = ""
+    apply plugin: 'java'
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+//    sourceCompatibility = 1.5
+//    targetCompatibility = 1.5
+    apply plugin: 'maven'
+    apply plugin: 'idea'
+    apply plugin: 'eclipse'
+    repositories {
+
+        mavenLocal()
+//        maven { url "https://repository.apache.org/content/repositories/releases/" }
+        maven { url 'http://maven.oschina.net/content/groups/public/' }
+
+//        maven { url "http://mirrors.ibiblio.org/pub/mirrors/maven2" }
+        mavenCentral()
+
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+        maven { url "https://oss.sonatype.org/service/local/staging/deploy/maven2/" }
+
+        jcenter()
+        //        maven { url 'http://maven.oschina.net/content/groups/public/' }
+
+///        maven { url 'http://maven.oschina.net/content/groups/public/' }
+//        maven {url "http://repos.someok.com/release"}
+//        maven {url "http://repos.dora.how/release"}
+    }
+//    jar {
+//        excludes = ['**/rebel.xml']
+//        doFirst {
+    // 生成jar 包的时候按此规则生成 manifest 文件
+//            manifest = defaultManifest({ subproj })
+//        }
+//    }
+//    task javadocJar(type: Jar, dependsOn: javadoc) {
+//        classifier = 'javadoc'
+//        from 'build/docs/javadoc'
+//        doFirst {
+//            manifest = defaultManifest({ subproj })
+//        }
+//    }
+//    task sourcesJar(type: Jar) {
+//        classifier = 'sources'
+//        from sourceSets.main.allSource
+//        doFirst {
+//            manifest = defaultManifest({ subproj })
+//        }
+//    }
+    // 编码改为 UTF-8, 否则编译源码的时候会出错
+    // 当然，这个需要根据自己的 java 源码的编码进行调整
+//    [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+    //
+//    artifacts {
+//        archives jar
+        // archives javadocJar
+//        archives sourcesJar
+//    }
+
+    // 执行 grunt 编译 js/less 等
+    //
+    task grunt(type: GruntTask) {
+        gruntArgs = "default"
+        // commandLine 'grunt.cmd', 'default'
+    }
+    configurations {
+        deployerJars
+        //
+        // 所有需要忽略的包定义在此
+        //
+//        all*.exclude group: 'commons-httpclient'
+//        all*.exclude group: 'commons-logging'
+//        all*.exclude group: 'commons-beanutils', module: 'commons-beanutils'
+    }
+    // 默认情况下gradle会选用版本最高的那个依赖，有时候会带来问题
+//    configurations.all {
+    // 有版本冲突的时候强制使用指定的版本，对于相关依赖也同样有效
+//        resolutionStrategy.force(
+//                "org.springframework:spring-core:${springVersion}",
+//        )
+//    }
+    dependencies {
+        // 用于上传自己项目的jar 包到中心 maven 库
+        deployerJars "org.apache.maven.wagon:wagon-ssh:2.2"
+        //
+        // 通用依赖
+        //
+        compile(
+                libraries.'logback',
+//                libraries.'jcl-over-slf4j',
+//                libraries.'log4j-over-slf4j',
+//
+//                libraries.'mysql'
+        )
+        //
+        // 引入根目录和各子项目下的libs中的jar包
+        //
+//        ext.jarTree = fileTree(dir: 'libs', include: '**/*.jar')
+//        ext.rootProjectLibs = new File(rootProject.rootDir, 'libs').getAbsolutePath()
+//        ext.jarTree += fileTree(dir: rootProjectLibs, include: '**/*.jar')
+//
+//        compile jarTree
+        //
+        // 测试依赖
+        //
+        testCompile(
+                libraries.'junit',
+//                libraries.'spring-test',
+//                libraries.'assertj'
+        )
+    }
+    // 上传 jar 包到自己的 maven 服务器
+    //
+    uploadArchives {
+        repositories.mavenDeployer {
+            //beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+            configuration = configurations.deployerJars
+            repository(
+                    // 这儿需要注意，后面的地址是服务器地址，需要写全，是个大坑啊
+                    // 另外初次执行的时候最好带上 --info 参数，会提示保存 ssh 验证信息的
+                    // 这时候需要输入 yes
+                    //
+                    // 更详细说明参见我的 blog: http://my.oschina.net/someok/blog/374562
+                    url: //"file://d:/Develop/MyProjects/repos/"
+                            "scp://repos.example.com:22/home/maven/repos/release"
+            )
+                    {
+                        // If these are not defined assemble needlessly fails for unrelated tasks, hence, defaultBlank.
+                        authentication(userName: "maven", password: "maven")
+                    }
+        }
+    }
+    // 显示当前项目下所有用于 compile 的 jar.
+    //
+    task listJars(description: 'Display all compile jars.') << {
+        configurations.compile.each { File file -> println file.name }
+    }
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Misc
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.3'
+}
+// 在idea 的 module 中忽略 projects 目录
+// project("projects") {
+//    ideaModule.enabled = false
+// }
+/**
+ * idea 里面忽略根项目，也就是说不将根项目设置为 module
+ */
+gradle.projectsEvaluated {
+    gradle.rootProject {
+        ideaModule.enabled = false
+        idea {
+            project {
+                // modules = subprojects*.idea.module
+                // 如果某个子项目的 ideaModule 设置为 false，则不会在 idea 中生成 module
+                def modulesToInclude = subprojects.findAll { it.ideaModule.enabled == true }
+                modules = modulesToInclude.idea.module
+            }
+        }
+    }
+}
+idea {
+    module {
+        downloadSources = true
+    }
+    project {
+        jdkName = 1.8
+        languageLevel = 1.8
+        vcs = 'Git'
+    }
+}
+/*
+project(':edugrow:core') {
+    ext{
+    }
+    dependencies {
+//        compile(
+//                project(':core'),
+//        )
+//        provided libraries.'servlet-api'
+//        provided libraries.'jstl'
+//        testCompile libraries.'junit'
+        compile(
+                libraries.'spring-core',
+                libraries.'spring-beans',
+                libraries.'spring-context',
+                libraries.'spring-context-support',
+                libraries.'spring-web',
+                libraries.'spring-webmvc',
+                libraries.'spring-aop',
+                libraries.'aspectjrt',
+                libraries.'aspectjweaver',
+                libraries.'spring-tx',
+                libraries.'spring-orm',
+                libraries.'spring-jdbc',
+                libraries.'spring-jms',
+                libraries.'mybatis',
+                libraries.'mybatis-spring',
+//            libraries.'ibatis-core',
+                libraries.'druid',
+                libraries.'mail',
+                libraries.'mysql',
+                libraries.'spymemcached',
+                libraries.'commons-fileupload',
+                libraries.'aopalliance',
+//            'aopalliance:aopallicance:1.0',
+                libraries.'commons-lang',
+                libraries.'commons-io',
+                libraries.'commons-net',
+                libraries.'commons-codec',
+                libraries.'commons-validator',
+                libraries.'commons-beanutils',
+                libraries.'commons-digester',
+                libraries.'commons-collections',
+                libraries.'commons-logging',
+                libraries.'commons-configuration',
+                libraries.'guava',
+                libraries.'log4j',
+                libraries.'slf4j-api',
+                libraries.'slf4j-log4j12',
+                libraries.'dom4j',
+                libraries.'urlrewritefilter',
+                libraries.'ezmorph',
+                libraries.'jrobin',
+                libraries.'json-lib',
+                libraries.'poi',
+                libraries.'ant',
+                'apache-httpclient:commons-httpclient:3.1',
+                // TODO 现在存在公共lib里
+//            'poi:poi-2.5.1-final:2004804',
+                libraries.'sitemesh',
+                libraries.'quartz',
+                libraries.'htmlcompressor',
+                libraries.'yuicompressor',
+                libraries.'hessian',
+                libraries.'ognl',
+                libraries.'gson',
+                libraries.'struts2-core',
+                libraries.'struts2-json-plugin',
+                libraries.'struts2-spring-plugin',
+                libraries.'velocity',
+                libraries.'velocity-tools',
+                libraries.'urlrewritefilter',
+                libraries.'jrobin',
+                libraries.'json-lib',
+                libraries.'ehcache-core',
+                libraries.'commons-net',
+                libraries.'UserAgentUtils',
+                libraries.'javamelody-core',
+                libraries.'jstl-api',
+                libraries.'jstl'
+        )
+    }
+}
+*/
+

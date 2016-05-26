@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserAreaMapper">
+
+	<resultMap id="UserAreaResult" type="UserArea">
+		<result property="id" column="id" />
+		<result property="parentId" column="parent_id" />
+		<result property="areaName" column="area_name" />
+		<result property="areaType" column="area_type" />
+	</resultMap>
+
+	<sql id="edu_user_area_columns">
+		edu_user_area.id,
+		edu_user_area.parent_id,
+		edu_user_area.area_name,
+		edu_user_area.area_type
+	</sql>
+
+	<sql id="edu_user_area_properties">
+		#{id},
+		#{parentId},
+		#{areaName},
+		#{areaType}
+	</sql>
+
+	<insert id="createUserArea" parameterType="UserArea" keyColumn="id"
+		keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_user_area (
+		<include refid="edu_user_area_columns" />
+		) VALUES (
+		<include refid="edu_user_area_properties" />
+		)
+	</insert>
+
+	<delete id="deleteUserAreaById" parameterType="Long">
+		delete from edu_user_area
+		where
+		id = #{value}
+	</delete>
+
+	<update id="updateUserArea" parameterType="UserArea">
+		update edu_user_area SET
+		id = #{id},
+		parent_id = #{parentId},
+		area_name = #{areaName},
+		area_type = #{areaType}
+		where
+		id = #{id}
+	</update>
+
+	<select id="getUserAreaById" resultMap="UserAreaResult"
+		parameterType="Long">
+		select
+		<include refid="edu_user_area_columns" />
+		from edu_user_area
+		where
+		id = #{value}
+	</select>
+
+	<select id="getUserAreaList" resultMap="UserAreaResult"
+		parameterType="UserArea">
+		select
+		<include refid="edu_user_area_columns" />
+		from edu_user_area
+		<where>
+			<if test="parentId!=null and parentId!=-1 ">
+				edu_user_area.parent_id = #{parentId}
+			</if>
+		</where>
+	</select>
+
+</mapper>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PhaseMapper">
+
+    <resultMap id="PhaseResult" type="Phase">
+        <result property="id" column="id"/>
+        <result property="planId" column="plan_id"/>
+        <result property="phaseName" column="phase_name"/>
+        <result property="phaseDescribe" column="phase_describe"/>
+        <result property="phaseRank" column="phase_rank"/>
+        <result property="status" column="status"/>
+    </resultMap>
+
+    <resultMap id="PhaseDTOResult" type="PhaseDTO" extends="PhaseResult">
+        <result property="studyTimeNo" column="hours" />
+    </resultMap>
+
+    <sql id="edu_plan_phase_columns">
+        edu_plan_phase.id,
+        edu_plan_phase.plan_id,
+        edu_plan_phase.phase_name,
+        edu_plan_phase.phase_describe,
+        edu_plan_phase.phase_rank,
+        edu_plan_phase.status
+    </sql>
+
+    <sql id="edu_plan_phase_properties">
+        #{id},
+        #{planId},
+        #{phaseName},
+        #{phaseDescribe},
+        #{phaseRank},
+        #{status}
+    </sql>
+
+    <insert id="createPhase" parameterType="Phase" keyColumn="id"
+            keyProperty="id" useGeneratedKeys="true">
+        insert into edu_plan_phase (
+        <include refid="edu_plan_phase_columns"/>
+        ) values (
+        <include refid="edu_plan_phase_properties"/>
+        )
+    </insert>
+
+    <delete id="deletePhaseById" parameterType="Long">
+        delete from edu_plan_phase  where edu_plan_phase.id=#{value}
+    </delete>
+
+    <!-- 修改学习阶段 -->
+    <update id="updatePhase" parameterType="Phase">
+        update edu_plan_phase SET
+        plan_id =#{planId},
+        phase_name = #{phaseName},
+        phase_describe = #{phaseDescribe},
+        phase_rank = #{phaseRank},
+        status = #{status}
+        where id=#{id}
+    </update>
+
+    <!-- 根据id查询学习阶段 -->
+    <select id="getPhaseById" resultMap="PhaseResult" parameterType="Long">
+        select
+        <include refid="edu_plan_phase_columns"/>
+        from edu_plan_phase
+        where edu_plan_phase.id=#{id}
+    </select>
+
+    <select id="getPhase" resultMap="PhaseResult" parameterType="Phase">
+        select
+        <include refid="edu_plan_phase_columns"/>
+        from edu_plan_phase
+        <where>
+            edu_plan_phase.status!=1
+            <if test="id!=null and id!=''">
+                and edu_plan_phase.id =#{id}
+            </if>
+            <if test="planId!=null and planId!=''">
+                and edu_plan_phase.plan_id =#{planId}
+            </if>
+            <if test="phaseRank!=null and phaseRank!=''">
+                and edu_plan_phase.phase_rank =#{phaseRank}
+            </if>
+            <if test="status!=null and status!=''">
+                and edu_plan_phase.status =#{status}
+            </if>
+        </where>
+    </select>
+
+    <select id="getPhaseList" resultMap="PhaseResult" parameterType="Phase">
+        select
+        <include refid="edu_plan_phase_columns"/>
+        from edu_plan_phase
+        <where>
+            edu_plan_phase.status!=1
+            <if test="id!=null and id!=''">
+                and edu_plan_phase.id =#{id}
+            </if>
+            <if test="planId!=null and planId!=''">
+                and edu_plan_phase.plan_id =#{planId}
+            </if>
+            <if test="status!=null and status!=''">
+                and edu_plan_phase.status =#{status}
+            </if>
+        </where>
+        order by edu_plan_phase.phase_rank
+    </select>
+
+    <select id="getPhaseDTOList" resultMap="PhaseDTOResult" parameterType="java.util.HashMap">
+        select
+        <include refid="edu_plan_phase_columns"/>,
+        SUM(edu_plan_phase_detail.hours) as hours
+        from edu_plan_phase
+        LEFT JOIN edu_plan_phase_detail ON edu_plan_phase.id = edu_plan_phase_detail.`phase_id`
+        <where>
+            <if test="e.planId!=null and e.planId>0">
+                and edu_plan_phase.plan_id =#{e.planId}
+            </if>
+        </where>
+        GROUP BY edu_plan_phase.id
+        order by edu_plan_phase.phase_rank
+        <include refid="publicMapper.pageEnd"/>
+    </select>
+
+    <select id="getPhaseDTOListCount" resultType="int" parameterType="java.util.HashMap">
+        select
+        count(1)
+        from edu_plan_phase
+        <where>
+            <if test="e.planId!=null and e.planId>0">
+                and edu_plan_phase.plan_id =#{e.planId}
+            </if>
+        </where>
+    </select>
+</mapper>

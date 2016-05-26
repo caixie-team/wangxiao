@@ -1,0 +1,260 @@
+/**
+ * 依赖包的定义。
+ *
+ * 这种定义方式的优点是在顶级项目目录下引入，在子项目中也可以直接用了。
+ *
+ */
+
+// 一些会重复出现的jar包的版本号
+// 
+ext.versions = [
+//        spring    : '3.2.9.RELEASE',
+spring    : '4.2.4.RELEASE',
+springboot: '1.3.1.RELEASE',
+security  : '4.2.4.RELEASE',
+//security  : '3.2.9.RELEASE',
+jackson   : '2.4.3',
+logback   : '1.0.13',
+slf4j     : '1.7.7',
+httpclient: '4.3.1',
+lucene    : '4.10.1',
+jfinal    : '2.0',
+resty     : '1.1.0-SNAPSHOT',
+springfox : '2.3.1'
+]
+
+// 各种可能会用到的jar包
+// 
+ext.libraries = [
+        // #1
+        "lombok"                  : "org.projectlombok:lombok:1.16.6",
+
+        "servlet-api"             : "javax.servlet:servlet-api:2.5",
+        "servlet"                 : "javax.servlet:javax.servlet-api:3.1.0",
+//        "standard"                : "standard:standard:1.2",
+        "jsp-api"                 : "javax.servlet:jsp-api:2.0",
+        "jstl-api"                : "javax.servlet.jsp.jstl:jstl-api:1.2",
+        "jstl"                    : "javax.servlet:jstl:1.2",
+
+        "persistence-api"         : "javax.persistence:persistence-api:1.0",
+        "validation-api"          : "javax.validation:validation-api:1.0.0.GA",
+        "jta"                     : "javax.transaction:jta:1.1",
+
+        "mysql"                   : "mysql:mysql-connector-java:5.1.39",
+
+        "aspectjrt"               : "org.aspectj:aspectjrt:1.7.4",
+        "aspectjweaver"           : "org.aspectj:aspectjweaver:1.7.4",
+
+        // Resty
+        //
+        "resty-route"             : "cn.dreampie:resty-route:${versions.resty}",
+        "resty-orm"               : "cn.dreampie:resty-orm:${versions.resty}",
+        "resty-security"          : "cn.dreampie:resty-security:${versions.resty}",
+        "resty-upload"            : "cn.dreampie:resty-upload:${versions.resty}",
+        "resty-client"            : "cn.dreampie:resty-client:${versions.resty}",
+        "resty-quartz"            : "cn.dreampie:resty-quartz:${versions.resty}",
+
+        // JFinal
+        //
+        "jfinal"                  : "com.jfinal:jfinal:${versions.jfinal}",
+        "jfinal-cos"              : "com.jfinal:cos:26Dec2008",
+        "jetty-server"            : "com.jfinal:jetty-server:8.1.8",
+
+        // spring boot
+        //
+        "spring-boot"             : "org.springframework.boot:spring-boot-starter-parent:${versions.springboot}",
+        "spring-boot-gradle"      : "org.springframework.boot:spring-boot-gradle-plugin:${versions.springboot}",
+
+        // spring 3.1.2
+        // spring 4.x
+        //
+        "spring-core"             : "org.springframework:spring-core:${versions.spring}",
+        "spring-beans"            : "org.springframework:spring-beans:${versions.spring}",
+        "spring-jdbc"             : "org.springframework:spring-jdbc:${versions.spring}",
+        "spring-tx"               : "org.springframework:spring-tx:${versions.spring}",
+        "spring-context"          : "org.springframework:spring-context:${versions.spring}",
+        "spring-context-support"  : "org.springframework:spring-context-support:${versions.spring}",
+
+        "spring-orm"              : "org.springframework:spring-orm:${versions.spring}",
+        "spring-oxm"              : "org.springframework:spring-oxm:${versions.spring}",
+        "spring-web"              : "org.springframework:spring-web:${versions.spring}",
+        "spring-webmvc"           : "org.springframework:spring-webmvc:${versions.spring}",
+        "spring-jms"              : "org.springframework:spring-jms:${versions.spring}",
+        "spring-aop"              : "org.springframework:spring-aop:${versions.spring}",
+        "spring-aspects"          : "org.springframework:spring-aspects:${versions.spring}",
+
+        "spring-websocket"        : "org.springframework:spring-websocket:${versions.spring}",
+        "spring-messaging"        : "org.springframework:spring-messaging:${versions.spring}",
+
+        "spring-test"             : "org.springframework:spring-test:${versions.spring}",
+
+        // Spring security
+        // 
+        "spring-security-core"    : "org.springframework.security:spring-security-core:${versions.security}",
+        "spring-security-web"     : "org.springframework.security:spring-security-web:${versions.security}",
+        "spring-security-config"  : "org.springframework.security:spring-security-config:${versions.security}",
+        "spring-security-taglibs" : "org.springframework.security:spring-security-taglibs:${versions.security}",
+
+        // lucene
+        "lucene-core"             : "org.apache.lucene:lucene-core:${versions.lucene}",
+        "lucene-analyzers-common" : "org.apache.lucene:lucene-analyzers-common:${versions.lucene}",
+        "lucene-analyzers-smartcn": "org.apache.lucene:lucene-analyzers-smartcn:${versions.lucene}",
+        "lucene-queries"          : "org.apache.lucene:lucene-queries:${versions.lucene}",
+        "lucene-queryparser"      : "org.apache.lucene:lucene-queryparser:${versions.lucene}",
+        "lucene-highlighter"      : "org.apache.lucene:lucene-highlighter:${versions.lucene}",
+        "lucene-spatial"          : "org.apache.lucene:lucene-spatial:4.6.0",
+
+        // Mybatis
+        "mybatis"                 : "org.mybatis:mybatis:3.3.0",
+        "mybatis-spring"          : "org.mybatis:mybatis-spring:1.2.3",
+
+        "ibatis-sqlmap"           : "org.apache.ibatis:ibatis-sqlmap:2.3.4.726",
+        "ibatis-core"             : "org.apache.ibatis:ibatis-core:3.0",
+
+        // Apache Struts
+        "struts2-core"            : "org.apache.struts:struts2-core:${versions.struts}",
+        "struts2-json-plugin"     : "org.apache.struts:struts2-json-plugin:${versions.struts}",
+        "struts2-spring-plugin"   : "org.apache.struts:struts2-spring-plugin:${versions.struts}",
+        "velocity-tools"          : "org.apache.velocity:velocity-tools:2.0",
+
+        // 忽略common log，使用slf4j代替
+        // 
+        "logback"                 : "ch.qos.logback:logback-classic:${versions.logback}",
+        "logback-core"            : "ch.qos.logback:logback-core:${versions.logback}",
+        "jcl-over-slf4j"          : "org.slf4j:jcl-over-slf4j:${versions.slf4j}",
+        "log4j-over-slf4j"        : "org.slf4j:log4j-over-slf4j:${versions.slf4j}",
+        "slf4j-api"               : "org.slf4j:slf4j-api:${versions.slf4j}",
+
+        // JSON 
+        // 
+//        "jackson-core-asl"        : "org.codehaus.jackson:jackson-core-asl:${versions.jackson}",
+//        "jackson-mapper-asl"      : "org.codehaus.jackson:jackson-mapper-asl:${versions.jackson}",
+        "jackson-databind"        : "com.fasterxml.jackson.core:jackson-databind:${versions.jackson}",
+        "jackson-annotations"     : "com.fasterxml.jackson.core:jackson-annotations:${versions.jackson}",
+        "jackson"                 : "com.fasterxml.jackson.core:jackson-core:${versions.jackson}",
+
+        // Apache
+        // 
+        "commons-dbcp"            : "commons-dbcp:commons-dbcp:1.4",
+        "commons-beanutils-core"  : "commons-beanutils:commons-beanutils-core:1.8.3",
+        "commons-beanutils"       : "commons-beanutils:commons-beanutils:1.8.3",
+        "commons-collections"     : "commons-collections:commons-collections:3.2.1",
+        "commons-logging"         : "commons-logging:commons-logging:1.2",
+        "commons-configuration"   : "commons-configuration:commons-configuration:1.10",
+        "commons-lang3"           : "org.apache.commons:commons-lang3:3.1",
+        "commons-lang"            : "commons-lang:commons-lang:2.6",
+        "commons-digester3"       : "org.apache.commons:commons-digester3:3.2",
+        "commons-digester"        : "commons-digester:commons-digester:1.8",
+        "commons-httpclient"      : "commons-httpclient:commons-httpclient:3.0",
+        "commons-fileupload"      : "commons-fileupload:commons-fileupload:1.3",
+        "commons-codec"           : "commons-codec:commons-codec:1.9",
+        "commons-validator"       : "commons-validator:commons-validator:1.3.1",
+        // "commons-io": "org.apache.commons:commons-io:1.3.2",
+        "commons-io"              : "commons-io:commons-io:2.4",
+        "commons-net"             : "commons-net:commons-net:3.3",
+        "commons-csv"             : 'org.apache.commons:commons-csv:1.1',
+        "commons-email"           : 'org.apache.commons:commons-email:1.3.3',
+
+
+        "aopalliance"             : "aopalliance:aopalliance:1.0",
+
+        "velocity"                : "org.apache.velocity:velocity:1.7",
+        "freemarker"              : "org.freemarker:freemarker:2.3.20",
+        "beetl"                   : "com.ibeetl:beetl:2.2.5",
+        "beetlsql"                   : "com.ibeetl:beetlsql:2.3.5",
+        "btjson"                  : "com.ibeetl:btjson:0.94",
+
+        "httpclient"              : "org.apache.httpcomponents:httpclient:${versions.httpclient}",
+        "httpmime"                : "org.apache.httpcomponents:httpmime:${versions.httpclient}",
+
+        "UserAgentUtils"          : "nl.bitwalker:UserAgentUtils:1.2.4",
+        "javamelody-core"         : "net.bull.javamelody:javamelody-core:1.49.0",
+
+        "ant"                     : "org.apache.ant:ant:1.9.2",
+        "poi"                     : "org.apache.poi:poi:3.13",
+        "poi-ooxml"               : "org.apache.poi:poi-ooxml:3.13",
+        "poi-scratchpad"          : "org.apache.poi:poi-scratchpad:3.13",
+
+        "jxls-core"               : "net.sf.jxls:jxls-core:1.0.5",
+        "jxls-reader"             : "net.sf.jxls:jxls-reader:1.0.5",
+
+        // ActiveMQ `
+        // 
+        // "activemq-all": "org.apache.activemq:activemq-all:5.2.0",
+        "c3p0"                    : "c3p0:c3p0:0.9.1.2",
+        "druid"                   : "com.alibaba:druid:1.0.19",
+
+        // Cache
+        //
+        "ehcache-core"            : "net.sf.ehcache:ehcache-core:2.6.6",
+        "ehcache"                 : "net.sf.ehcache:ehcache:2.8.3",
+        "jedis"                   : "redis.clients:jedis:2.6.2",
+
+        // Mail
+        // 
+        "mail"                    : "javax.mail:mail:1.4",
+        "activation"              : "javax.activation:activation:1.1.1",
+        "im4java"                 : "org.im4java:im4java:1.4.0",
+
+        // joda
+        //
+        "joda-money"              : "org.joda:joda-money:0.10.0",
+        "joda-beans"              : "org.joda:joda-beans:1.6",
+        "joda-convert"            : "org.joda:joda-convert:1.8",
+        "joda-collect"            : "org.joda:joda-collect:0.7",
+        "joda-primitives"         : "org.joda:joda-primitives:1.0",
+        "joda-time"               : "joda-time:joda-time:2.8.2",
+
+        // webjars
+        //
+        "jquery"                  : "org.webjars:jquery:2.1.4",
+        "semantic"                : "org.webjars:Semantic-UI:2.1.4",
+        "require-js"              : "org.webjars:requirejs:2.1.20",
+        "require-css"             : "org.webjars:require-css:0.1.8-1",
+        "bootstrap-datepicker"    : "org.webjars:bootstrap-datepicker:1.4.0",
+        "jquery-file-upload"      : "org.webjars:jquery-file-upload:9.10.1",
+
+        // Other
+        //
+        "gson"                    : "com.google.code.gson:gson:2.4",
+        "guava"                   : "com.google.guava:guava:18.0",
+        "jaxen"                   : "jaxen:jaxen:1.1.6",
+        "swagger-ui"              : "io.springfox:springfox-swagger-ui:${versions.springfox}",
+        "swagger"                 : "io.springfox:springfox-swagger2:${versions.springfox}",
+        "cors-filter"             : "com.thetransactioncompany:cors-filter:2.4",
+
+        "htmlparser"              : "org.htmlparser:htmlparser:2.1",
+        "htmlcompressor"          : "com.googlecode.htmlcompressor:htmlcompressor:1.5.2",
+        // "mvel2": "org.mvel:mvel2:2.0.9",
+        "xstream"                 : "com.thoughtworks.xstream:xstream:1.4.5",
+        "jsoup"                   : "org.jsoup:jsoup:1.7.2",
+        "ezmorph"                 : "net.sf.ezmorph:ezmorph:1.0.6",
+        "jrobin"                  : "org.jrobin:jrobin:1.5.9",
+        "hessian"                 : "com.caucho:hessian:3.1.5",
+        "ognl"                    : "ognl:ognl:3.0.8",
+        "quartz"                  : "org.quartz-scheduler:quartz:2.2.1",
+        "spymemcached"            : "net.spy:spymemcached:2.10.3",
+        "json-lib"                : "net.sf.json-lib:json-lib:2.4:jdk15@jar",
+        "fastjson"                : "com.alibaba:fastjson:1.2.5",
+        "dom4j"                   : "dom4j:dom4j:1.6.1",
+        "urlrewritefilter"        : "org.tuckey:urlrewritefilter:4.0.4",
+        "junit"                   : "junit:junit:4.11",
+        "yuicompressor"           : "com.yahoo.platform.yui:yuicompressor:2.4.7",
+        "sitemesh"                : "opensymphony:sitemesh:2.4.2",
+        "assertj"                 : "org.assertj:assertj-core:1.6.0",
+
+        "thumbnailator"           : "net.coobird:thumbnailator:0.4.7",
+        "snakeyaml"               : "org.yaml:snakeyaml:1.14",
+        "jpinyin"                 : "com.github.stuxuhai:jpinyin:1.0",
+
+]
+
+// #1 lombok 提供了简单的注解的形式来帮助我们简化消除一些必须有但显得很臃肿的 java 代码
+/// @Data   ：注解在类上；提供类所有属性的 getting 和 setting 方法，此外还提供了equals、canEqual、hashCode、toString 方法
+/// @Setter：注解在属性上；为属性提供 setting 方法
+/// @Getter：注解在属性上；为属性提供 getting 方法
+/// @Log4j ：注解在类上；为类提供一个 属性名为log 的 log4j 日志对象
+/// @NoArgsConstructor：注解在类上；为类提供一个无参的构造方法
+/// @AllArgsConstructor：注解在类上；为类提供一个全参的构造方法
+
+// #2 Jaxen是一个Java编写的开源的XPath库。这是适应多种不同的对象模型，包括DOM，XOM，dom4j和JDOM。也可以作为适配器，转换Java字节代码或XML的Java bean为xml，从而使您可以使用XPath查询这些树了。

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserFeedbackMapper">
+
+	<resultMap id="UserFeedbackResult" type="UserFeedback">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="content" column="content" />
+		<result property="qq" column="qq" />
+		<result property="mobile" column="mobile" />
+		<result property="email" column="email" />
+		<result property="name" column="name" />
+		<result property="createTime" column="create_time" />
+	</resultMap>
+
+	<sql id="edu_user_feedback_columns">
+		edu_user_feedback.id,
+		edu_user_feedback.user_id,
+		edu_user_feedback.content,
+		edu_user_feedback.qq,
+		edu_user_feedback.mobile,
+		edu_user_feedback.email,
+		edu_user_feedback.name,
+		edu_user_feedback.create_time
+	</sql>
+
+	<sql id="edu_user_feedback_properties">
+		#{id},
+		#{userId},
+		#{content},
+		#{qq},
+		#{mobile},
+		#{email},
+		#{name},
+		#{createTime}
+	</sql>
+
+	<insert id="createUserFeedback" parameterType="UserFeedback"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_user_feedback (
+		<include refid="edu_user_feedback_columns" />
+		) VALUES (
+		<include refid="edu_user_feedback_properties" />
+		)
+	</insert>
+
+	<delete id="deleteUserFeedbackById" parameterType="Long">
+		delete from
+		edu_user_feedback
+		where
+		id = #{value}
+
+
+
+
+
+
+
+	</delete>
+
+	<update id="updateUserFeedback" parameterType="UserFeedback">
+		update
+		edu_user_feedback set
+		id = #{id},
+		user_id = #{userId},
+		content = #{content},
+		qq = #{qq},
+		mobile = #{mobile},
+		email = #{email},
+		name = #{name}
+		where
+		id = #{id}
+
+
+
+
+	</update>
+
+	<select id="getUserFeedbackById" resultMap="UserFeedbackResult"
+		parameterType="Long">
+		select
+		<include refid="edu_user_feedback_columns" />
+		from edu_user_feedback
+		where
+		id = #{value}
+
+	</select>
+
+	<select id="getUserFeedbackList" resultMap="UserFeedbackResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="edu_user_feedback_columns" />
+		from edu_user_feedback
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="getUserFeedbackListCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select
+		count(1)
+		from edu_user_feedback
+	</select>
+
+
+</mapper>

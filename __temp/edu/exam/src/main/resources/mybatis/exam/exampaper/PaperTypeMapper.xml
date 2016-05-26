@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PaperTypeMapper">
+	<resultMap id="PaperTypeResult" type="PaperType">
+		<result property="id" column="id"/>
+		<result property="title" column="title"/>
+		<result property="describtion" column="describtion"/>
+		<result property="buttonTitle" column="button_title"/>
+		<result property="imgUrl" column="img_url"/>
+		<result property="addTime" column="ADDTIME"/>
+		<result property="state" column="state"/>
+		<result property="sort" column="sort"/>
+	</resultMap>
+	<sql id="exam_paper_type_columns">
+		exam_paper_type.id,
+		exam_paper_type.title,
+		exam_paper_type.describtion,
+		exam_paper_type.button_title,
+		exam_paper_type.img_url,
+		exam_paper_type.ADDTIME,
+		exam_paper_type.state,
+		exam_paper_type.sort
+	</sql>
+	
+	<sql id="exam_paper_type_properties">
+		#{id},
+		#{title},
+		#{describtion},
+		#{buttonTitle},
+		#{imgUrl},
+		#{addTime},
+		#{state},
+		#{sort}
+		
+	</sql>
+	
+	 <insert id="createPaper" parameterType="PaperType" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO exam_paper_type (<include refid="exam_paper_type_columns"/>) VALUES (<include
+            refid="exam_paper_type_properties"/>)
+    </insert>
+    
+    <!-- 查询试卷类型 -->
+    <select id="queryPaperTypeList" parameterType="java.util.HashMap" resultMap="PaperTypeResult">
+		select <include refid="exam_paper_type_columns"/>
+		from exam_paper_type 
+		order by sort desc
+	</select>
+	
+	 <select id="queryPaperTypeById" parameterType="java.util.HashMap" resultMap="PaperTypeResult">
+		select <include refid="exam_paper_type_columns"/>
+		from exam_paper_type 
+		where 
+		id = #{id}
+	</select>
+	
+	 <select id="queryPaperTypeListByState" parameterType="java.util.HashMap" resultMap="PaperTypeResult">
+		select <include refid="exam_paper_type_columns"/>
+		from exam_paper_type 
+		where 
+		state = #{state}
+		order by sort desc
+	</select>
+	
+	<update id="updatePaperTypeById" parameterType="java.util.HashMap" >
+ 		update exam_paper_type set title=#{title},describtion=#{describtion},button_title=#{buttonTitle},img_url=#{imgUrl},
+ 		state=#{state},sort=#{sort}
+ 		 where id=#{id,jdbcType=INTEGER}
+	</update>
+	
+</mapper>

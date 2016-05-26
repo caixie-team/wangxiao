@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<title>资讯中心 | 理臣教育</title>
+	<meta name="author" content=""/>
+	<meta name="keywords" content="" />
+	<meta name="description" content="" />
+	<link rel="stylesheet" type="text/css" href="${staticServer}/static/cms/css/style.css">
+	<script type="text/javascript" src="${staticServer}/static/common/jquery-1.11.1.min.js"></script>
+	<script type="text/javascript" src="${staticServer}/static/common/webutils.js"></script>
+	<script type="text/javascript" src="${staticServer}/static/cms/js/cms-util.js"></script>
+	<!--[if lt IE 9]><script src="${staticServer}/static/common/html5.js" type="text/javascript"></script><![endif]-->
+	<script type="text/javascript">
+	
+	function checkLichen(type){
+		$("li[name='lichen']").removeClass();
+		$("#lichen"+type).addClass("current");
+		$("div[name='lShow']").hide();
+		$("#lShow"+type).show();
+	}
+	function checkHangye(type){
+		$("li[name='hangye']").removeClass();
+		$("#hangye"+type).addClass("current");
+		$("div[name='hShow']").hide();
+		$("#hShow"+type).show();
+	}
+	function checkShequ(type){
+		$("li[name='shequ']").removeClass();
+		$("#shequ"+type).addClass("current");
+		$("div[name='sShow']").hide();
+		$("#sShow"+type).show();
+	}
+	function getSearch(){
+		var search=$("#search").val();
+		if(search==""){
+			search="0";
+		}
+		window.open("$!{staticServer}/line/course/search/"+search); 
+	};
+	</script>
+</head>
+<body>
+	#parse("/cms_header.vm")
+	<!-- cms main begin -->
+	<div class="container-i">
+		<article class="mt20">
+			<section class="cms-l">
+				<div class="mr30">
+					<div id="cms-slider">
+						<ul>
+						#set($bannerList=$cmsArticleService.getArticleByCondition(0,"2",0))
+						#foreach($a in $bannerList)
+							<li>
+								<a target="_blank" href="#if(${a.linkUrl}=='') javascript:void(0);#else ${articleUrl}/$!{a.linkUrl} #end">
+									<img alt="" src="$staticImageServer/$a.imageUrl">
+									<p class="cs-txt"><span>$!{a.title}</span></p>
+								</a>
+							</li>
+						#end
+						</ul>
+					</div><!--focus end-->
+				</div>
+			</section>
+			<aside class="cms-r">
+				#set($newList=$cmsArticleService.getArticleByType(0, 4, "", 0))
+				#foreach($a in $newList)
+				<section class="h-c-r-h2">
+					<h2 class="unFw"><a href="#if(${a.linkUrl}=='') javascript:void(0);#else ${articleUrl}/$!{a.linkUrl} #end" title="" class="c-333 f-fM">$!{a.title}</a></h2>
+					<div class="h-c-r-desc">
+						<p>$!{a.summary}</p>
+					</div>
+				</section>
+				#end
+			</aside>
+			<div class="clear"></div>
+		</article>
+		<article class="mt20">
+			<header class="cms-c-title">
+				<h4 class="">热门专题</h4>
+				<div class="clear"></div>
+			</header>
+			<!-- /cms-c-title -->
+			<div class="activities-list">
+				<ol class="clearfix">
+					#set($zhuantiList=$cmsArticleService.getArticleByCondition(28,"",0))
+					#foreach($a in $zhuantiList)
+					<li>
+						<a href="#if(${a.linkUrl}=='') javascript:void(0);#else ${articleUrl}/$!{a.linkUrl} #end" title="">
+							<img src="$staticImageServer/$a.imageUrl" width="220" height="120" alt="">
+							<p class="mt10 hLh20">$!{a.title}</p>
+						</a>
+					</li>
+					#end
+				</ol>
+			</div>
+		</article>
+		<article class="mt30">
+			<header class="cms-c-title">
+				<h4 class="">理臣资讯</h4>
+				<ul>
+					#set($typeList=$lineArticleTypeService.queryChildTypeListByParentId(2))##里臣咨询类型
+					#set($c=1)
+					#foreach($t in $typeList)
+						<li id="lichen$c"  name="lichen" #if($c==1) class="current" #end><a href="javascript:checkLichen($c)" title="$t.typeName">$t.typeName</a></li>
+						#set($c=$c+1)
+					#end
+				</ul>
+				<div class="clear"></div>
+			</header>
+			<!-- /cms-c-title -->
+			<div class="mt20">
+				<section class="cms-l" style="width:250px;">
+					<div class="mr30">
+						<aside class="c-l-200">
+							<div id="sub-slider" class="sub-slider">
+								<ul>
+								#set($articleList=$cmsArticleService.getArticleByCondition(2,"1",5))##里臣推荐资讯
+								#foreach($a in $articleList)
+									<li>
+										<a target="_blank" href="#if(${a.linkUrl}=='') javascript:void(0);#else ${articleUrl}/$!{a.linkUrl} #end">
+											<img alt="" src="$staticImageServer/$a.imageUrl">
+											<p class="cs-txt"><span>$!{a.title}</span></p>
+										</a>
+									</li>
+								#end
+								</ul>
+							</div>
+						</aside>
+					</div>
+				</section>
+				
+				#set($c=1)
+				#foreach($t in $typeList)
+				<div id="lShow$c" name="lShow" #if($c!=1) style="display: none" #end>
+				
+				#set($cc=1)
+				#set($articleList=$cmsArticleService.getArticleByCondition($!{t.typeId},"",10))
+				<aside class="cms-r" style="margin-right:40px;">
+					<div class="hot-c-box">
+						#foreach($a in $articleList)
+							#if($cc==1)
+								<a href="#if(${a.linkUrl}=='') javascript:void(0);#else ${articleUrl}/$!{a.linkUrl} #end" title=""><img src="$staticImageServer/$!{a.imageUrl}" width="165" height="90" class="dis fl mr10" alt=""></a>
+									<section class="h-c-r-desc">
+										$!{a.title}
+									</section>
+								<section class="mt20 tar">
+									<span class="c-999">$dateTool.format('yyyy-MM-dd',$!{a.addTime})</span>
+								</section>
+							#end
+							#set($cc=$cc+1)
+						#end
+					</div>
+					<ul class="cms-clist">
+						#set($cc=1)
+						#foreach($a in $articleList)
+							#if($cc>2&&$cc<7)
+								<li><a href="#if(${a.linkUrl}=='') javascript:void(0);#else ${articleUrl}/$!{a.linkUrl} #end" title="$!{a.title}"><em>·</em>$!{a.title}</a></li>
+							#end
+							#set($cc=$cc+1)
+						#end
+					</ul>
+				</aside>
+				#set($cc=1)
+				<aside class="cms-r">
+					<div class="hot-c-box">
+						#foreach($a in $articleList)
+							#if($cc==2)
+								<a href="#if(${a.linkUrl}=='') javascript:void(0);#else ${articleUrl}/$!{a.linkUrl} #end" title=""><img src="$staticImageServer/$!{a.imageUrl}" width="165" height="90" class="dis fl mr10" alt=""></a>
+								<section class="h-c-r-desc">
+									$!{a.title}
+								</section>
+								<section class="mt20 tar">
+									<span class="c-999">$dateTool.format('yyyy-MM-dd',$!{a.addTime})</span>
+								</section>
+							#end
+							#set($cc=$cc+1)
+						#end
+					</div>
+					<ul class="cms-clist">
+						#set($cc=1)
+						#foreach($a in $articleList)
+							#if($cc>=7&&$cc<12)
+								<li><a href="#if(${a.linkUrl}=='') javascript:void(0);#else ${articleUrl}/$!{a.linkUrl} #end" title=""><em>·</em>$!{a.title}</a></li>
+							#end
+							#set($cc=$cc+1)
+						#end
+					</ul>
+				</aside>
+				</div>
+				#set($c=$c+1)
+				#end
+				<div class="clear"></div>
+			</div>
+		</article>
+		<!-- /ads-cms begin -->
+		<article class="mt20">
+			<a href="" title=""><img src="${staticServer}/static/edu/images/lc_official_line/ts-banner.jpg" width="1000" height="120" class="dis" alt=""></a>
+		</article>
+		<!-- /ads-cms end -->
+		<article class="mt30">
+			<header class="cms-c-title">
+				<h4 class="">行业资讯</h4>
+				<ul>
+					#set($typeList=$lineArticleTypeService.queryChildTypeListByParentId(4))##行业咨询类型
+					#set($c=1)
+					#foreach($t in $typeList)
+						<li id="hangye$c"  name="hangye" #if($c==1) class="current" #end><a href="javascript:checkHangye($c)" title="$t.typeName">$t.typeName</a></li>
+						#set($c=$c+1)
+					#end
+				</ul>
+				<div class="clear"></div>
+			</header>
+			<!-- /cms-c-title -->
+			<div class="mt20">
+				<section class="cms-l" style="width:250px;">
+					<div class="mr30">
+						<aside class="c-l-200">
+							<div id="sub-slider2" class="sub-slider">
+								<ul>
+								#set($articleList=$cmsArticleService.getArticleByCondition(4,"1",5))##行业推荐资讯
+								#foreach($a in $articleList)
+									<li>
+										<a target="_blank" href="#if(${a.linkUrl}=='') javascript:void(0);#else ${articleUrl}/$!{a.linkUrl} #end">
+											<img alt="" src="$staticImageServer/$a.imageUrl">
+											<p class="cs-txt"><span>$!{a.title}</span></p>
+										</a>
+									</li>
+								#end
+								</ul>
+							</div>
+						</aside>
+					</div>
+					
+				</section>
+				#set($c=1)
+				#foreach($t in $typeList)
+				<div id="hShow$c" name="hShow" #if($c!=1) style="display: none" #end>
+				
+				#set($cc=1)
+				#set($articleList=$cmsArticleService.getArticleByCondition($!{t.typeId},"",10))
+				<aside class="cms-r" style="margin-right:40px;">
+					<div class="hot-c-box">
+						#foreach($a in $articleList)
+							#if($cc==1)
+								<a href="#if(${a.linkUrl}=='') javascript:void(0);#else ${articleUrl}/$!{a.linkUrl} #end" title=""><img src="$staticImageServer/$!{a.imageUrl}" width="165" height="90" class="dis fl mr10" alt=""></a>
+									<section class="h-c-r-desc">
+										$!{a.title}
+									</section>
+								
+								<section class="mt20 tar">
+									<span class="c-999">$dateTool.format('yyyy-MM-dd',$!{a.addTime})</span>
+								</section>
+							#end
+							#set($cc=$cc+1)
+						#end
+					</div>
+					<ul class="cms-clist">
+						#set($cc=1)
+						#foreach($a in $articleList)
+							#if($cc>2&&$cc<7)
+								<li><a href="#if(${a.linkUrl}=='') javascript:void(0);#else ${articleUrl}/$!{a.linkUrl} #end" title="$!{a.title}"><em>·</em>$!{a.title}</a></li>
+							#end
+							#set($cc=$cc+1)
+						#end
+					</ul>
+				</aside>
+				#set($cc=1)
+				<aside class="cms-r">
+					<div class="hot-c-box">
+						#foreach($a in $articleList)
+							#if($cc==2)
+								<a href="#if(${a.linkUrl}=='') javascript:void(0);#else ${articleUrl}/$!{a.linkUrl} #end" title=""><img src="$staticImageServer/$!{a.imageUrl}" width="165" height="90" class="dis fl mr10" alt=""></a>
+								<section class="h-c-r-desc">
+									$!{a.title}
+								</section>
+								<section class="mt20 tar">
+									<span class="c-999">$dateTool.format('yyyy-MM-dd',$!{a.addTime})</span>
+								</section>
+							#end
+							#set($cc=$cc+1)
+						#end
+					</div>
+					<ul class="cms-clist">
+						#set($cc=1)
+						#foreach($a in $articleList)
+							#if($cc>=7&&$cc<12)
+								<li><a href="#if(${a.linkUrl}=='') javascript:void(0);#else ${articleUrl}/$!{a.linkUrl} #end" title=""><em>·</em>$!{a.title}</a></li>
+							#end
+							#set($cc=$cc+1)
+						#end
+					</ul>
+				</aside>
+				</div>
+				#set($c=$c+1)
+				#end
+				<div class="clear"></div>
+			</div>
+		</article>
+		<article class="mt30">
+			<header class="cms-c-title">
+				<h4 class="">社区资讯</h4>
+				<ul>
+					#set($typeList=$lineArticleTypeService.queryChildTypeListByParentId(5))##社区咨询类型
+					#set($c=1)
+					#foreach($t in $typeList)
+						<li id="shequ$c"  name="shequ" #if($c==1) class="current" #end><a href="javascript:checkShequ($c)" title="$t.typeName">$t.typeName</a></li>
+						#set($c=$c+1)
+					#end
+				</ul>
+				<div class="clear"></div>
+			</header>
+			<!-- /cms-c-title -->
+			<div class="mt20">
+				<section class="cms-l" style="width:250px;">
+					<div class="mr30">
+						<aside class="c-l-200">
+							#set($articleList=$cmsArticleService.getArticleByCondition(5,"1",0))
+							<div>
+								#set($c=1)
+								#foreach($a in $articleList)
+									#if($c==1)
+										<a href="#if(${a.linkUrl}=='') javascript:void(0);#else ${articleUrl}/$!{a.linkUrl} #end" title="">
+										<img src="$staticImageServer/$a.imageUrl" width="220" height="120" class="dis" alt="">
+										<p class="mt10 hLh20 of"><span class="fsize14 c-4e">$!{a.title}</span></p>
+										</a>
+									#end
+									#set($c=$c+1)
+								#end
+								
+							</div>
+							<div class="pt10">
+								<ul class="cms-clist">
+									#set($c=1)
+									#foreach($a in $articleList)
+										#if($c>1)
+										<li><a title="" href="#if(${a.linkUrl}=='') javascript:void(0);#else ${articleUrl}/$!{a.linkUrl} #end"><em>·</em>$!{a.title}</a></li>
+										#end
+										#set($c=$c+1)
+									#end
+								</ul>
+							</div>
+						</aside>
+						
+					</div>
+				</section>
+				#set($c=1)
+				#foreach($t in $typeList)
+				<div id="sShow$c" name="sShow" #if($c!=1) style="display: none" #end>
+				
+				#set($cc=1)
+				#set($articleList=$cmsArticleService.getArticleByCondition($!{t.typeId},"",10))
+				<aside class="cms-r" style="margin-right:40px;">
+					<div class="hot-c-box">
+						#foreach($a in $articleList)
+							#if($cc==1)
+								<a href="#if(${a.linkUrl}=='') javascript:void(0);#else ${articleUrl}/$!{a.linkUrl} #end" title=""><img src="$staticImageServer/$!{a.imageUrl}" width="165" height="90" class="dis fl mr10" alt=""></a>
+									<section class="h-c-r-desc">
+										$!{a.title}
+									</section>
+								
+								<section class="mt20 tar">
+									<span class="c-999">$dateTool.format('yyyy-MM-dd',$!{a.addTime})</span>
+								</section>
+							#end
+							#set($cc=$cc+1)
+						#end
+					</div>
+					<ul class="cms-clist">
+						#set($cc=1)
+						#foreach($a in $articleList)
+							#if($cc>2&&$cc<7)
+								<li><a href="#if(${a.linkUrl}=='') javascript:void(0);#else ${articleUrl}/$!{a.linkUrl} #end" title="$!{a.title}"><em>·</em>$!{a.title}</a></li>
+							#end
+							#set($cc=$cc+1)
+						#end
+					</ul>
+				</aside>
+				#set($cc=1)
+				<aside class="cms-r">
+					<div class="hot-c-box">
+						#foreach($a in $articleList)
+							#if($cc==2)
+								<a href="#if(${a.linkUrl}=='') javascript:void(0);#else ${articleUrl}/$!{a.linkUrl} #end" title=""><img src="$staticImageServer/$!{a.imageUrl}" width="165" height="90" class="dis fl mr10" alt=""></a>
+								<section class="h-c-r-desc">
+									$!{a.title}
+								</section>
+								<section class="mt20 tar">
+									<span class="c-999">$dateTool.format('yyyy-MM-dd',$!{a.addTime})</span>
+								</section>
+							#end
+							#set($cc=$cc+1)
+						#end
+					</div>
+					<ul class="cms-clist">
+						#set($cc=1)
+						#foreach($a in $articleList)
+							#if($cc>=7&&$cc<12)
+								<li><a href="#if(${a.linkUrl}=='') javascript:void(0);#else ${articleUrl}/$!{a.linkUrl} #end" title=""><em>·</em>$!{a.title}</a></li>
+							#end
+							#set($cc=$cc+1)
+						#end
+					</ul>
+				</aside>
+				</div>
+				#set($c=$c+1)
+				#end
+				<div class="clear"></div>
+			</div>
+		</article>
+	</div>
+	<!-- cms main end -->
+	<!-- cms footer begin -->
+	#parse("/cms_bottom.vm")
+	<!-- cms footer end -->
+	<script type="text/javascript">
+		$(function() {
+			sSlider("#cms-slider");
+			sSlider("#sub-slider");
+			sSlider("#sub-slider2");
+		});
+		//公共左右滚动图片幻灯片插件
+		function sSlider(sWrap) {
+			var sBox = $(sWrap);
+			var sUl = sBox.find("ul").eq(0);
+			var sWidth = sBox.width();
+			var len = sUl.find("li").length;
+			var index = 0;
+			var picTimer;
+			var btnBg = "<div class='btnBg'></div>";
+			var btn = "<div class='btn'>";
+			for (var i = 0; i < len; i++) {
+				btn += "<span></span>";
+			}
+			btn += "</div>";
+			//sBox.prepend(btnBg);
+			sBox.append(btn);
+			var sBtn = sBox.find(".btn");
+			//sBox.find(".cs-txt").css("opacity", 0.5);
+			sBtn.find("span").css("opacity", 0.4).mouseover(function() {
+				index = sBtn.find("span").index(this);
+				showPics(index);
+			}).eq(0).trigger("mouseover");
+			sBox.find(".preNext").css("opacity", 0.2).hover(function() {
+				$(this).stop(true, false).animate({
+					"opacity": "0.5"
+				},
+				300);
+			},
+			function() {
+				$(this).stop(true, false).animate({
+					"opacity": "0.2"
+				},
+				300);
+			});
+			sBox.find(".pre").click(function() {
+				index -= 1;
+				if (index == -1) {
+					index = len - 1;
+				}
+				showPics(index);
+			});
+			sBox.find(".next").click(function() {
+				index += 1;
+				if (index == len) {
+					index = 0;
+				}
+				showPics(index);
+			});
+			sUl.css("width", sWidth * (len));
+			sBox.hover(function() {
+				clearInterval(picTimer);
+			},
+			function() {
+				picTimer = setInterval(function() {
+					showPics(index);
+					index++;
+					if (index == len) {
+						index = 0;
+					}
+				},
+				4000);
+			}).trigger("mouseleave");
+			function showPics(index) {
+				var nowLeft = -index * sWidth;
+				sUl.stop(true, false).animate({
+					"left": nowLeft
+				},
+				300);
+				sBtn.find("span").stop(true, false).animate({
+					"opacity": "0.4"
+				},
+				300).eq(index).stop(true, false).animate({
+					"opacity": "1"
+				},
+				300);
+			}
+		}
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SugSuggestReplyMapper">
+
+	<resultMap id="SugSuggestReplyResult" type="SugSuggestReply">
+		<result property="id" column="id" />
+		<result property="cusId" column="cus_id" />
+		<result property="suggestId" column="suggest_id" />
+		<result property="content" column="content" />
+		<result property="type" column="type" />
+		<result property="isbest" column="isbest" />
+		<result property="addtime" column="addtime" />
+		<result property="showname" column="showname" />
+	</resultMap>
+
+	<sql id="sns_sug_suggest_reply_columns">
+		sns_sug_suggest_reply.id,
+		sns_sug_suggest_reply.cus_id,
+		sns_sug_suggest_reply.suggest_id,
+		sns_sug_suggest_reply.content,
+		sns_sug_suggest_reply.type,
+		sns_sug_suggest_reply.isbest,
+		sns_sug_suggest_reply.addtime,
+		sns_sug_suggest_reply.showname
+	</sql>
+
+	<sql id="sns_sug_suggest_reply_properties">
+		#{id},
+		#{cusId},
+		#{suggestId},
+		#{content},
+		#{type},
+		#{isbest},
+		#{addtime},
+		#{showname}
+	</sql>
+
+	<insert id="createSugSuggestReply" parameterType="SugSuggestReply"
+		keyColumn="id" keyProperty="id">
+		insert INTO sns_sug_suggest_reply (
+		<include refid="sns_sug_suggest_reply_columns" />
+		) VALUES (
+		<include refid="sns_sug_suggest_reply_properties" />
+		)
+	</insert>
+
+	<delete id="deleteSugSuggestReplyById" parameterType="long">
+		delete from
+		sns_sug_suggest_reply
+		where
+		id = #{value}
+	</delete>
+	
+	<delete id="deleteSugSuggestReplyBySuggestId" parameterType="long">
+		delete from
+		sns_sug_suggest_reply
+		where
+		suggest_id = #{value}
+	</delete>
+
+
+	<update id="updateSugSuggestReply" parameterType="SugSuggestReply">
+		update
+		sns_sug_suggest_reply SET
+		id = #{id},
+		cus_id = #{cusId},
+		suggest_id =
+		#{suggestId},
+		content = #{content},
+		type = #{type},
+		isBest = #{isBest},
+		addTime = #{addTime}
+		where
+		id = #{id}
+	</update>
+
+	<select id="getSugSuggestReplyById" resultMap="SugSuggestReplyResult"
+		parameterType="long">
+		select
+		<include refid="sns_sug_suggest_reply_columns" />
+		from sns_sug_suggest_reply
+		where
+		id = #{value}
+	</select>
+
+	<select id="getSugSuggestReplyList" resultMap="SugSuggestReplyResult"
+		parameterType="SugSuggestReply">
+		select
+		<include refid="sns_sug_suggest_reply_columns" />
+		from sns_sug_suggest_reply
+	</select>
+
+
+	<select id="querySugSuggestReplyListBySuggestId" resultMap="SugSuggestReplyResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="sns_sug_suggest_reply_columns" />
+		from sns_sug_suggest_reply
+		where sns_sug_suggest_reply.suggest_id =
+		#{e.suggestId}
+		<if test="e.isbest != -1" >  
+		and sns_sug_suggest_reply.isBest = #{e.isbest}
+		</if>
+		order by sns_sug_suggest_reply.addTime desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="querySugSuggestReplyListBySuggestIdCount"
+		resultType="int" parameterType="java.util.HashMap">
+		select
+		count(1)
+		from sns_sug_suggest_reply
+		where sns_sug_suggest_reply.suggest_id =
+		#{e.suggestId}
+		<if test="e.isbest != -1" >  
+		and sns_sug_suggest_reply.isBest = #{e.isbest}
+		</if>
+	</select>
+
+	<select id="querySugSuggestReplyAllListBySuggestId" resultMap="SugSuggestReplyResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="sns_sug_suggest_reply_columns" />
+		from sns_sug_suggest_reply
+		where sns_sug_suggest_reply.suggest_id =
+		#{suggestId}
+		<if test="isbest != 0" >  
+		and sns_sug_suggest_reply.isBest = #{isbest}
+		</if>
+		order by sns_sug_suggest_reply.addTime desc
+	</select>
+
+	<update id="updateSugSuggestReplyBySugSuggestReplyIdForIsBest">
+		update sns_sug_suggest_reply SET
+		isBest = #{isbest}
+		where
+		id = #{id}
+	</update>
+	
+	
+</mapper>

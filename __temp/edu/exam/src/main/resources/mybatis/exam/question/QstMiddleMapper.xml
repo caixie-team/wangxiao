@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="QstMiddleMapper" >
+	<resultMap id="QstMiddleResult" type="QstMiddle">
+		<result property="id" column="id"/>
+		<result property="paperId" column="paper_id"/>
+		<result property="qstId" column="QST_ID"/>
+		<result property="qstType" column="QST_TYPE"/>
+		<result property="complexId" column="complex_id"/>
+		<result property="addTime" column="addTime"/>
+		<result property="sort" column="sort"/>
+		<result property="paperMiddleId" column="paperMiddle_Id"/>
+	</resultMap>
+	
+	<resultMap id="QueryQstMiddleResult" type="QueryQstMiddle" extends="QstMiddleResult">
+		<result property="qstContent" column="QST_CONTENT"/>
+	</resultMap>
+  
+  <resultMap id="QueryQstMiddleOptionsResult" type="QueryQstMiddle" extends="QueryQstMiddleResult">
+ 		<result property="complexContent" column="complex_content"/>
+		<result property="isAsr" column="IS_ASR"/>
+		<result property="qstAnalyze" column="qst_analyze"/>
+		<result property="pointId" column="point_id"/>
+	 	<result property="optContent" column="OPT_CONTENT"/>
+	 	<result property="optOrder" column="OPT_ORDER"/>
+	    <result property="optAnswer" column="OPT_ANSWER"/>
+	    <result property="favoritesId" column="favoritesId"/>
+	    <result property="userAnswer" column="userAnswer"/>
+	    <result property="status" column="status"/>
+	    <result property="noteContent" column="NOTE_CONTENT"/>
+	    <result property="noteId" column="noteId"/>
+	    <result property="questionType" column="questionType"/>
+	    <result property="pointName" column="pointName"/>
+	    <result property="parentId" column="parent_id"/>
+	    <result property="complexId" column="complex_id"/>
+	    <result property="score" column="score"/>
+	     <result property="state" column="state"/>
+	     <result property="qstrdId" column="qstrdId"/>
+	    
+	</resultMap>
+  	
+    <sql id="exam_qstmiddle_columns">
+        exam_qstmiddle.id,
+        exam_qstmiddle.paper_ID,
+        exam_qstmiddle.QST_ID,
+        exam_qstmiddle.QST_TYPE,
+        exam_qstmiddle.complex_id,
+        exam_qstmiddle.addTime,
+        exam_qstmiddle.sort,
+        exam_qstmiddle.paperMiddle_Id
+    </sql>
+
+    <sql id="exam_qstmiddle_properties">
+        #{id},
+        #{paperId},
+        #{qstId},
+        #{qstType},
+        #{complexId},
+        #{addTime},
+        #{sort},
+        #{paperMiddleId}
+    </sql>
+	
+    <insert id="createQstMiddleBatch" parameterType="java.util.List" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO exam_qstmiddle (  <include refid="exam_qstmiddle_columns"/>) VALUES  
+        <foreach collection="qstMiddleList" item="item"  separator="," >
+        	(#{item.id},#{item.paperId},#{item.qstId},#{item.qstType},#{item.complexId},#{item.addTime},#{item.sort},#{paperMiddleId})
+        </foreach>
+    </insert>
+    
+     <insert id="createQstMiddle" parameterType="QstMiddle" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO exam_qstmiddle (<include refid="exam_qstmiddle_columns"/>) VALUES (<include
+            refid="exam_qstmiddle_properties"/>)
+    </insert>
+    
+    <select id="queryQstMiddleListBypaperRecord" parameterType="java.util.HashMap" resultMap="QueryQstMiddleOptionsResult">
+	select <include refid="exam_qstmiddle_columns"/>,
+	exam_question.QST_CONTENT,
+	exam_question.IS_ASR,
+	exam_question.qst_analyze,
+	exam_question.point_id,
+	exam_question.QST_TYPE questionType,
+	exam_options.OPT_CONTENT,
+	exam_options.OPT_ORDER,
+	exam_options.OPT_ANSWER,
+	exam_question_record.userAnswer,
+	exam_question_record.status,
+	exam_question_record.score,
+	exam_question_record.state,
+	exam_question_record.id qstrdId,
+	exam_note.NOTE_CONTENT,
+	exam_note.id noteId,
+	exam_favorites_qst.id favoritesId,
+	exam_point.Name pointName,
+	exam_point.parent_id
+	from exam_qstmiddle 
+	left join exam_question on exam_qstmiddle.qst_id=exam_question.id
+	left join exam_question_record on 
+	exam_question_record.cus_id=#{cusId} and
+	exam_question_record.paper_ID = #{paperId}
+	and  exam_qstmiddle.qst_id=exam_question_record.qst_id
+	and exam_qstmiddle.paperMiddle_Id =exam_question_record.paperMiddle_Id
+	left join exam_options on exam_qstmiddle.qst_id= exam_options.qst_id 
+	LEFT JOIN exam_favorites_qst on exam_favorites_qst.cus_id = #{cusId}
+	and exam_favorites_qst.Qst_id =exam_qstmiddle.qst_id 
+   left join exam_note  on exam_note.cus_id = #{cusId} 
+    and  exam_qstmiddle.qst_id = exam_note.qst_id 
+   left join exam_point on 
+   exam_question.point_id=exam_point.id
+	<where>
+	 exam_qstmiddle.paper_ID=#{paperId}
+	<if test="id!=null and id!=0">
+	and exam_qstmiddle.id=#{id}
+	</if>
+	<if test="paperRecordId!=null and  paperRecordId!=0">
+	and exam_question_record.paper_record_id = #{paperRecordId}
+	</if>
+	</where>
+	order by exam_qstmiddle.paperMiddle_Id,exam_options.id
+	</select>
+	
+	<!-- 查询出一张试卷所有的试题 -->
+	 <select id="getQstMiddleList" parameterType="java.util.HashMap" resultMap="QueryQstMiddleOptionsResult">
+	select <include refid="exam_qstmiddle_columns"/>,
+	exam_question.QST_CONTENT,
+	exam_question.IS_ASR,
+	exam_question.qst_analyze,
+	exam_question.point_id,
+	exam_question.QST_TYPE questionType,
+	exam_options.OPT_CONTENT,
+	exam_options.OPT_ORDER,
+	exam_options.OPT_ANSWER
+	<if test="cusId!=null and cusId!=0">
+		,exam_favorites_qst.id favoritesId
+	</if>
+	from exam_qstmiddle left join exam_question on exam_qstmiddle.qst_id = exam_question.id
+	left join exam_options on exam_qstmiddle.qst_id = exam_options.qst_id 
+	<if test="cusId!=null and cusId!=0">
+	LEFT JOIN exam_favorites_qst on exam_favorites_qst.cus_id = #{cusId}
+	and exam_qstmiddle.qst_id = exam_favorites_qst.Qst_id 
+	</if>
+	<where>
+	exam_question.status= 1
+	<if test="id!=null and id!=0">
+	and exam_qstmiddle.id=#{id}
+	</if>
+	and exam_qstmiddle.paper_ID=#{paperId}
+	</where>
+	order by exam_qstmiddle.paperMiddle_Id,exam_options.id
+	</select>
+	
+	 <select id="getQstMiddleListMaxSort" parameterType="java.util.HashMap" resultType="int">
+		select max(sort)
+		from exam_qstmiddle 
+		<where>
+		<if test="id!=null and id!=0">
+		and exam_qstmiddle.id=#{id}
+		</if>
+		<if test="paperId!=null and paperId!=0">
+		and exam_qstmiddle.paper_ID=#{paperId}
+		</if>
+		<if test="qstType!=0">
+		and exam_qstmiddle.QST_TYPE=#{qstType}
+		</if>
+		<if test="complexId!=null and complexId!=0">
+		and exam_qstmiddle.complex_id=#{complexId}
+		</if>
+		</where>
+	</select>
+	
+	<delete id="delQstMiddleById" parameterType="QstMiddle">
+ 		DELETE from exam_qstmiddle 
+        <where>
+        exam_qstmiddle.papermiddle_id=#{paperMiddleId}
+	        <if test="paperId!=null and paperId!=0">
+			and exam_qstmiddle.paper_id = #{paperId} 
+			</if>
+			<if test="id!=null and id!=0">
+			and exam_qstmiddle.id = #{id} 
+			</if>
+			<if test="complexId!=null and complexId!=0">
+			and exam_qstmiddle.complex_id=#{complexId}
+			</if>
+		</where>
+    </delete>
+    
+    <update id="updateQstMiddleBySort" parameterType="java.util.HashMap" >
+ 		update exam_qstmiddle set sort=#{sort} 
+ 		<where>
+		<if test="paperId!=null and paperId!=0">
+		and exam_qstmiddle.paper_ID=#{paperId,jdbcType=INTEGER} 
+		</if>
+		<if test="qstType!=0">
+		and exam_qstmiddle.QST_TYPE=#{qstType}
+		</if>
+		<if test="complexId!=null and complexId!=0">
+		and exam_qstmiddle.complex_id=#{complexId}
+		</if>
+		<if test="qstId!=null and qstId!=0">
+		and exam_qstmiddle.QST_ID=#{qstId}
+		</if>
+		</where>
+	</update>
+	
+	<select id="queryQstMiddleListQstIds" parameterType="qstMiddle" resultType="int">
+		select
+		exam_qstmiddle.QST_ID
+		from exam_qstmiddle
+		where exam_qstmiddle.paper_ID=#{paperId}
+	</select>
+</mapper>

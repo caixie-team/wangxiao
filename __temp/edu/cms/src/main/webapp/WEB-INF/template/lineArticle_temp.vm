@@ -1,0 +1,161 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<meta http-equiv="X-UA-Compatible" content="IE=9, IE=8"/> 
+	<title>$!{article.title}</title>
+	<meta name="author" content="${websitemap.web.author}"/> 
+	<meta name="keywords" content="${websitemap.web.keywords}" />
+	<meta name="description" content="${websitemap.web.description}"/> 
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"/> 
+	<link href="${staticServer}/static/edu/css/lc_official_line/style.css" type="text/css" rel="stylesheet"/>
+	<script type="text/javascript" src="${staticServer}/static/common/jquery-1.11.1.min.js"></script>
+	<script type="text/javascript" src="${ctx}/static/common/webutils.js"></script>
+	<script type="text/javascript" src="${staticServer}/static/line/js/line-course.js"></script>
+	<!--[if lt IE 9]><script src="${staticServer}/static/common/html5.js"></script><![endif]-->
+	<script type="text/javascript">
+		$(function() {
+			//浏览量加1
+			$.ajax({
+		 		type:"GET",
+		 		dataType:"json",
+		 		async:false,
+		 		url:"${staticServer}/line/article/updateLookNum/$article.articleId",
+		 		success:function(result){
+		 			if(result.success){
+		 			}
+		 		},
+		 	});
+		});
+		
+	</script>
+</head>
+<body class="O-body">
+	<!-- online header begin -->
+	#parse("/cms_header.vm")
+	<!-- online nav end -->
+	<!-- /main begin -->
+	<!-- 内容，开始 -->
+	<div>
+		<div class="container-i">
+			<article class="mt20">
+				#set($banner=$lineImageService.queryImageByType(8,1,0))##banner
+				#foreach($a in $banner)
+				<a href="#if(${a.linkUrl}=='') javascript:void(0);#else ${articleUrl}/$!{a.linkUrl} #end" title="">
+					<img src="$staticImageServer/$a.imageUrl" width="1000" height="120" class="dis" alt="$!{a.title}"/>
+				</a>
+				#end
+			</article>
+			<section class="passway">
+				<span class="c-999">您的位置：</span>
+				<a class="c-999" href="/">首页</a>
+				&nbsp;&gt;&nbsp;
+				<a class="c-999" href="/static/cms/index.html">资讯中心</a>
+				&nbsp;&gt;&nbsp;
+				<a class="c-999" href="/cms/news/list">资讯列表</a>
+				&nbsp;&gt;&nbsp;
+				<span class="c-999">$!{article.title}</span>
+			</section>
+			<section class="mt20">
+				<article class="fl" style="width: 780px;">
+					<div class="mr30">
+						<section class="pb20 line1">
+							<h2 class="tac unFw"><font class="fsize20 c-333 f-fM">$!{article.title}</font></h2>
+							<div class="mt5 mb5 tac">
+								<span class="c-999 vam disIb" title="发表日期">发表日期：$!dateTool.format('yyyy-MM-dd',$!{article.addTime}) </span><span class="disIb c-999 vam ml20" title="阅读">阅读：$!{article.lookNum}人</span><span class="disIb c-999 vam ml20" title="来源">来源： $!{article.source}</span>
+							</div>
+						</section>
+						<div class="mt20">
+							<div class="articleText c-4e"> 
+							$!{article.content}
+								
+															</div>
+						</div>
+						<div class="mt10 hLh30 of line1">&nbsp;</div>
+						<div class="mt20 clearfix">
+							<section class="fr">
+								<div class="bdsharebuttonbox bdshare-button-style0-16" data-bd-bind="1419232107810"><a href="#" class="bds_more" data-cmd="more"></a><a title="分享到QQ空间" href="#" class="bds_qzone" data-cmd="qzone"></a><a title="分享到新浪微博" href="#" class="bds_tsina" data-cmd="tsina"></a><a title="分享到腾讯微博" href="#" class="bds_tqq" data-cmd="tqq"></a><a title="分享到人人网" href="#" class="bds_renren" data-cmd="renren"></a><a title="分享到微信" href="#" class="bds_weixin" data-cmd="weixin"></a></div>
+								<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"0","bdSize":"16"},"share":{},"image":{"viewList":["qzone","tsina","tqq","renren","weixin"],"viewText":"分享到：","viewSize":"16"},"selectShare":{"bdContainerClass":null,"bdSelectMiniList":["qzone","tsina","tqq","renren","weixin"]}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+							</section>
+							<section class="fl">
+									<p class="hLh30 of"><span class="c-666">上一篇：</span>
+										#if($!{upArticle}=='')
+											暂无上一篇
+										#else
+											<a href="${articleUrl}/$!{upArticle.linkUrl}" class="c-666">$!{upArticle.title}</a>
+										#end
+										
+									</p>
+									<p class="hLh30 of"><span class="c-666">下一篇：</span>
+										#if($!{downArticle}=='')
+											暂无下一篇
+										#else
+											<a href="${articleUrl}/$!{downArticle.linkUrl}" class="c-666">$!{downArticle.title}</a>
+										#end
+									</p>
+								</section>
+						</div>
+					</div>
+				</article>
+				<aside class="c-l-200">
+					<div>
+						<article>
+							<header class="cms-c-title">
+								<h4 style="width: 120px;">热门新闻</h4>
+								<div class="clear"></div>
+							</header>
+						</article>
+						<section>
+							<div class="mt20 line1 pb20">
+								#set($c=1)
+								#foreach($a in $hotArticle)
+									#if($c==1)
+									<a href="#if(${a.linkUrl}=='')javascript:void(0); #else ${articleUrl}/$!{a.linkUrl} #end">
+										<img src="$staticImageServer/$!{a.imageUrl}" width="220" height="120" class="dis" />
+										<h6 class="hLh30 of c-333">$!{a.title}</h6>
+									</a>
+									#end
+									#set($c=$c+1)
+								#end
+								<ul class="cms-clist">
+									#set($c=1)
+									#foreach($a in $hotArticle)
+										#if($c>1&&$c<=6)
+										<li><a href="#if(${a.linkUrl}=='')javascript:void(0); #else ${articleUrl}/$!{a.linkUrl} #end" title=""><em>·</em>$!{a.title}</a></li>
+										#end
+										#set($c=$c+1)
+									#end
+								</ul>
+							</div>
+							<div class="mt30">
+								#set($c=1)
+								#foreach($a in $hotArticle)
+									#if($c==7)
+									<a href="#if(${a.linkUrl}=='')javascript:void(0); #else ${articleUrl}/$!{a.linkUrl} #end">
+										<img src="$staticImageServer/$!{a.imageUrl}" width="220" height="120" class="dis" />
+										<h6 class="hLh30 of c-333">$!{a.title}</h6>
+									</a>
+									#end
+									#set($c=$c+1)
+								#end
+								<ul class="cms-clist">
+									#set($c=1)
+									#foreach($a in $hotArticle)
+										#if($c>7&&$c<=12)
+										<li><a href="#if(${a.linkUrl}=='')javascript:void(0); #else ${articleUrl}/$!{a.linkUrl} #end" title=""><em>·</em>$!{a.title}</a></li>
+										#end
+										#set($c=$c+1)
+									#end																																												
+								</ul>
+							</div>
+						</section>
+					</div>
+				</aside>
+				<div class="clear"></div>
+			</section>
+		</div>
+	</div>
+	<!-- 内容，结束-->
+	<!-- /main end -->
+	#parse("cms_bottom.vm")
+</body>
+</html>

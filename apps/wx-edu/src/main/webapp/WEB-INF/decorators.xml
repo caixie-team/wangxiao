@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<decorators defaultdir="/WEB-INF/layouts/">
+    <excludes>
+        <!-- 不走布局的页面 静态资源 文本编辑器 api -->
+        <pattern>/static/*</pattern>
+        <pattern>/kindeditor/*</pattern>
+        <pattern>/api/*</pattern>
+        <!-- ajax返回html -->
+        <pattern>/*/ajax/*</pattern>
+        <!-- 剔除后台iframe布局的路径 -->
+        <pattern>/admin</pattern>
+        <pattern>/admin/</pattern>
+        <pattern>/admin/sys/login</pattern>
+        <pattern>/admin/sys/bottomFrame</pattern>
+        <pattern>/admin/func/showchild</pattern>
+        <pattern>/admin/sys/leftframe</pattern>
+        <!--阶段列表-->
+        <pattern>/admin/phase/getPhaseById/*</pattern>
+        <pattern>/admin/phase/getPhaseForInfo/*</pattern>
+        <!--阶段详情列表-->
+        <pattern>/admin/phase/getPhaseListAjax/*</pattern>
+        <pattern>/admin/phase/getPhaseListForInfo/*</pattern>
+
+        <pattern>/front/playkpoint*</pattern>
+        <pattern>/common/dialog</pattern>
+    </excludes>
+
+    <!-- nxb前端布局 -->
+    <decorator name="nxbdefault" page="nxb/web/default.jsp">
+        <pattern>/front/*/*</pattern>
+        <pattern>/index*</pattern>
+        <pattern>/login</pattern>
+        <pattern>/register</pattern><!-- 注册 -->
+        <pattern>/front/*</pattern>
+        <pattern>/shopcart*</pattern>
+        <pattern>/user/getpwdcode</pattern>
+        <pattern>/user/to*</pattern>
+        <pattern>/order/bank</pattern>
+        <pattern>/memberorder/bank</pattern>
+        <pattern>/member/*</pattern>
+        <pattern>/help</pattern>
+        <pattern>/library/*</pattern>
+        <pattern>/book/*</pattern>
+        <pattern>/cash/order</pattern>
+        <pattern>/cash/order/repay*</pattern>
+        <pattern>/cashorder/bank</pattern>
+    </decorator>
+
+    <!-- nxb学习中心布局 -->
+    <decorator name="nxbucdefault" page="nxb/uc/default_uc.jsp">
+        <pattern>/uc/*</pattern>
+        <pattern>/uletter</pattern>
+    </decorator>
+
+    <!-- app资讯布局 -->
+    <decorator name="appdefault" page="app/default.jsp">
+        <pattern>/app/article/info*</pattern>
+        <pattern>/app/course/content*</pattern>
+    </decorator>
+
+
+    <!-- 微端布局 -->
+    <decorator name="mobiledefault" page="mobile/default.jsp">
+        <pattern>/mobile/*</pattern>
+        <pattern>/mobile/*/*</pattern>
+        <pattern>/mobile/index</pattern>
+    </decorator>
+
+    <!-- 后台管理布局 -->
+    <decorator name="admindefault" page="admin/default.jsp">
+        <pattern>/admin/*</pattern>
+        <pattern>/admin/**/*</pattern>
+    </decorator>
+
+</decorators>
+

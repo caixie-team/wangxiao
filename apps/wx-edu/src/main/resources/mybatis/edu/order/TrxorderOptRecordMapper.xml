@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TrxorderOptRecordMapper">
+
+        <resultMap id="TrxorderOptRecordResult" type="TrxorderOptRecord">
+            <result property="id" column="id"/>
+            <result property="orderId" column="trxorder_id"/>
+            <result property="type" column="type"/>
+            <result property="optuser" column="optuser"/>
+            <result property="optusername" column="optusername"/>
+            <result property="desc" column="description"/>
+            <result property="createtime" column="createtime"/>
+        </resultMap>
+
+        <sql id="edu_trxorder_opt_record_columns">
+            edu_trxorder_opt_record.id,
+            edu_trxorder_opt_record.trxorder_id,
+            edu_trxorder_opt_record.type,
+            edu_trxorder_opt_record.optuser,
+            edu_trxorder_opt_record.optusername,
+            edu_trxorder_opt_record.description,
+            edu_trxorder_opt_record.createtime
+        </sql>
+
+        <sql id="edu_trxorder_opt_record_properties">
+            #{id},
+            #{orderId},
+            #{type},
+            #{optuser},
+            #{optusername},
+            #{desc},
+            #{createtime}
+        </sql>
+
+        <insert id="createTrxorderOptRecord" parameterType="TrxorderOptRecord" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_trxorder_opt_record (<include refid="edu_trxorder_opt_record_columns"/>) VALUES (<include refid="edu_trxorder_opt_record_properties"/>)
+        </insert>
+
+        <delete id="deleteTrxorderOptRecordById" parameterType="Long">
+            delete from edu_trxorder_opt_record
+            where
+                id = #{value}
+
+
+
+
+
+
+        </delete>
+
+        <update id="updateTrxorderOptRecord" parameterType="TrxorderOptRecord">
+            update edu_trxorder_opt_record SET
+                id = #{id},
+                trxorder_id = #{orderId},
+                type = #{type},
+                optuser = #{optuser},
+                optusername = #{optusername},
+                description = #{desc},
+                createtime = #{createtime}
+            where
+                id = #{id}
+
+
+
+
+
+
+        </update>
+
+        <select id="getTrxorderOptRecordById" resultMap="TrxorderOptRecordResult" parameterType="Long">
+            select
+            <include refid="edu_trxorder_opt_record_columns"/>
+            from edu_trxorder_opt_record
+            where
+                id = #{value}
+
+
+
+
+
+
+        </select>
+		
+        <select id="getTrxorderOptRecordList" resultMap="TrxorderOptRecordResult" parameterType="TrxorderOptRecord">
+            select
+            <include refid="edu_trxorder_opt_record_columns"/>
+            from edu_trxorder_opt_record
+        </select>
+
+    <select id="getTrxorderOptRecordListPage" resultMap="TrxorderOptRecordResult" parameterType="java.util.HashMap">
+        select
+        <include refid="edu_trxorder_opt_record_columns"/>
+        from edu_trxorder_opt_record
+        <where>
+            <if test="e.orderId!=null and e.orderId>0">
+                and edu_trxorder_opt_record.trxorder_id = #{e.orderId}
+            </if>
+            <if test="e.type!=null and e.type!=''">
+                and edu_trxorder_opt_record.type = #{e.type}
+            </if>
+            <if test="e.optusername!=null and e.optusername!=''">
+                and edu_trxorder_opt_record.optusername = #{e.optusername}
+            </if>
+            <if test="e.startDate!=null and e.startDate!='' ">
+                and <![CDATA[ edu_trxorder_opt_record.createtime >=]]>CONCAT(#{e.startDate},'00:00:00')
+            </if>
+            <if test="e.endDate!=null and e.endDate!='' ">
+                and <![CDATA[ edu_trxorder_opt_record.createtime <=]]>CONCAT(#{e.endDate},'23:59:59')
+            </if>
+        </where>
+        <include refid="publicMapper.pageEnd" />
+    </select>
+    <select id="getTrxorderOptRecordListPageCount" resultType="int" parameterType="java.util.HashMap">
+        select
+        count(1)
+        from edu_trxorder_opt_record
+        <where>
+            <if test="e.orderId!=null and e.orderId>0">
+                and edu_trxorder_opt_record.trxorder_id = #{e.orderId}
+            </if>
+            <if test="e.type!=null and e.type!=''">
+                and edu_trxorder_opt_record.type = #{e.type}
+            </if>
+            <if test="e.optusername!=null and e.optusername!=''">
+                and edu_trxorder_opt_record.optusername = #{e.optusername}
+            </if>
+            <if test="e.startDate!=null and e.startDate!='' ">
+                and <![CDATA[ edu_trxorder_opt_record.createtime >=]]>CONCAT(#{e.startDate},'00:00:00')
+            </if>
+            <if test="e.endDate!=null and e.endDate!='' ">
+                and <![CDATA[ edu_trxorder_opt_record.createtime <=]]>CONCAT(#{e.endDate},'23:59:59')
+            </if>
+        </where>
+    </select>
+</mapper>

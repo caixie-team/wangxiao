@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="WebsiteLoginMapper">
+	<resultMap type="WebsiteLogin" id="WebsiteLoginResult">
+		<result property="id" column="ID"/>
+		<result property="ip" column="ip"/>
+		<result property="brand" column="brand"/>
+		<result property="type" column="type"/>
+		<result property="size" column="size"/>
+		<result property="createTime" column="create_time"/>
+		<result property="userId" column="user_id"/>
+	</resultMap>
+    <resultMap type="WebsiteLogin" id="queryWebsiteLoginResult" extends="WebsiteLoginResult">
+        <result property="email" column="email"/>
+    </resultMap>
+	<sql id="app_webstie_login_columns">
+		app_webstie_login.id,
+		app_webstie_login.ip,
+		app_webstie_login.brand,
+		app_webstie_login.type,
+		app_webstie_login.size,
+		app_webstie_login.create_time,
+		app_webstie_login.user_id
+	</sql>
+  
+	<sql id="app_webstie_login_properties">
+		#{id},
+		#{ip},
+		#{brand},
+		#{type},
+		#{size},
+		#{createTime},
+		#{userId}
+	</sql>
+    <insert id="insertWebsiteLogin" parameterType="WebsiteLogin">
+        INSERT INTO app_webstie_login
+        (<include refid="app_webstie_login_columns"/>)
+        VALUES
+        (<include refid="app_webstie_login_properties"/>)
+    </insert>
+
+    <select id="getWebsiteLoginPageList" resultMap="queryWebsiteLoginResult" parameterType="Map">
+        SELECT <include refid="app_webstie_login_columns"/>,
+        user_user.email
+        FROM app_webstie_login
+        left join  user_user
+        on app_webstie_login.user_id = user_user.id
+        <where>
+            <if test="e.email!=null and e.email!='' ">
+                and user_user.email like CONCAT('%',#{e.email},'%')
+            </if>
+            <if test="e.ip!=null and e.ip!='' ">
+                and app_webstie_login.ip like CONCAT('%',#{e.ip},'%')
+            </if>
+            <if test="e.brand!=null and e.brand!='' ">
+                and app_webstie_login.brand like CONCAT('%',#{e.brand},'%')
+            </if>
+            <if test="e.type!=null and e.type!='' ">
+                and app_webstie_login.type like CONCAT('%',#{e.type},'%')
+            </if>
+            <if test="e.size!=null and e.size!='' ">
+                and app_webstie_login.size like CONCAT('%',#{e.size},'%')
+            </if>
+            <if test="e.startTime!=null ">
+                and <![CDATA[ app_webstie_login.create_time>=#{e.startTime}]]>
+            </if>
+            <if test="e.endTime!=null ">
+                and <![CDATA[ app_webstie_login.create_time<=#{e.endTime}]]>
+            </if>
+        </where>
+        ORDER BY app_webstie_login.ID DESC
+        <include refid="publicMapper.pageEnd"/>
+    </select>
+    <select id="getWebsiteLoginPageListCount" resultType="int" parameterType="Map">
+        SELECT COUNT(1)
+        FROM app_webstie_login
+        left join  user_user
+        on app_webstie_login.user_id = user_user.id
+        <where>
+            <if test="e.email!=null and e.email!='' ">
+                and user_user.email like CONCAT('%',#{e.email},'%')
+            </if>
+            <if test="e.ip!=null and e.ip!='' ">
+                and app_webstie_login.ip like CONCAT('%',#{e.ip},'%')
+            </if>
+            <if test="e.brand!=null and e.brand!='' ">
+                and app_webstie_login.brand like CONCAT('%',#{e.brand},'%')
+            </if>
+            <if test="e.type!=null and e.type!='' ">
+                and app_webstie_login.type like CONCAT('%',#{e.type},'%')
+            </if>
+            <if test="e.size!=null and e.size!='' ">
+                and app_webstie_login.size like CONCAT('%',#{e.size},'%')
+            </if>
+            <if test="e.startTime!=null ">
+                and <![CDATA[ app_webstie_login.create_time>=#{e.startTime}]]>
+            </if>
+            <if test="e.endTime!=null ">
+                and <![CDATA[ app_webstie_login.create_time<=#{e.endTime}]]>
+            </if>
+        </where>
+    </select>
+
+
+</mapper>

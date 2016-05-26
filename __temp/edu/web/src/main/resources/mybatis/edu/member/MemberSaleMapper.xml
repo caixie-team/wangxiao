@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MemberSaleMapper">
+
+        <resultMap id="MemberSaleResult" type="MemberSale">
+            <result property="id" column="id"/>
+            <result property="name" column="name"/>
+            <result property="price" column="price"/>
+            <result property="description" column="description"/>
+            <result property="sort" column="sort"/>
+            <result property="type" column="type"/>
+            <result property="days" column="days"/>
+        </resultMap>
+		<resultMap id="MemberSaleDTOResult" type="MemberSaleDTO" extends="MemberSaleResult">
+            <result property="title" column="title"/>
+        </resultMap>
+        <sql id="edu_member_sale_columns">
+            edu_member_sale.id,
+            edu_member_sale.name,
+            edu_member_sale.price,
+            edu_member_sale.description,
+            edu_member_sale.sort,
+            edu_member_sale.type,
+            edu_member_sale.days,
+            edu_member_sale.status
+        </sql>
+
+        <sql id="edu_member_sale_properties">
+            #{id},
+            #{name},
+            #{price},
+            #{description},
+            #{sort},
+            #{type},
+            #{days},
+            #{status}
+        </sql>
+        <!-- 添加会员商品 -->
+        <insert id="addMemberSale" parameterType="MemberSale">
+        	insert into edu_member_sale(<include refid="edu_member_sale_columns"/>) values(<include refid="edu_member_sale_properties"/>)
+        </insert>
+        
+		<!-- 更新会员商品 -->
+        <update id="updateMemberSale" parameterType="MemberSale">
+            update edu_member_sale SET
+            	name=#{name},
+            	type = #{type},
+                price = #{price},
+                days = #{days},
+                sort=#{sort},
+                description=#{description}
+            where
+                id = #{id}
+        </update>
+        <!-- 删除会员商品 -->
+        <update id="delMemberSale" parameterType="Long">
+        	update edu_member_sale set status=1 where id=#{value}
+        </update>
+        
+         <!-- 会员服务级联删除会员商品 -->
+        <update id="delMemberSaleByType" parameterType="Long">
+        	update edu_member_sale set status=1 where type=#{value}
+        </update>
+		<!-- id查询会员商品 -->
+        <select id="getMemberSaleById" resultMap="MemberSaleResult" parameterType="Long">
+            select
+            <include refid="edu_member_sale_columns"/>
+            from edu_member_sale
+            where id = #{value}
+        </select>
+       
+            
+		<!-- 会员商品分页 -->
+        <select id="getMemberSalePage" resultMap="MemberSaleDTOResult" parameterType="Map">
+            select
+            <include refid="edu_member_sale_columns"/>,
+            edu_member_type.title
+            from edu_member_sale
+            left join edu_member_type on edu_member_sale.type=edu_member_type.id
+            where edu_member_sale.status=0
+            <if test="e.type!=null and e.type>0">
+            	and edu_member_sale.type=#{e.type}
+            </if>
+            order by edu_member_sale.type,edu_member_sale.sort DESC
+           	<include refid="publicMapper.pageEnd"/>
+        </select>
+        <select id="getMemberSalePageCount" resultType="int" parameterType="Map">
+            select
+            count(1)
+            from edu_member_sale
+            left join edu_member_type on edu_member_sale.type=edu_member_type.id
+            where edu_member_sale.status=0
+           	<if test="e.type!=null and e.type>0">
+           		and edu_member_sale.type=#{e.type}
+           	</if>
+        </select>
+        
+        <!-- 按类型查询会员商品 -->
+        <select id="getMemberSaleByType" resultMap="MemberSaleResult" parameterType="Long">
+        	select
+            <include refid="edu_member_sale_columns"/>
+            from edu_member_sale 
+            where edu_member_sale.type=#{value} and edu_member_sale.status=0
+            order by sort DESC
+        </select>
+</mapper>

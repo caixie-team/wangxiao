@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PhaseDetailProgressMapper">
+
+    <resultMap id="PhaseDetailProgressResult" type="PhaseDetailProgress">
+        <result property="id" column="id"/>
+        <result property="phaseDetailId" column="phase_detail_id"/>
+        <result property="phaseId" column="phase_id"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="type" column="type"/>
+        <result property="status" column="status"/>
+        <result property="name" column="name"/>
+        <result property="total" column="total"/>
+        <result property="complete" column="complete"/>
+        <result property="userId" column="user_id"/>
+    </resultMap>
+
+    <sql id="edu_plan_phase_detail_progress_columns">
+        edu_plan_phase_detail_progress.id,
+        edu_plan_phase_detail_progress.phase_detail_id,
+        edu_plan_phase_detail_progress.phase_id,
+        edu_plan_phase_detail_progress.start_time,
+        edu_plan_phase_detail_progress.end_time,
+        edu_plan_phase_detail_progress.type,
+        edu_plan_phase_detail_progress.status,
+        edu_plan_phase_detail_progress.name,
+        edu_plan_phase_detail_progress.total,
+        edu_plan_phase_detail_progress.complete,
+        edu_plan_phase_detail_progress.user_id
+    </sql>
+
+    <sql id="edu_plan_phase_detail_progress_properties">
+        #{id},
+        #{phaseDetailId},
+        #{phaseId},
+        #{startTime},
+        #{endTime},
+        #{type},
+        #{status},
+        #{name},
+        #{total},
+        #{complete},
+        #{userId}
+    </sql>
+
+    <insert id="createPhaseDetailProgress" parameterType="PhaseDetailProgress"  keyColumn="id"
+            keyProperty="id" useGeneratedKeys="true">
+        INSERT INTO edu_plan_phase_detail_progress(
+          <include refid="edu_plan_phase_detail_progress_columns"/>
+        )VALUES (
+          <include refid="edu_plan_phase_detail_progress_properties"/>
+        )
+    </insert>
+
+    <insert id="addProgressBatch" parameterType="list">
+        INSERT INTO edu_plan_phase_detail_progress(<include refid="edu_plan_phase_detail_progress_columns"/>)VALUES
+        <foreach collection="list" separator="," item="item">
+            (#{item.id},
+            #{item.phaseDetailId},
+            #{item.phaseId},
+            #{item.startTime},
+            #{item.endTime},
+            #{item.type},
+            #{item.status},
+            #{item.name},
+            #{item.total},
+            #{item.complete},
+            #{item.userId})
+        </foreach>
+    </insert>
+
+    <select id="getPhaseDetailProgress" parameterType="PhaseDetailProgress" resultMap="PhaseDetailProgressResult">
+        SELECT <include refid="edu_plan_phase_detail_progress_columns"/> FROM edu_plan_phase_detail_progress
+        <where>
+            <if test="phaseDetailId!=null and phaseDetailId>0">
+                AND edu_plan_phase_detail_progress.phase_detail_id = #{phaseDetailId}
+            </if>
+            <if test="userId!=null and userId>0">
+                AND edu_plan_phase_detail_progress.user_id = #{userId}
+            </if>
+        </where>
+    </select>
+
+    <select id="getPhaseDetailProgressById" parameterType="Long" resultMap="PhaseDetailProgressResult">
+        SELECT <include refid="edu_plan_phase_detail_progress_columns"/> FROM edu_plan_phase_detail_progress
+        WHERE edu_plan_phase_detail_progress.id = #{value}
+    </select>
+
+    <update id="updateCompleteTime" parameterType="PhaseDetailProgress">
+        UPDATE edu_plan_phase_detail_progress SET
+        edu_plan_phase_detail_progress.complete = #{complete},
+        edu_plan_phase_detail_progress.status = #{status}
+        <if test="endTime!=null">
+        ,edu_plan_phase_detail_progress.end_time = #{endTime}
+        </if>
+        <where>
+            <if test="id!=null and id!=0">
+                and edu_plan_phase_detail_progress.id = #{id}
+            </if>
+            <if test="phaseDetailId!=null and phaseDetailId!=0">
+                and edu_plan_phase_detail_progress.phase_detail_id = #{phaseDetailId}
+            </if>
+            <if test="userId!=null and userId!=0">
+                and edu_plan_phase_detail_progress.user_id = #{userId}
+            </if>
+        </where>
+    </update>
+
+    <select id="queryPhaseDetailProgressList" parameterType="java.util.HashMap" resultMap="PhaseDetailProgressResult">
+        SELECT
+        <include refid="edu_plan_phase_detail_progress_columns"/>
+        FROM edu_plan_phase_detail_progress
+        LEFT JOIN edu_plan_phase_detail ON edu_plan_phase_detail_progress.phase_detail_id = edu_plan_phase_detail.id
+        <where>
+            <if test="e.userId!=null and e.userId>0">
+                edu_plan_phase_detail_progress.user_id = #{e.userId}
+            </if>
+            <if test="e.phaseId!=null and e.phaseId>0">
+                edu_plan_phase_detail_progress.phase_id = #{e.phaseId}
+            </if>
+            <if test="e.type!=null and e.type!=0">
+                edu_plan_phase_detail_progress.type = #{e.type}
+            </if>
+            <if test="e.status!=null and e.status!=-1">
+                edu_plan_phase_detail_progress.status = #{e.status}
+            </if>
+            <if test="courseId!=null and courseId>0">
+                edu_plan_phase_detail.courseId = #{e.courseId}
+            </if>
+        </where>
+    </select>
+
+    <select id="getPhaseDetailProgressList" parameterType="PhaseDetailProgress" resultMap="PhaseDetailProgressResult">
+        SELECT
+          <include refid="edu_plan_phase_detail_progress_columns"/>
+        FROM edu_plan_phase_detail_progress
+        LEFT JOIN edu_plan_phase_detail ON edu_plan_phase_detail_progress.phase_detail_id = edu_plan_phase_detail.id
+        <where>
+            AND edu_plan_phase_detail.type = 2
+            <if test="courseId!=null and courseId>0">
+                AND edu_plan_phase_detail.other_id = #{courseId}
+            </if>
+            <if test="userId!=null and userId>0">
+                AND edu_plan_phase_detail_progress.user_id = #{userId}
+            </if>
+        </where>
+    </select>
+    <select id="queryPhaseDetailProgressListCount" parameterType="java.util.HashMap" resultType="int">
+        SELECT COUNT(1)
+        FROM edu_plan_phase_detail_progress
+        LEFT JOIN edu_plan_phase_detail ON edu_plan_phase_detail_progress.phase_detail_id = edu_plan_phase_detail.id
+        <where>
+            <if test="e.userId!=null and e.userId>0">
+                edu_plan_phase_detail_progress.user_id = #{e.userId}
+            </if>
+            <if test="e.phaseId!=null and e.phaseId>0">
+                edu_plan_phase_detail_progress.phase_id = #{e.phaseId}
+            </if>
+            <if test="e.type!=null and e.type!=0">
+                edu_plan_phase_detail_progress.type = #{e.type}
+            </if>
+            <if test="e.status!=null and e.status!=-1">
+                edu_plan_phase_detail_progress.status = #{e.status}
+            </if>
+        </where>
+    </select>
+
+    <!-- 获取阶段完成时长 -->
+    <select id="getPhaseCompleteTime" parameterType="Long" resultType="int">
+        SELECT SUM(edu_plan_phase_detail_progress.complete) FROM edu_plan_phase_detail_progress WHERE edu_plan_phase_detail_progress.phase_id = #{value}
+    </select>
+
+    <!-- 获取小组完成进度 -->
+    <select id="getGroupComplete" parameterType="PlanMiddleGroup" resultType="int">
+        SELECT SUM(edu_plan_phase_detail_progress.`complete`)
+        FROM edu_plan_phase_detail_progress
+        WHERE edu_plan_phase_detail_progress.`phase_id` IN(
+          SELECT edu_plan_phase.id FROM edu_plan_phase WHERE edu_plan_phase.plan_id = #{planId}
+        ) AND edu_plan_phase_detail_progress.user_id IN (
+          SELECT user_id FROM group_middle_user WHERE group_middle_user.`group_id` = #{userGroupId}
+        )
+    </select>
+    <!-- 获取课程进度 -->
+    <select id="getPhaseDetailCompleteTime" parameterType="Long" resultType="int">
+        SELECT SUM(edu_plan_phase_detail_progress.complete) FROM edu_plan_phase_detail_progress WHERE edu_plan_phase_detail_progress.phase_detail_id = #{value}
+    </select>
+
+    <select id="getPhaseDetailProgressByPhaseIdAndUserId" parameterType="java.util.HashMap" resultMap="PhaseDetailProgressResult">
+        SELECT <include refid="edu_plan_phase_detail_progress_columns"/> FROM edu_plan_phase_detail_progress
+        WHERE edu_plan_phase_detail_progress.phase_id = #{phaseId} AND edu_plan_phase_detail_progress.user_id = #{userId}
+    </select>
+</mapper>

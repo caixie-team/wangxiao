@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PaperMiddleMapper">
+	<resultMap id="PaperMiddleResult" type="PaperMiddle">
+		<result property="id" column="id"/>
+		<result property="paperId" column="paper_id"/>
+		<result property="type" column="type"/>
+		<result property="name" column="name"/>
+		<result property="num" column="num"/>
+		<result property="score" column="score"/>
+		<result property="title" column="title"/>
+		<result property="sort" column="sort"/>
+	</resultMap>
+	
+	<sql id="EXAM_EXAMPAPERMIDDLE_TBL_columns">
+		exam_paper_middle.id,
+		exam_paper_middle.paper_id,
+		exam_paper_middle.type,
+		exam_paper_middle.name,
+		exam_paper_middle.num,
+		exam_paper_middle.score,
+		exam_paper_middle.title,
+		exam_paper_middle.sort
+	</sql>
+	
+	<sql id="EXAM_EXAMPAPERMIDDLE_TBL_properties">
+		#{id},
+		#{paperId},
+		#{type},
+		#{name},
+		#{num},
+		#{score},
+		#{title},
+		#{sort}
+	</sql>
+	
+	 <insert id="createPaperMiddle" parameterType="exampaper" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO exam_paper_middle (<include refid="EXAM_EXAMPAPERMIDDLE_TBL_columns"/>) VALUES (<include
+            refid="EXAM_EXAMPAPERMIDDLE_TBL_properties"/>)
+    </insert>
+    <select id="getPaperMiddleById" parameterType="Long" resultMap="PaperMiddleResult">
+ 		select <include refid="EXAM_EXAMPAPERMIDDLE_TBL_columns"/>
+ 		from exam_paper_middle where id=${value}
+ 	</select>
+    <insert id="createPaperMiddleBatch" parameterType="java.util.List" >
+        INSERT INTO exam_paper_middle (<include refid="EXAM_EXAMPAPERMIDDLE_TBL_columns"/>) VALUES  
+        <foreach collection="list" item="item"  separator="," >
+        	(#{item.id},#{item.paperId},#{item.type},#{item.name},#{item.num},#{item.score},#{item.title},#{item.sort})
+        </foreach>
+    </insert>
+    
+    <select id="getPaperMiddleListMaxSort" parameterType="java.util.HashMap" resultType="int">
+	select max(sort)
+	from exam_paper_middle 
+	<where>
+	and exam_paper_middle.paper_ID=#{paperId}
+	</where>
+	</select>
+	
+    <select id="getPaperMiddleList" parameterType="java.util.HashMap" resultMap="PaperMiddleResult">
+	select <include refid="EXAM_EXAMPAPERMIDDLE_TBL_columns"/>
+	from exam_paper_middle 
+	<where>
+	<if test="id!=null and id!=0">
+	and exam_paper_middle.id=#{id}
+	</if>
+	and exam_paper_middle.paper_ID=#{paperId}
+	</where>
+	order by sort
+	</select>
+	
+	<!-- 删除 -->
+ 	<delete id="deletePaperMiddleByPaperId" parameterType="java.util.HashMap">
+ 	DELETE FROM exam_paper_middle 
+ 	<where> 
+ 	<if test="id!=null and id!=0">
+	and exam_paper_middle.id=#{id}
+	</if>
+	<if test="paperId!=null and paperId!=0">
+	and exam_paper_middle.paper_ID=#{paperId}
+	</if>
+	</where>
+    </delete>
+    
+    <update id="updatePaperMiddle" parameterType="java.util.HashMap" >
+ 		update exam_paper_middle set name=#{name},num=#{num},score=#{score},title=#{title}
+ 		where id=#{id,jdbcType=INTEGER} 
+ 	</update>
+ 	
+ 	 <update id="updatePaperMiddleMoveUp" parameterType="java.util.HashMap" >
+ 		update exam_paper_middle set sort=#{sort}
+ 		where id = #{id,jdbcType=INTEGER}
+ 	</update>
+</mapper>

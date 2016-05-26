@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="VisitorMapper">
+
+
+	<resultMap type="Visitor" id="VisitorMap">
+		<result property="id" column="id" />
+		<result property="cusId" column="cus_id" />
+		<result property="addTime" column="add_time" />
+		<result property="showname" column="showname" />
+		<result property="visitorCusId" column="visitor_cus_id" />
+		<result property="viewDay" column="view_day" />
+		<result property="friendId" column="friendId" />
+	</resultMap>
+
+	<sql id="sns_cus_visitor_columns">
+		sns_cus_visitor.id,
+		sns_cus_visitor.cus_id,
+		sns_cus_visitor.add_time,
+		sns_cus_visitor.showname,
+		sns_cus_visitor.visitor_cus_id,
+		sns_cus_visitor.view_day
+	</sql>
+
+	<sql id="sns_cus_visitor_properties">
+		#{id},#{cusId},#{addTime},#{showname},#{visitorCusId},#{viewDay}
+	</sql>
+	<!-- 添加访客 -->
+	<insert id="addVisitor" parameterType="java.util.HashMap"
+		useGeneratedKeys="true" keyProperty="id" keyColumn="id">
+		INSERT INTO sns_cus_visitor(
+		<include refid="sns_cus_visitor_columns" />
+		)VALUES
+		(
+		<include refid="sns_cus_visitor_properties" />
+		)
+	</insert>
+	<!-- 查询该用户的最近访客 -->
+	<select id="queryVisitorByCusId" parameterType="java.util.HashMap"
+		resultMap="VisitorMap">
+		select
+		sns_cus_visitor.id,
+		sns_cus_visitor.cus_id,
+		sns_cus_visitor.showname,
+		sns_cus_visitor.visitor_cus_id,
+         max(sns_cus_visitor.add_time) add_time
+		from sns_cus_visitor
+		where cus_id=#{cusId,jdbcType=INTEGER}
+		group by sns_cus_visitor.visitor_cus_id
+		order by
+		add_time desc
+		limit 9
+	</select>
+	
+	<select id="queryVisitorByCusIdpage" parameterType="java.util.HashMap"
+		resultMap="VisitorMap">
+		select
+		sns_cus_visitor.id,
+		sns_cus_visitor.cus_id,
+		sns_cus_visitor.showname,
+		sns_cus_visitor.visitor_cus_id,
+		sns_cus_friend.id friendId,
+         sns_cus_visitor.add_time 
+		from sns_cus_visitor
+		left join sns_cus_friend
+		on sns_cus_visitor.visitor_cus_id = sns_cus_friend.cus_friend_id
+		and sns_cus_friend.cus_id = #{e}
+		where sns_cus_visitor.cus_id=#{e}
+		order by
+		sns_cus_visitor.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	
+	<select id="queryVisitorByCusIdpageCount" parameterType="java.util.HashMap"
+		resultType="int">
+		select
+		count(1)
+		from sns_cus_visitor
+		where cus_id=#{e}
+	</select>
+	
+	
+	<!-- 查询访客是否访问过我的空间 -->
+	<select id="clickVisitorByCusIdAndVisitorCusId" parameterType="java.util.HashMap"
+		resultType="int">
+		select
+		count(1)
+		from sns_cus_visitor
+		where
+		cus_id=#{cusId,jdbcType=INTEGER}
+		and visitor_cus_id = #{visitorCusId}
+		and view_day = #{viewDay}
+	</select>
+	<!-- 更新访客添加时间 -->
+	<update id="updateVisitorByCusIdAndVisitorCusId" parameterType="java.util.HashMap">
+		update sns_cus_visitor
+		SET
+		sns_cus_visitor.add_time = #{addTime}
+		where
+		cus_id
+		=
+		#{cusId} and visitor_cus_id = #{visitorCusId}
+	</update>
+	<!-- 查询我的访问量 -->
+	<select id="queryVisitorNumByCusId" parameterType="java.util.HashMap"
+		resultType="int">
+		select
+		count(1)
+		from sns_cus_visitor
+		where
+		cus_id=#{cusId,jdbcType=INTEGER}
+	</select>
+	
+
+</mapper>

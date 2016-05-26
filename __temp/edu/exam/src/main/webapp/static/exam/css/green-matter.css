@@ -1,0 +1,28 @@
+
+
+/*---======== /theme-matter ========---*/
+	.c-master {color: #2C8B55;}
+	/* .e-logo a {background: url(../images/green-theme/e-logo.png) no-repeat 0 0;} */
+	.icon14,.icon18,.icon20,.icon24,.kg-list dl dt span,.bj-link a,.subNav li.poiter-item a.a-subNav,.l-f-w-pic-1,.l-f-w-pic-2,.l-f-w-pic-3,.t-p-t-icon,.t-p-t-icon-1,.t-p-t-icon-2,.t-p-topic-num,.t-p-topic-img,.answer-bar,.answer-list ol li a,.answer-jg .answer-list ol li a,.exp-a-right,.exp-a-error,.qj-icon,.bc-icon,.dtClose,.thr-itme-icon,.goTopBtn a,.n-d-t-icon,.allKmIco {background: url(../images/green-theme/e-icon.png) no-repeat;}
+	.e-km-title,.e-pl,.e-nr {background: url(../images/green-theme/stair-icon.png) no-repeat;}
+	.e-km-i-list ul li a {background: url(../images/green-theme/stair-bg.png) no-repeat -191px 0;}
+	.e-km-i-list ul li a:hover {background-position: 0 0;}
+	.subNav li.current a.a-subNav {background: url(../images/green-theme/nav-curr-bg.png) no-repeat 50% 28px;color: #fff;}
+	.e-h-line {border-bottom: 2px solid #55AF59;}
+	.k-btn,.kg-list,.poin-item-sub-nav,.pagination ul > li > a:hover,.pagination ul > .active > a:hover,.pagination ul > .active > a {background: #286A46;}
+	.a-s-n-title span,.answer-sheet-number,.zh-test-list {border: 1px dotted #286A46;}
+	.l-f-w-menu ol li.current a,.l-f-w-menu ol li a:hover {border-bottom-color: #286A46;}
+	/* .subNav li.current a.a-subNav {color: #55AF59;font-weight: bold;} */
+	.l-f-w-menu ol li.current a,.l-f-w-menu ol li a:hover,.ztree li a:hover,.ztree li a.curSelectedNode {color: #286A46;}
+	.e-login-btn,.e-register-btn {background-color: #2C8B55;}
+	.e-login-btn:hover,.e-register-btn:hover,.k-btn:hover,.s-km-list ul li:hover .s-km-btn {background-color: #2F975C;}
+	.s-km-list ul li .s-km-btn:hover {background-color: #16A554;}
+	.subNav li.hover a.a-subNav {color: #286A46;font-weight: bold;}
+	.answer-bar.open,.allItemWrap dl dd a:hover {background-color: #2C8B55;}
+	.k-btn {border: 1px solid #20643F;}
+	.kg-list,.answer-bar,.answer-list {border: 1px solid #2C8B55;}
+	.d-tips-9 .d-s-head-txt {color: #2C8B55;}
+	.e-login-options li input:focus {border-color: #2C8B55;box-shadow: 0 0 5px rgba(44,139,85,.3);}
+	.my-history-title {border-bottom: 2px solid #16A554;}
+	.my-history-title ul li.current a {background-color: #16A554;border: 1px solid;border-color: #16A554 #16A554 #16A554 #16A554;border-top-width: 2px;}
+	.my-history-title ul li a:hover {color: #16A554;}

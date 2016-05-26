@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="QuestionRecordMapper" >
+
+    <resultMap id="QueryPaperRecordResult" type="QuestionRecord">
+       <result property="id" column="id" />
+       <result property="paperId" column="paper_id" />
+       <result property="qstId" column="qst_id" />
+       <result property="userAnswer" column="userAnswer" />
+       <result property="status" column="status" />
+       <result property="cusId" column="CUS_ID" />
+       <result property="addTime" column="ADDTIME" />
+       <result property="paperRecordId" column="paper_record_id" />
+       <result property="paperMiddleId" column="paperMiddle_Id" />
+       <result property="qstNum" column="qstNum"/>
+       <result property="rightQstNum" column="rightQstNum"/>
+       <result property="score" column="score"/>
+    </resultMap>
+    
+    <sql id="EXAM_QUESTIONRECORD_TBL_columns">
+        exam_question_record.id,
+        exam_question_record.paper_id,
+        exam_question_record.qst_id,
+        exam_question_record.userAnswer,
+        exam_question_record.status,
+        exam_question_record.CUS_ID,
+        exam_question_record.ADDTIME,
+        exam_question_record.paper_record_id,
+        exam_question_record.paperMiddle_Id,
+        exam_question_record.qst_type,
+        exam_question_record.point_id,
+        exam_question_record.score
+    </sql>
+
+    <sql id="EXAM_QUESTIONRECORD_TBL_properties">
+       #{id},#{paperId},#{qstId},#{userAnswer}, #{status},#{cusId},#{addTime},#{paperRecordId},#{paperMiddleId},#{qstType},#{pointId},
+       #{score}
+    </sql>
+	
+    <insert id="createQuestionRecord" parameterType="java.util.HashMap" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO exam_question_record (<include refid="EXAM_QUESTIONRECORD_TBL_columns"/>) VALUES 
+         <foreach collection="questionRecordList" index="index" item="item" separator="," >
+        	 (#{item.id},#{item.paperId},#{item.qstId},
+        	 #{item.userAnswer}, #{item.status},#{item.cusId},
+        	 #{item.addTime},#{item.paperRecordId},#{item.paperMiddleId},#{item.qstType},#{item.pointId},#{item.score})
+        </foreach>
+    </insert>
+	<!-- 添加收藏 -->
+	
+	<delete id="delQuestionRecordByPaperRecordId" parameterType="java.util.HashMap">
+		DELETE FROM exam_question_record 
+		where paper_id =#{paperId} and  paper_record_id = #{paperRecordId}
+	</delete>
+	
+	
+	 <select id="queryQuestionRecordByGroupByQstId" resultMap="QueryPaperRecordResult" parameterType="java.util.HashMap">
+	 SELECT 
+		  exam_question_record.qst_id,
+		  COUNT(1) qstNum,
+		  COUNT(
+		    exam_question_record.STATUS = 0 
+		    OR NULL
+		  ) rightQstNum 
+		FROM exam_question_record 
+		JOIN exam_exampaper_record
+		WHERE  exam_exampaper_record.id = exam_question_record.paper_record_id 
+		AND exam_exampaper_record.update_time > #{lastUpdateRecord} 
+		  AND exam_exampaper_record.status = 0 
+		GROUP BY exam_question_record.qst_id 
+	</select>    
+	 <select id="queryQuestionRecordMaxId" resultType="int">
+		SELECT IFNULL(max(id),0)
+	     FROM exam_question_record
+	</select>    
+	
+	 <select id="queryQuestionRecordById" resultMap="QueryPaperRecordResult" parameterType="java.util.HashMap">
+		SELECT 
+		<include refid="EXAM_QUESTIONRECORD_TBL_columns"/>
+	     FROM exam_question_record
+	     where exam_question_record.id = #{id} 
+	</select>    
+	
+	<update id="updateQuestionRecordForScore" parameterType="java.util.HashMap">
+		update  exam_question_record 
+		set score = score${score},
+		state = 1
+		where id = #{id}
+	</update>
+	
+</mapper>

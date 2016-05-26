@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="KnowledgeMapper">
+    <!-- 知识体系 -->
+    <resultMap id="KnowledgeResult" type="Knowledge">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="picture" column="picture"/>
+        <result property="description" column="description"/>
+        <result property="createTime" column="create_time"/>
+        <result property="sort" column="sort"/>
+    </resultMap>
+    <resultMap id="KnowledgeDTOResult" type="KnowledgeDTO" extends="KnowledgeResult">
+        <collection property="knowledgeCatalogList"  column="id"  select="getKnowledgeCatalog">
+            <collection property="middleList" column="id" select="getKnowledgeCatalogMiddleCourse" />
+        </collection>
+    </resultMap>
+    <sql id="edu_knowledge_columns">
+        edu_knowledge.id,
+        edu_knowledge.name,
+        edu_knowledge.picture,
+        edu_knowledge.description,
+        edu_knowledge.create_time,
+        edu_knowledge.sort
+    </sql>
+    <sql id="edu_knowledge_properties">
+        #{id},
+        #{name},
+        #{picture},
+        #{description},
+        #{createTime},
+        #{sort}
+    </sql>
+    <!-- 添加知识体系 -->
+    <insert id="addKnowledge" parameterType="Knowledge">
+        INSERT INTO edu_knowledge(<include refid="edu_knowledge_columns" />) VALUES (<include refid="edu_knowledge_properties"/> )
+    </insert>
+    <!-- 删除知识体系 -->
+    <delete id="deleteKnowledge" parameterType="Long">
+        DELETE FROM edu_knowledge WHERE edu_knowledge.id = #{value}
+    </delete>
+    <!-- 更新知识体系 -->
+    <update id="updateKnowledge" parameterType="Knowledge">
+        UPDATE edu_knowledge SET
+          edu_knowledge.name = #{name},
+          edu_knowledge.picture = #{picture},
+          edu_knowledge.description = #{description},
+          edu_knowledge.create_time = #{createTime},
+          edu_knowledge.sort = #{sort}
+        WHERE
+          edu_knowledge.id = #{id}
+    </update>
+    <select id="getKnowledge" parameterType="Long" resultMap="KnowledgeDTOResult">
+        SELECT <include refid="edu_knowledge_columns" /> FROM edu_knowledge WHERE edu_knowledge.id = #{value}
+    </select>
+    <!-- 根据id查询知识体系 -->
+    <select id="getKnowledgeById" parameterType="Long" resultMap="KnowledgeResult">
+        SELECT <include refid="edu_knowledge_columns" /> FROM edu_knowledge WHERE edu_knowledge.id = #{value}
+    </select>
+    <!-- 查询知识体系 -->
+    <select id="getKnowledgeList" parameterType="java.util.HashMap" resultMap="KnowledgeResult">
+        SELECT <include refid="edu_knowledge_columns" /> FROM edu_knowledge
+        <where>
+            <if test="e.id!=null and e.id>0">
+                AND edu_knowledge.id = #{e.id}
+            </if>
+            <if test="e.name!=null and e.name!=''">
+                and edu_knowledge.name LIKE CONCAT('%',#{e.name},'%')
+            </if>
+            <if test="e.startTime!=null and e.startTime!=''">
+                AND <![CDATA[edu_knowledge.create_time>=#{e.startTime}]]>
+            </if>
+            <if test="e.endTime!=null and e.startTime!=''">
+                AND <![CDATA[edu_knowledge.create_time<=#{e.endTime}]]>
+            </if>
+        </where>
+        ORDER BY edu_knowledge.sort DESC
+        <include refid="publicMapper.pageEnd" />
+    </select>
+    <select id="getKnowledgeListCount" parameterType="java.util.HashMap" resultType="int">
+        SELECT count(1) FROM edu_knowledge
+        <where>
+            <if test="e.id!=null and e.id>0">
+                AND edu_knowledge.id = #{e.id}
+            </if>
+            <if test="e.name!=null and e.name!=''">
+                and edu_knowledge.name LIKE CONCAT('%',#{e.name},'%')
+            </if>
+            <if test="e.startTime!=null and e.startTime!=''">
+                AND <![CDATA[edu_knowledge.create_time>=#{e.startTime}]]>
+            </if>
+            <if test="e.endTime!=null and e.startTime!=''">
+                AND <![CDATA[edu_knowledge.create_time<=#{e.endTime}]]>
+            </if>
+        </where>
+    </select>
+
+    <!-- 知识体系目录 -->
+    <resultMap id="KnowledgeCatalogResult" type="KnowledgeCatalog">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="knowledgeId" column="knowledge_id"/>
+        <result property="description" column="description"/>
+        <result property="createTime" column="create_time"/>
+        <result property="sort" column="sort"/>
+        <result property="picture" column="picture"/>
+    </resultMap>
+    <resultMap id="KnowledgeCatalogDTOResult" type="KnowledgeCatalogDTO" extends="KnowledgeCatalogResult">
+        <collection property="middleList" column="id" select="getKnowledgeCatalogMiddleCourse" />
+    </resultMap>
+    <sql id="edu_knowledge_catalog_columns">
+        edu_knowledge_catalog.id,
+        edu_knowledge_catalog.name,
+        edu_knowledge_catalog.knowledge_id,
+        edu_knowledge_catalog.description,
+        edu_knowledge_catalog.create_time,
+        edu_knowledge_catalog.sort,
+        edu_knowledge_catalog.picture
+    </sql>
+    <sql id="edu_knowledge_catalog_properties">
+        #{id},
+        #{name},
+        #{knowledgeId},
+        #{description},
+        #{createTime},
+        #{sort},
+        #{picture}
+    </sql>
+    <!-- 添加知识体系目录 -->
+    <insert id="addKnowledgeCatalog" parameterType="KnowledgeCatalog">
+        INSERT INTO edu_Knowledge_catalog(<include refid="edu_knowledge_catalog_columns"/> ) VALUES (<include refid="edu_knowledge_catalog_properties"/> )
+    </insert>
+    <!-- 删除目录 -->
+    <delete id="deleteKnowledgeCatalog" parameterType="Long">
+        DELETE FROM edu_Knowledge_catalog WHERE edu_Knowledge_catalog.id = #{value}
+    </delete>
+    <!-- 更新知识体系目录 -->
+    <update id="updateKnowledgeCatalog" parameterType="KnowledgeCatalog">
+        UPDATE edu_Knowledge_catalog SET
+            edu_knowledge_catalog.name = #{name},
+            edu_knowledge_catalog.knowledge_id = #{knowledgeId},
+            edu_knowledge_catalog.description = #{description},
+            edu_knowledge_catalog.create_time = #{createTime},
+            edu_knowledge_catalog.sort = #{sort},
+            edu_knowledge_catalog.picture = #{picture}
+        WHERE
+            edu_knowledge_catalog.id = #{id}
+    </update>
+    <select id="getKnowledgeCatalog" parameterType="Long" resultMap="KnowledgeCatalogDTOResult">
+        SELECT <include refid="edu_knowledge_catalog_columns" /> FROM edu_knowledge_catalog WHERE edu_knowledge_catalog.knowledge_id = #{value}
+    </select>
+    <!-- 根据id查询知识体系目录 -->
+    <select id="getKnowledgeCatalogById" parameterType="Long" resultMap="KnowledgeCatalogResult">
+        SELECT <include refid="edu_knowledge_catalog_columns" /> FROM edu_knowledge_catalog WHERE edu_knowledge_catalog.id = #{value}
+    </select>
+    <!-- 查询知识体系目录 -->
+    <select id="getKnowledgeCatalogList" parameterType="KnowledgeCatalog" resultMap="KnowledgeCatalogResult">
+        SELECT <include refid="edu_knowledge_catalog_columns" /> FROM edu_Knowledge_catalog
+        <where>
+            <if test="knowledgeId!=null and knowledgeId>0">
+                AND edu_Knowledge_catalog.knowledge_id = #{knowledgeId}
+            </if>
+        </where>
+        ORDER BY edu_Knowledge_catalog.sort DESC
+    </select>
+
+    <!--知识体系目录中间表-->
+    <resultMap id="KnowledgeCatalogMiddleCourseResult" type="KnowledgeCatalogMiddleCourse">
+        <result property="id" column="id"/>
+        <result property="courseId" column="course_id"/>
+        <result property="courseName" column="course_name"/>
+        <result property="catalogId" column="catalog_id"/>
+        <result property="createTime" column="create_time"/>
+        <result property="sort" column="sort"/>
+    </resultMap>
+    <sql id="edu_knowledge_catalog_middle_course_columns">
+        edu_knowledge_catalog_middle_course.id,
+        edu_knowledge_catalog_middle_course.course_id,
+        edu_knowledge_catalog_middle_course.course_name,
+        edu_knowledge_catalog_middle_course.catalog_id,
+        edu_knowledge_catalog_middle_course.create_time,
+        edu_knowledge_catalog_middle_course.sort
+    </sql>
+    <sql id="edu_knowledge_catalog_middle_course_properties">
+        #{id},
+        #{courseId},
+        #{courseName},
+        #{catalogId},
+        #{createTime},
+        #{sort}
+    </sql>
+    <!-- 添加目录关联课程 -->
+    <insert id="addKnowledgeCatalogMiddleCourse" parameterType="KnowledgeCatalogMiddleCourse">
+        INSERT INTO edu_knowledge_catalog_middle_course(<include refid="edu_knowledge_catalog_middle_course_columns"/> ) VALUES (<include refid="edu_knowledge_catalog_middle_course_properties"/> )
+    </insert>
+    <!-- 删除目录关联课程 -->
+    <delete id="deleteKnowledgeCatalogMiddleCourse" parameterType="list">
+        DELETE FROM edu_knowledge_catalog_middle_course WHERE edu_knowledge_catalog_middle_course.id IN (
+        <foreach collection="array" item="id" separator=",">
+            #{id}
+        </foreach>
+        )
+    </delete>
+    <!-- 根据catalogId删除课程 -->
+    <delete id="deleteKnowledgeCatalogMiddleCourseByCatalogId" parameterType="Long">
+        DELETE FROM edu_knowledge_catalog_middle_course WHERE edu_knowledge_catalog_middle_course.catalog_id = #{value}
+    </delete>
+    <!-- 修改课程排序 -->
+    <update id="updateKnowledgeCatalogMiddleCourseSort" parameterType="KnowledgeCatalogMiddleCourse">
+        UPDATE edu_knowledge_catalog_middle_course SET edu_knowledge_catalog_middle_course.sort = #{sort} WHERE edu_knowledge_catalog_middle_course.id = #{id}
+    </update>
+    <!-- 根据id查询目录课程 -->
+    <select id="getKnowledgeCatalogMiddleCourse" parameterType="Long" resultMap="KnowledgeCatalogMiddleCourseResult">
+        SELECT <include refid="edu_knowledge_catalog_middle_course_columns" /> FROM edu_knowledge_catalog_middle_course WHERE edu_knowledge_catalog_middle_course.catalog_id = #{value}
+    </select>
+    <select id="getKnowledgeCatalogMiddleCourseById" parameterType="Long" resultMap="KnowledgeCatalogMiddleCourseResult">
+        SELECT <include refid="edu_knowledge_catalog_middle_course_columns" /> FROM edu_knowledge_catalog_middle_course WHERE edu_knowledge_catalog_middle_course.id = #{value}
+    </select>
+    <!-- 课程目录查询 -->
+    <select id="getKnowledgeCatalogMiddleCourseList" parameterType="KnowledgeCatalogMiddleCourse" resultMap="KnowledgeCatalogMiddleCourseResult">
+        SELECT <include refid="edu_knowledge_catalog_middle_course_columns" /> FROM edu_knowledge_catalog_middle_course
+        <where>
+            <if test="id!=null and id>0">
+                AND edu_knowledge_catalog_middle_course.id = #{id}
+            </if>
+            <if test="catalogId!=null and catalogId>0">
+                AND edu_knowledge_catalog_middle_course.catalog_id = #{catalogId}
+            </if>
+        </where>
+        ORDER BY edu_knowledge_catalog_middle_course.sort DESC
+    </select>
+
+    <!-- 根据体系id查询课程数量 -->
+    <select id="getCourseNumByKnowledgeId" parameterType="Long" resultType="int">
+        SELECT COUNT(1)
+        FROM edu_knowledge_catalog_middle_course
+        LEFT JOIN edu_knowledge_catalog ON edu_knowledge_catalog_middle_course.catalog_id = edu_knowledge_catalog.id
+        WHERE edu_knowledge_catalog.knowledge_id = #{value}
+    </select>
+</mapper>

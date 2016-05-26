@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="WebsiteCourseDetailMapper">
+
+	<resultMap id="WebsiteCourseDetailResult" type="WebsiteCourseDetail">
+		<result property="id" column="id" />
+		<result property="recommendId" column="recommendId" />
+		<result property="courseId" column="course_id" />
+		<result property="orderNum" column="ordernum" />
+	</resultMap>
+	<resultMap id="WebsiteCourseDetailDTOResult" type="WebsiteCourseDetailDTO" extends="WebsiteCourseDetailResult">
+		<result property="isavaliable" column="isavaliable" />
+		<result property="recommendName" column="recommendName" />
+		<result property="courseName" column="courseName" />
+	</resultMap>
+	<sql id="edu_website_course_detail_columns">
+		edu_website_course_detail.id,
+		edu_website_course_detail.recommendId,
+		edu_website_course_detail.course_id,
+		edu_website_course_detail.orderNum
+	</sql>
+
+	<sql id="edu_website_course_detail_properties">
+		#{id},
+		#{recommendId},
+		#{courseId},
+		#{orderNum}
+	</sql>
+	<!-- 添加推荐课程 -->
+	<insert id="createWebsiteCourseDetail" parameterType="java.util.List">
+		insert INTO edu_website_course_detail (
+		<include refid="edu_website_course_detail_columns" />
+		) VALUES 
+		<foreach collection="list" item="item" index="index" separator="," > 
+			(#{item.id},#{item.recommendId},#{item.courseId},#{item.orderNum}) 
+		</foreach>
+	</insert>
+	<!-- 删除推荐课程 -->
+	<delete id="delWebsiteCourseDetailById" parameterType="Long">
+		delete from edu_website_course_detail where id = #{value}
+	</delete>
+	<delete id="deleteWebsiteCourseDetail" parameterType="WebsiteCourseDetail">
+		delete from edu_website_course_detail where 
+		course_id = #{courseId}
+	</delete>
+	<!-- 更新推荐课程 -->
+	<update id="updateWebsiteCourseDetail" parameterType="WebsiteCourseDetail">
+		update edu_website_course_detail SET
+		orderNum = #{orderNum}
+		where
+		id = #{id}
+	</update>
+	<!-- id查询推荐课程 -->
+	<select id="getWebsiteCourseDetailDTOById" resultMap="WebsiteCourseDetailDTOResult" parameterType="Long">
+		select
+		<include refid="edu_website_course_detail_columns" />,
+		edu_course.NAME as courseName,
+		edu_course.isavaliable,
+		edu_website_course.NAME as recommendName
+		from
+		edu_website_course_detail
+		left join edu_course on edu_website_course_detail.course_Id=edu_course.ID
+		left join edu_website_course on edu_website_course_detail.recommendId=edu_website_course.id
+		where
+		edu_website_course_detail.id = #{value}
+	</select>
+	<!-- 推荐分类查询推荐课程集合 -->
+	<select id="getWebsiteCourseDetails" resultMap="WebsiteCourseDetailResult" parameterType="Long">
+		select
+		<include refid="edu_website_course_detail_columns" />
+		from edu_website_course_detail
+		where
+		recommendId = #{value}
+	</select>
+	<!-- 推荐分类删除推荐课程 -->
+	<delete id="delWebsiteCourseDetails" parameterType="Long">
+		delete from edu_website_course_detail where recommendId = #{value}
+	</delete>
+	<!-- 推荐课程列表 -->
+	<select id="queryWebsiteCourseDetailList" parameterType="WebsiteCourseDetailDTO" resultMap="WebsiteCourseDetailDTOResult">
+		select
+		<include refid="edu_website_course_detail_columns" />,
+		edu_course.NAME as courseName,
+		edu_course.isavaliable,
+		edu_website_course.NAME as recommendName
+		from
+		edu_website_course_detail
+		left join edu_course on edu_website_course_detail.course_id=edu_course.ID
+		left join edu_website_course on edu_website_course_detail.recommendId=edu_website_course.id
+		<where>
+			<if test="e.courseName!=null and e.courseName!='' ">
+				and edu_course.NAME like CONCAT('%',#{e.courseName},'%')
+			</if>
+			<if test="e.recommendId!=null and e.recommendId>0 ">
+				and edu_website_course_detail.recommendId = #{e.recommendId}
+			</if>
+			<if test="e.isavaliable!=null and e.isavaliable>0 ">
+				and edu_course.isavaliable = #{e.isavaliable}-1
+			</if>
+		</where>
+		order by edu_website_course_detail.orderNum DESC,edu_website_course_detail.id
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryWebsiteCourseDetailListCount" parameterType="WebsiteCourseDetailDTO" resultType="int">
+		select count(1)
+		from
+		edu_website_course_detail
+		left join edu_course on edu_website_course_detail.course_id=edu_course.ID
+		left join edu_website_course on edu_website_course_detail.recommendId=edu_website_course.id
+		<where>
+			<if test="e.courseName!=null and e.courseName!='' ">
+				and edu_course.NAME like CONCAT('%',#{e.courseName},'%')
+			</if>
+			<if test="e.recommendId!=null and e.recommendId>0 ">
+				and edu_website_course_detail.recommendId = #{e.recommendId}
+			</if>
+			<if test="e.isavaliable!=null and e.isavaliable>0 ">
+				and edu_course.isavaliable = #{e.isavaliable}-1
+			</if>
+		</where>
+	</select>
+	<!-- 所有未下架的推荐课程 -->
+	<select id="getWebWebsiteCourseDetails" resultMap="WebsiteCourseDetailDTOResult">
+		select <include refid="edu_website_course_detail_columns" />
+		edu_course.NAME as courseName
+		from edu_website_course_detail
+		left join edu_course on edu_website_course_detail.sellId=edu_course.ID
+		where edu_course.isavaliable=0
+		order by recommendId,orderNum
+	</select>
+</mapper>

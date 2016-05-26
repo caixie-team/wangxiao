@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ExamRecordMapper">
+
+	<resultMap id="ExamRecordResult" type="ExamRecord">
+		<result property="id" column="id"/>
+		<result property="lastRecordId" column="last_record_id"/>
+		<result property="lastUpdateRecord" column="last_update_record"/>
+		<result property="type" column="type"/>
+	</resultMap>
+	
+	<sql id="exam_record_columns">
+		exam_record.id,
+		exam_record.last_record_id,
+		exam_record.last_update_record,
+		exam_record.type
+	</sql>
+	
+	<sql id="exam_record_properties">
+		#{id},
+		#{lastRecordId},
+		#{lastUpdateRecord},
+		#{type}
+	</sql>
+	
+  <select id="getExamRecordByType" resultMap="ExamRecordResult" parameterType="java.util.HashMap">
+	SELECT 
+		<include refid="exam_record_columns"/>
+	     FROM exam_record
+	     where exam_record.type =#{type}
+	</select>    
+	
+	<update id="updateExamRecordById" parameterType="java.util.HashMap" >
+ 		update exam_record set id=#{id},last_record_id=#{lastRecordId},last_update_record=#{lastUpdateRecord}
+ 		 where id=#{id,jdbcType=INTEGER}
+	</update>
+      
+</mapper>

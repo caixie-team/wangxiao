@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CmsArticleContentMapper">
+
+	<resultMap id="CmsArticleContentResult" type="CmsArticleContent">
+		<result property="contentId" column="CONTENT_ID" />
+		<result property="content" column="CONTENT" />
+		<result property="articleId" column="ARTICLE_ID" />
+	</resultMap>
+
+	<sql id="LINE_ARTICLE_CONTENT_column">
+		LINE_ARTICLE_CONTENT.CONTENT_ID,
+		LINE_ARTICLE_CONTENT.CONTENT,
+		LINE_ARTICLE_CONTENT.ARTICLE_ID
+	</sql>
+
+	<sql id="LINE_ARTICLE_CONTENT_properties">
+		#{contentId},
+		#{content},
+		#{articleId}
+	</sql>
+
+	<insert id="createArticleContent" parameterType="CmsArticleContent" keyColumn="CONTENT_ID"
+		keyProperty="contentId" useGeneratedKeys="true">
+		INSERT INTO LINE_ARTICLE_CONTENT (
+		<include refid="LINE_ARTICLE_CONTENT_column" />
+		) VALUES (
+		<include refid="LINE_ARTICLE_CONTENT_properties" />
+		)
+	</insert>
+	
+	<update id="updateArticleContent" parameterType="CmsArticleContent">
+		update LINE_ARTICLE_CONTENT SET
+		LINE_ARTICLE_CONTENT.CONTENT=#{content}
+		where
+		ARTICLE_ID = #{articleId}
+	</update>
+	
+	<!--通过id获取文章内容  -->
+	<select id="getArticleContentById" resultMap="CmsArticleContentResult" parameterType="Long">
+		SELECT  <include refid="LINE_ARTICLE_CONTENT_column" />
+		FROM LINE_ARTICLE_CONTENT
+		WHERE ARTICLE_ID=#{articleId}
+	</select>
+
+	<!-- 批量刪除 -->
+	<delete id="delArticleContent" parameterType="String">
+		DELETE FROM LINE_ARTICLE_CONTENT
+		WHERE LINE_ARTICLE_CONTENT.ARTICLE_ID IN (${value})
+	</delete>
+	
+</mapper>

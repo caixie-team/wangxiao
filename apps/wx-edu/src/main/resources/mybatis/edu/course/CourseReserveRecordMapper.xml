@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CourseReserveRecordMapper">
+	<resultMap type="CourseReserveRecord" id="CourseReserveRecordResult">
+		<result column="id" property="id"/>
+		<result column="user_id" property="userId"/>
+		<result column="course_id" property="courseId"/>
+		<result column="coursename" property="courseName"/>
+		<result column="courseprice" property="coursePrice"/>
+		<result column="create_time" property="createTime"/>
+		<result column="check" property="check"/>
+		<result column="nickname" property="nickname" />
+		<result column="mobile" property="mobile" />
+		<result column="email" property="email" />
+	</resultMap>
+	
+	<sql id="edu_course_reservation_columns">
+		edu_course_reservation.id,
+		edu_course_reservation.user_id,
+		edu_course_reservation.course_id,
+		edu_course_reservation.coursename,
+		edu_course_reservation.courseprice,
+		edu_course_reservation.create_time,
+		edu_course_reservation.check
+	</sql>
+	<sql id="edu_course_reservation_properties">
+		#{id},
+		#{userId},
+		#{courseId},
+		#{courseName},
+		#{coursePrice},
+		#{createTime},
+		#{check}
+	</sql>
+	<insert id="addCourseReserveRecord" parameterType="CourseReserveRecord" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert into edu_course_reservation(
+		<include refid="edu_course_reservation_columns" />
+		)values(
+		<include refid="edu_course_reservation_properties" />
+		)
+	</insert>
+	
+	<select id="getCourseReserveRecord" parameterType="Long" resultMap="CourseReserveRecordResult">
+		SELECT <include refid="edu_course_reservation_columns" /> FROM edu_course_reservation WHERE edu_course_reservation.id = #{value}
+	</select>
+	<select id="queryCourseReserveRecord" parameterType="CourseReserveRecord" resultMap="CourseReserveRecordResult">
+		SELECT <include refid="edu_course_reservation_columns" /> FROM edu_course_reservation
+		<where>
+			<if test="id!=null and id>0">
+				AND edu_course_reservation.id = #{id}
+			</if>
+			<if test="userId!=null and userId>0">
+				AND edu_course_reservation.user_id = #{userId}
+			</if>
+			<if test="courseId!=null and courseId>0">
+				AND edu_course_reservation.course_id = #{courseId}
+			</if>
+		</where>
+	</select>
+	
+	<select id="getCourseReserveRecordPageList" parameterType="java.util.Map" resultMap="CourseReserveRecordResult">
+		select 
+		edu_course_reservation.id,
+		edu_course_reservation.user_id,
+		edu_course_reservation.course_id,
+		edu_course_reservation.coursename,
+		edu_course_reservation.courseprice,
+		edu_course_reservation.create_time,
+		edu_course_reservation.check,
+		user_user.nickname,
+		user_user.mobile,
+		user_user.email
+		from edu_course_reservation
+		left join user_user on edu_course_reservation.user_id = user_user.id
+		<where>
+			<if test="e.courseId!=null and e.courseId>0">
+				edu_course_reservation.course_id=#{e.courseId}
+			</if>
+			<if test="e.userId!=null and e.userId>0">
+				and edu_course_reservation.user_id=#{e.userId}
+			</if>
+			<if test="e.nickname!=null and e.nickname!=''">
+				and (user_user.nickname LIKE CONCAT('%',#{e.nickname},'%') OR user_user.mobile LIKE CONCAT('%',#{e.nickname},'%') OR user_user.email LIKE CONCAT('%',#{e.nickname},'%'))
+			</if>
+			<if test="e.courseName!=null and e.courseName!=''">
+				and edu_course_reservation.coursename LIKE CONCAT('%',#{e.courseName},'%')
+			</if>
+			<if test="e.check!=null">
+				and edu_course_reservation.check=#{e.check}
+			</if>
+		</where>
+		order by id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getCourseReserveRecordPageListCount" parameterType="java.util.Map" resultType="int">
+		select 
+		count(1)
+		from edu_course_reservation
+		<where>
+			<if test="e.courseId!=null and e.courseId>0">
+				edu_course_reservation.course_id=#{e.courseId}
+			</if>
+			<if test="e.userId!=null and e.userId>0">
+				and edu_course_reservation.user_id=#{e.userId}
+			</if>
+			<if test="e.nickname!=null and e.nickname!=''">
+				and (user_user.nickname LIKE CONCAT('%',#{e.nickname},'%') OR user_user.mobile LIKE CONCAT('%',#{e.nickname},'%') OR user_user.email LIKE CONCAT('%',#{e.nickname},'%'))
+			</if>
+			<if test="e.courseName!=null and e.courseName!=''">
+				and edu_course_reservation.coursename LIKE CONCAT('%',#{e.courseName},'%')
+			</if>
+			<if test="e.check!=null">
+				and edu_course_reservation.check=#{e.check}
+			</if>
+		</where>
+	</select>
+
+	<update id="passCheck" parameterType="Long">
+		update edu_course_reservation
+		set edu_course_reservation.check = 1
+		where id=#{value}
+	</update>
+	<delete id="delteCourseReservedByCourseId" parameterType="Long">
+		DELETE FROM edu_course_reservation WHERE course_id = #{value}
+	</delete>
+
+	<!-- 查询预约人数 -->
+	<select id="getCourseReserveRecordCount" parameterType="Long" resultType="int">
+		SELECT COUNT(DISTINCT edu_course_reservation.user_id)FROM edu_course_reservation WHERE edu_course_reservation.course_id=#{value}
+	</select>
+
+	<!-- 查询是否预约 -->
+	<select id="checkCourseReserved" parameterType="java.util.HashMap" resultType="int">
+		SELECT
+		COUNT(1)
+		FROM edu_course_reservation
+		WHERE
+			edu_course_reservation.user_id=#{userId} and edu_course_reservation.course_id=#{courseId}
+	</select>
+</mapper>

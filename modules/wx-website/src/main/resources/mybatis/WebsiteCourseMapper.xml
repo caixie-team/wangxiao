@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="WebsiteCourseMapper">
+
+	<resultMap id="WebsiteCourseResult" type="WebsiteCourse">
+		<result property="id" column="ID" />
+		<result property="name" column="NAME" />
+		<result property="link" column="LINK" />
+		<result property="description" column="DESCRIPTION" />
+		<result property="courseNum" column="COURSENUM" />
+	</resultMap>
+
+	<sql id="edu_website_course_columns">
+		edu_website_course.id,
+		edu_website_course.name,
+		edu_website_course.link,
+		edu_website_course.description,
+		edu_website_course.courseNum
+	</sql>
+
+	<sql id="edu_website_course_properties">
+		#{id},
+		#{name},
+		#{link},
+		#{description},
+		#{courseNum}
+	</sql>
+	<!-- 添加推荐课程分类 -->
+	<insert id="createWebsiteCourse" parameterType="WebsiteCourse" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_website_course (
+		<include refid="edu_website_course_columns" />
+		) VALUES (
+		<include refid="edu_website_course_properties" />
+		)
+	</insert>
+	<!-- 删除推荐课程分类 -->
+	<delete id="deleteWebsiteCourseById" parameterType="Long">
+		delete from edu_website_course where id = #{value}
+	</delete>
+	<!-- 更新推荐课程分类 -->
+	<update id="updateWebsiteCourse" parameterType="WebsiteCourse">
+		update edu_website_course SET
+		NAME = #{name},
+		LINK = #{link},
+		DESCRIPTION = #{description},
+		COURSENUM = #{courseNum}
+		where
+		ID = #{id}
+	</update>
+	<!-- id查询推荐课程分类 -->
+	<select id="getWebsiteCourseById" resultMap="WebsiteCourseResult" parameterType="Long">
+		select
+		<include refid="edu_website_course_columns" />
+		from edu_website_course
+		where
+		ID = #{value}
+	</select>
+	<!-- 推荐课程分类列表 -->
+	<select id="queryWebsiteCourseList" resultMap="WebsiteCourseResult">
+		select
+		<include refid="edu_website_course_columns" />
+		from edu_website_course
+	</select>
+	
+	
+</mapper>

@@ -1,0 +1,18 @@
+	/*---======== /leftMenuStyle ========---*/
+	a{text-decoration:none;color: #555;}
+	a:hover{text-decoration:underline;color: #e94c2a;}a:focus{outline:none;-moz-outline:none;}
+	a:active{outline:none;blr:expression(this.onFocus=this.blur())}
+	a,img{border:0 none;}
+	#lMenu dl dt,#lMenu dl dd li {height: 38px;line-height: 38px;}
+	#lMenu dl dt {border-top: 1px solid #363636;position: relative;overflow: hidden;}
+	#lMenu dl dt a {display: block;height: 38px;padding-left: 28px;}
+	#lMenu dl dt a:hover {background: #444;cursor: pointer;text-decoration: none;}
+	#lMenu dl dt a span {color: #aaa;font: 14px/36px 'Microsoft YaHei';margin-left: 10px;vertical-align: middle;}
+	#lMenu dl dd {display: none;}
+	#lMenu dl dd li {background: #333;border-bottom: 1px solid #404040;}
+	#lMenu dl dd li a {color: #b2b2b2;display: block;font: 12px/38px 'Microsoft YaHei';padding-left: 56px;width: 150px;}
+	#lMenu dl dd li a:hover {color: #e94c2a;text-decoration: none;}
+	#lMenu dl dt.current,#lMenu dl dt.current a:hover {background: -webkit-gradient(linear, left top, left bottom, from(#525252), to(#454545));background: -moz-linear-gradient(top, #525252, #454545);background: -ms-linear-gradient(top, #525252, #454545);filter:  progid:DXImageTransform.Microsoft.gradient(startColorstr='#525252', endColorstr='#454545');}
+	#lMenu dl dt.current a span {color: #fff;}
+	#lMenu dl {border-bottom: 1px solid #363636;}
+	.sjWrap {display: none;position: absolute;right: -13px;top: 0;font-style:normal;font-size:26px;color: #F5F5F5;}

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CourseMemberMapper">
+	
+	<resultMap id="CourseMemberResult" type="CourseMember">
+		<result property="id" column="id" />
+		<result property="courseId" column="course_id" />
+		<result property="memberTypeId" column="memberType_id" />
+	</resultMap>
+	<resultMap id="CourseMemberDTOResult" type="CourseMemberDTO" extends="CourseMemberResult">
+		<result property="memberTitle" column="title" />
+	</resultMap>
+	<sql id="edu_course_member_columns">
+		edu_course_member.id,
+		edu_course_member.course_id,
+		edu_course_member.memberType_id
+	</sql>
+
+	<sql id="edu_course_member_properties">
+		#{id},
+		#{courseId},
+		#{memberTypeId}
+	</sql>
+	
+	<!-- 批量添加课程所属会员 -->
+	<insert id="addCourseMember" parameterType="List">
+		insert into edu_course_member(<include refid="edu_course_member_columns"/>) values
+		<foreach collection="list" item="item" index="index"  separator=",">
+			(#{item.id},#{item.courseId},#{item.memberTypeId})
+		</foreach>
+	</insert>
+	
+	<!-- 课程删除所属会员 -->
+	<delete id="delCourseMember" parameterType="Long">
+		delete from edu_course_member where course_id=#{value}
+	</delete>
+	<!-- 课程的会员信息 -->
+	<select id="getCourseMemberListByCourse" resultType="CourseMemberDTO" parameterType="list">
+		SELECT
+		CONCAT(edu_course_member.course_id,'') as id,
+		CONCAT(GROUP_CONCAT(edu_member_type.id),'') as memberTag,
+		GROUP_CONCAT(edu_member_type.title,'') as memberTitle
+		from edu_member_type
+		left join edu_course_member on edu_member_type.id=edu_course_member.memberType_id
+		WHERE
+		edu_course_member.course_id in
+		<foreach collection="list" item="item" separator="," open="("
+			close=")">
+			#{item}
+		</foreach>
+		GROUP BY edu_course_member.course_id
+	</select>
+	
+	
+	
+</mapper>

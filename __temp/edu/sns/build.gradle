@@ -1,0 +1,146 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+apply plugin: 'war'
+apply from: 'provided.gradle'
+
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.bmuschko:gradle-cargo-plugin:2.2.1'
+    }
+}
+
+apply plugin: "com.bmuschko.cargo"
+apply plugin: 'com.bmuschko.cargo-base'
+
+dependencies {
+    compile(
+            project(':edu:core')
+
+    )
+
+    provided libraries.'servlet-api'
+    provided libraries.'jstl'
+    testCompile libraries.'junit'
+    compile(
+            libraries.'spring-core',
+            libraries.'spring-beans',
+            libraries.'spring-context',
+            libraries.'spring-context-support',
+            libraries.'spring-web',
+            libraries.'spring-webmvc',
+            libraries.'spring-aop',
+            libraries.'aspectjrt',
+            libraries.'aspectjweaver',
+            libraries.'spring-tx',
+            libraries.'spring-orm',
+            libraries.'spring-jdbc',
+            libraries.'spring-jms',
+            libraries.'mybatis',
+            libraries.'mybatis-spring',
+            libraries.'druid',
+            libraries.'mail',
+            libraries.'mysql',
+            libraries.'spymemcached',
+            libraries.'commons-fileupload',
+            libraries.'aopalliance',
+            libraries.'commons-lang',
+            libraries.'commons-io',
+            libraries.'commons-net',
+            libraries.'commons-codec',
+            libraries.'commons-validator',
+            libraries.'commons-beanutils',
+            libraries.'commons-digester',
+            libraries.'commons-collections',
+            libraries.'commons-logging',
+            libraries.'commons-configuration',
+            libraries.'guava',
+            libraries.'dom4j',
+            libraries.'urlrewritefilter',
+            libraries.'ezmorph',
+            libraries.'jrobin',
+            libraries.'json-lib',
+            libraries.'poi',
+            libraries.'poi-scratchpad',
+            libraries.'poi-ooxml',
+            libraries.'ant',
+            libraries.'httpclient',
+            libraries.'sitemesh',
+            libraries.'quartz',
+            libraries.'htmlcompressor',
+            libraries.'yuicompressor',
+            libraries.'hessian',
+            libraries.'ognl',
+//            libraries.'gson',
+//            libraries.'struts2-core',
+//            libraries.'struts2-json-plugin',
+//            libraries.'struts2-spring-plugin',
+            libraries.'velocity',
+            libraries.'velocity-tools',
+            libraries.'urlrewritefilter',
+            libraries.'jrobin',
+            libraries.'json-lib',
+            libraries.'ehcache-core',
+            libraries.'commons-net',
+            libraries.'UserAgentUtils',
+            libraries.'javamelody-core',
+            libraries.'jackson',
+            libraries.'jackson-annotations',
+            libraries.'jackson-databind',
+            libraries.'lucene-queryparser'
+//            libraries.'jstl-api',
+//            libraries.'jstl'
+
+    )
+}
+
+cargo {
+    containerId = 'tomcat8x'
+    port = 10083 //服务器tomcat端口号
+
+    deployable {
+        context = '/'
+    }
+}
+
+task deploy(type: com.bmuschko.gradle.cargo.tasks.remote.CargoRedeployRemote) {
+    dependsOn clean, war
+
+    hostname = "sns.ihoubo.cn"//服务器地址
+    username = "admin" //来源于tomcat-users.xml
+    password = "abcd1234"
+    logger.lifecycle("CargoDeployRemote war package!")
+}
+
+// File: build.gradle
+loadConfiguration()
+
+task printProps << {
+    println "serverName:  $config.jdbc.url"
+    println "mail.server: $config.jdbc.user"
+    println "mail.port:   $config.jdbc.password"
+}
+
+def loadConfiguration() {
+    def environment = hasProperty('env') ? env : 'dev'
+    project.ext.envrionment = environment
+    println "Environment is set to $environment"
+
+    def configFile = file('environment.groovy')
+    def config = new ConfigSlurper("$environment").parse(configFile.toURL())
+    project.ext.config = config
+    config.toProperties()
+}
+
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+        filter(ReplaceTokens,
+                tokens: loadConfiguration()
+        )
+    }
+}

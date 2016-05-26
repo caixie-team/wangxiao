@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MemberRecordMapper">
+
+        <resultMap id="MemberRecordResult" type="MemberRecord">
+            <result property="id" column="id"/>
+            <result property="userId" column="user_id"/>
+            <result property="memberType" column="member_type"/>
+            <result property="beginDate" column="begin_date"/>
+            <result property="endDate" column="end_date"/>
+            <result property="description" column="description"/>
+            <result property="status" column="status"/>
+        </resultMap>
+		<resultMap id="MemberRecordDTOResult" type="MemberRecordDTO" extends="MemberRecordResult">
+            <result property="email" column="email"/>
+            <result property="memberTitle" column="title"/>
+        </resultMap>
+        <sql id="edu_member_record_columns">
+            edu_member_record.id,
+            edu_member_record.user_id,
+            edu_member_record.member_type,
+            edu_member_record.begin_date,
+            edu_member_record.end_date,
+            edu_member_record.description,
+            edu_member_record.status
+        </sql>
+
+        <sql id="edu_member_record_properties">
+            #{id},
+            #{userId},
+            #{memberType},
+            #{beginDate},
+            #{endDate},
+            #{description},
+            #{status}
+        </sql>
+
+        <insert id="createMemberRecord" parameterType="MemberRecord" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_member_record (<include refid="edu_member_record_columns"/>) VALUES (<include refid="edu_member_record_properties"/>)
+        </insert>
+        <update id="updateMemberRecord" parameterType="MemberRecord">
+            update edu_member_record SET
+                id = #{id},
+                user_id = #{userId},
+                member_type = #{memberType},
+                begin_date = #{beginDate},
+                end_date = #{endDate},
+                description = #{description},
+                status=#{status}
+            where
+                id = #{id}
+        </update>
+
+        <select id="getMemberRecordById" resultMap="MemberRecordResult" parameterType="Long">
+            select
+            <include refid="edu_member_record_columns"/>
+            from edu_member_record
+            where
+                id = #{value}
+        </select>
+		<!-- 会员开通列表 -->
+        <select id="getMemberRecordPage" resultMap="MemberRecordDTOResult" parameterType="MemberRecordDTO">
+            select
+            <include refid="edu_member_record_columns"/>,
+            edu_member_type.title,
+            user_user.email
+            from edu_member_record
+            left join edu_member_type on edu_member_record.member_type=edu_member_type.id
+			left join user_user on user_user.id=edu_member_record.user_id
+			<where>
+				<if test="e.email!=null and e.email!='' ">
+					and user_user.email=#{e.email}
+				</if>
+				<if test="e.memberType!=null and e.memberType>0 ">
+					and edu_member_record.member_type=#{e.memberType}
+				</if>
+			</where>
+			GROUP BY edu_member_record.id
+			<include refid="publicMapper.pageEnd"/>
+        </select>
+        <select id="getMemberRecordPageCount" resultType="int"  parameterType="MemberRecordDTO">
+            select
+            count(1)
+            from edu_member_record
+            left join edu_member_type on edu_member_record.member_type=edu_member_type.id
+			left join user_user on user_user.id=edu_member_record.user_id
+			<where>
+				<if test="e.email!=null and e.email!='' ">
+					and user_user.email=#{e.email}
+				</if>
+				<if test="e.memberType!=null and e.memberType>0 ">
+					and edu_member_record.member_type=#{e.memberType}
+				</if>
+			</where>
+        </select>
+        <!-- 用户某会员的开通记录 -->
+        <select id="getMemberRecordByCondition" parameterType="java.util.Map" resultMap="MemberRecordResult">
+        	select
+            <include refid="edu_member_record_columns"/>
+            from edu_member_record
+            left join edu_member_type on edu_member_record.member_type=edu_member_type.id
+            where user_id=#{userId} and member_type=#{type} and edu_member_record.status=0 and edu_member_type.status=0
+        </select>
+        <!-- 用户所有会员的开通记录 -->
+        <select id="getMemberRecordByUser" parameterType="Long" resultMap="MemberRecordDTOResult">
+        	select
+            <include refid="edu_member_record_columns"/>,
+            edu_member_type.title
+            from edu_member_record
+            left join edu_member_type on edu_member_record.member_type=edu_member_type.id
+            where edu_member_record.user_id=#{value} and edu_member_record.status=0 and edu_member_type.status=0
+        </select>
+        <!-- 获得开通详情 -->
+        <select id="getMemberRecordInfo" parameterType="Long" resultMap="MemberRecordDTOResult">
+         select
+            <include refid="edu_member_record_columns"/>,
+            edu_member_type.title,
+            user_user.email
+            from edu_member_record
+            left join edu_member_type on edu_member_record.member_type=edu_member_type.id
+			left join user_user on user_user.id=edu_member_record.user_id
+			where edu_member_record.id=#{id}
+        </select>
+        <!-- 会员关闭 -->
+        <update id="updateMemberStatus" parameterType="MemberRecord">
+	        update edu_member_record set
+	        edu_member_record.status=#{status}
+	        where edu_member_record.id=#{id}
+        </update>
+</mapper>

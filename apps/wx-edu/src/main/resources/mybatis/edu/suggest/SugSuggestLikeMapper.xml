@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SugSuggestLikeMapper">
+
+	<resultMap id="SugSuggestLikeResult" type="SugSuggestLike">
+		<result property="id" column="id" />
+		<result property="suggestId" column="suggest_id" />
+		<result property="userId" column="user_id" />
+	</resultMap>
+	<!-- 问答点赞表全部的属性 -->
+	<sql id="edu_sug_suggest_like_columns">
+		edu_sug_suggest_like.id,
+		edu_sug_suggest_like.suggest_id,
+		edu_sug_suggest_like.user_id
+	</sql>
+
+	<sql id="edu_sug_suggest_like_properties">
+		#{id},
+		#{suggestId},
+		#{userId}
+	</sql>
+
+	<!-- 点赞 -->
+	<insert id="createSugSuggestLike" parameterType="SugSuggestLike"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		insert INTO edu_sug_suggest_like (
+		<include refid="edu_sug_suggest_like_columns" />
+		) VALUES (
+		<include refid="edu_sug_suggest_like_properties" />
+		)
+	</insert>
+
+	<!-- 取消点赞 -->
+	<delete id="deleteSugSuggestLike" parameterType="SugSuggestLike">
+		delete from
+			edu_sug_suggest_like
+		where
+	  		edu_sug_suggest_like.suggest_id = #{suggestId} and edu_sug_suggest_like.user_id = #{userId}
+	</delete>
+
+	<!-- 获取点赞数量 -->
+	<select id="getSugSuggestLikeCount" parameterType="SugSuggestLike" resultType="int">
+		SELECT count(1) FROM edu_sug_suggest_like WHERE edu_sug_suggest_like.suggest_id = #{suggestId}
+		<if test="userId!=null and userId>0">
+			AND edu_sug_suggest_like.user_id = #{userId}
+		</if>
+	</select>
+</mapper>

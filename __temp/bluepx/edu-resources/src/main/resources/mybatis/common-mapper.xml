@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace和定义的Mapper接口对应，并实现其中的方法 -->
+<mapper namespace="common">
+
+	<sql id="idsForEach">
+		 <foreach collection="ids" open="(" separator="," close=")" item="id">
+	    	#{id}
+	    </foreach>
+	</sql>	
+	
+	<sql id="andCondition">
+			
+		<if test="condition.operator!=null and condition.operator=='in'">
+			${condition.field} ${condition.operator}
+			<foreach item="one" index="index" collection="condition.newValue"
+				open="(" separator="," close=")">
+				#{one}
+			 </foreach>
+		</if>
+		<if test="condition.operator!=null and condition.operator!='in'">
+			${condition.field} ${condition.operator}
+			#{condition.newValue}
+		</if>
+	</sql>
+	
+	
+	<sql id="orCondition">
+			
+		<if test="orCondition.operator!=null and orCondition.operator=='in'">
+			${orCondition.field} ${orCondition.operator}
+			<foreach item="one" index="index" collection="orCondition.newValue"
+				open="(" separator="," close=")">
+				#{one}
+			 </foreach>
+		</if>
+		<if test="orCondition.operator!=null and orCondition.operator!='in'">
+			${orCondition.field} ${orCondition.operator}
+			#{orCondition.newValue}
+		</if>
+			
+	
+	</sql>
+	<sql id="dynamicConditionsNoWhere">
+		<if test="conditions!=null">
+			<foreach collection="conditions" item="condition" index="index">
+				<if test="condition.class.simpleName=='SingleFieldCondition'">
+					<if test="condition.newValue!=null and  condition.newValue.toString().length()>0">
+						AND <include refid="common.andCondition"/>
+					</if>
+				</if>
+				<if test="condition.class.simpleName=='MultiFieldCondition'">
+					<if test="condition.newValue!=null and  condition.newValue.toString().length()>0">
+						AND (
+						<foreach collection="condition.singleConditions" item="orCondition" index="orIndex">
+							<if test="orIndex>0"> OR </if>
+							<include refid="common.orCondition"/>
+						</foreach>
+						)
+					</if>
+				</if>
+					
+			</foreach>
+		</if>	
+	</sql>	
+	<sql id="dynamicConditions">
+		<where>
+			<include refid="common.dynamicConditionsNoWhere"/>
+		</where>
+	</sql>
+
+</mapper>

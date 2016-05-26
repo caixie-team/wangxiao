@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TaskMapper">
+
+    <resultMap id="TaskResult" type="Task">
+        <result property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="beginTime" column="begin_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="releasePeople" column="release_people"/>
+        <result property="releaseTime" column="release_time"/>
+        <result property="status" column="status"/>
+        <result property="isRepeat" column="is_repeat"/>
+        <result property="type" column="type"/>
+        <result property="submit" column="submit"/>
+
+    </resultMap>
+
+    <sql id="edu_task_columns">
+        edu_task.id,
+        edu_task.name,
+        edu_task.begin_time,
+        edu_task.end_time,
+        edu_task.release_people,
+        edu_task.release_time,
+        edu_task.status,
+        edu_task.is_repeat,
+        edu_task.type,
+        edu_task.submit
+    </sql>
+
+    <sql id="edu_task_properties">
+        #{id},
+        #{name},
+        #{beginTime},
+        #{endTime},
+        #{releasePeople},
+        #{releaseTime},
+        #{status},
+        #{isRepeat},
+        #{type},
+        #{submit}
+    </sql>
+
+    <!-- 后台xml开始 -->
+    <insert id="createTask" parameterType="Task" keyColumn="id"
+            keyProperty="id" useGeneratedKeys="true">
+        insert INTO edu_task (
+        <include refid="edu_task_columns"/>
+        ) VALUES (
+        <include refid="edu_task_properties"/>
+        )
+    </insert>
+
+    <delete id="deleteTaskById" parameterType="Long">
+        delete from edu_task
+    </delete>
+    <!-- 修改任务 -->
+    <update id="updateTask" parameterType="Task">
+        update edu_task SET
+        name =#{name},
+        begin_time = #{beginTime},
+        end_time = #{endTime},
+        release_people = #{releasePeople},
+        release_time = #{releaseTime},
+        status = #{status},
+        is_repeat = #{isRepeat},
+        type=#{type},
+        submit=#{submit}
+        where id=#{id}
+    </update>
+
+    <!-- 更新任务状态 -->
+    <update id="updateTaskStatus" parameterType="Task">
+        update edu_task SET
+        status = #{status}
+        where id=#{id}
+    </update>
+
+    <!-- 根据id查询任务 -->
+    <select id="getTaskById" resultMap="TaskResult" parameterType="Long">
+        select
+        <include refid="edu_task_columns"/>
+        from edu_task
+        where edu_task.id=#{id}
+    </select>
+
+    <select id="getTask" parameterType="java.util.Map" resultMap="TaskResult">
+        select
+        <include refid="edu_task_columns"/>
+        from edu_task
+        <where>
+            edu_task.status!=2
+            <if test="id!=null and id!=''">
+                and edu_task.id =#{id}
+            </if>
+            <if test="type!=null">
+                and edu_task.type =#{type}
+            </if>
+            <if test="status!=null and status!=''">
+                and edu_task.status =#{status}
+            </if>
+            <if test="submit!=null and submit!=''">
+                and edu_task.submit =#{submit}
+            </if>
+        </where>
+    </select>
+
+    <!-- 任务列表 -->
+    <select id="getTaskList" resultMap="TaskResult" parameterType="java.util.Map">
+        select
+        <include refid="edu_task_columns"/>
+        from edu_task
+        <where>
+            edu_task.status!=2
+            <if test="e.status!=null and e.status!=''">
+                and edu_task.status =#{e.status}
+            </if>
+            <if test="e.submit!=null and e.submit!=''">
+                and edu_task.submit =#{e.submit}
+            </if>
+            <if test="e.name!=null and e.name!=''">
+                and edu_task.name LIKE CONCAT('%',#{e.name},'%')
+            </if>
+            <if test="e.beginTime!=null and e.beginTime!=''">
+                and <![CDATA[ edu_task.begin_time >=]]>CONCAT(#{e.beginTime},'00:00:00')
+            </if>
+            <if test="e.endTime!=null and e.endTime!=''">
+                and <![CDATA[ edu_task.end_time >=]]>CONCAT(#{e.endTime},'23:59:59')
+            </if>
+        </where>
+        <include refid="publicMapper.pageEnd"/>
+    </select>
+    <select id="getTaskListCount" resultType="int" parameterType="java.util.Map">
+        select
+        count(1)
+        from edu_task
+        <where>
+            edu_task.status!=2
+            <if test="e.name!=null and e.name!=''">
+                and edu_task.name LIKE CONCAT('%',#{e.name},'%')
+            </if>
+            <if test="e.beginTime!=null and e.beginTime!=''">
+                and <![CDATA[ edu_task.begin_time>=#{e.beginTime}]]>
+            </if>
+            <if test="e.endTime!=null and e.endTime!=''">
+                and <![CDATA[ edu_task.end_time >=#{e.endTime}]]>
+            </if>
+            <if test="e.status!=null and e.status!=''">
+                and edu_task.status =#{e.status}
+            </if>
+            <if test="e.submit!=null and e.submit!=''">
+                and edu_task.submit =#{e.submit}
+            </if>
+        </where>
+    </select>
+
+    <resultMap type="Task" id="TaskNewResult" extends="TaskResult">
+        <result property="groupName" column="groupName"/>
+        <result property="examIds" column="examIds"/>
+        <result property="exampaperName" column="exampaper_name"/>
+        <result property="nickname" column="nickname"/>
+        <result property="userGroupId" column="userGroupId"/>
+    </resultMap>
+
+    <!-- 我的部门任务 -->
+    <select id="getGroupTaskList" resultMap="TaskNewResult"
+            parameterType="java.util.Map">
+        SELECT
+        <include refid="edu_task_columns"/>
+        ,
+        edu_task_exam.exampaper_name,
+        user_group.name as groupName,
+        user_group.`id` as userGroupId
+        FROM
+        `edu_task`
+        LEFT JOIN
+        `edu_task_middle_group` ON
+        edu_task_middle_group.`task_id`=edu_task.`id`
+        LEFT JOIN user_group ON
+        user_group.`id`=edu_task_middle_group.`user_group_id`
+        LEFT JOIN
+        `edu_task_exam` ON edu_task_exam.`task_id`=edu_task.`id`
+        <where>
+            <if test="e.userGroupId!=null and e.userGroupId!=0">
+                edu_task_middle_group.user_group_id=#{e.userGroupId}
+            </if>
+            <if test="e.id!=null and e.id!=0">
+                and edu_task.id=#{e.id}
+            </if>
+            <if test="e.name!=null and e.name!=''">
+                and edu_task.name like CONCAT('%',#{e.name},'%')
+            </if>
+            <if test="e.submit!=null and e.submit!=''">
+                and edu_task.submit =#{e.submit}
+            </if>
+        </where>
+        <include refid="publicMapper.pageEnd"/>
+    </select>
+    <select id="getGroupTaskListCount" resultType="int"
+            parameterType="java.util.Map">
+        SELECT
+        COUNT(1),
+        edu_task_exam.exampaper_name,
+        user_group.name as
+        groupName
+        FROM `EDU_TASK`
+        LEFT JOIN `EDU_TASK_MIDDLE_GROUP` ON
+        EDU_TASK_MIDDLE_GROUP.`TASK_ID`=EDU_TASK.`ID`
+        LEFT JOIN USER_GROUP ON
+        USER_GROUP.`ID`=EDU_TASK_MIDDLE_GROUP.`USER_GROUP_ID`
+        LEFT JOIN
+        `EDU_TASK_EXAM` ON EDU_TASK_EXAM.`TASK_ID`=EDU_TASK.`ID`
+        <where>
+            <if test="e.userGroupId!=null and e.userGroupId!=0">
+                edu_task_middle_group.user_group_id=#{e.userGroupId}
+            </if>
+            <if test="e.id!=null and e.id!=0">
+                and edu_task.id=#{e.id}
+            </if>
+            <if test="e.name!=null and e.name!=''">
+                and edu_task.name like CONCAT('%',#{e.name},'%')
+            </if>
+            <if test="e.submit!=null and e.submit!=''">
+                and edu_task.submit =#{e.submit}
+            </if>
+        </where>
+    </select>
+
+    <!-- 任务详情 -->
+    <select id="taskDetailsById" resultMap="TaskNewResult"
+            parameterType="java.util.Map">
+        SELECT
+        <include refid="edu_task_columns"/>
+        ,
+        EDU_TASK_EXAM.EXAMPAPER_NAME,
+        USER_GROUP.NAME AS GROUPNAME,
+        USER_USER.`NICKNAME`
+        FROM
+        `EDU_TASK`
+        LEFT JOIN `EDU_TASK_MIDDLE_USER`
+        ON
+        EDU_TASK_MIDDLE_USER.`TASK_ID`=EDU_TASK.`ID`
+        LEFT JOIN `EDU_TASK_EXAM`
+        ON EDU_TASK_EXAM.`TASK_ID`=EDU_TASK.`ID`
+        LEFT JOIN
+        `EDU_TASK_MIDDLE_GROUP` ON
+        EDU_TASK_MIDDLE_GROUP.`TASK_ID`=EDU_TASK.`ID`
+        LEFT JOIN USER_GROUP ON
+        USER_GROUP.`ID`=EDU_TASK_MIDDLE_GROUP.`USER_GROUP_ID`
+        LEFT JOIN
+        USER_USER ON USER_USER.`ID`=EDU_TASK_MIDDLE_USER.`USER_ID`
+        <where>
+            <if test="e.id!=null and e.id!=0">
+                edu_task.id=#{e.id}
+            </if>
+        </where>
+        <include refid="publicMapper.pageEnd"/>
+    </select>
+
+    <select id="taskDetailsByIdCount" resultType="int"
+            parameterType="java.util.Map">
+        SELECT COUNT(1),
+        EDU_TASK_EXAM.EXAMPAPER_NAME,
+        USER_GROUP.NAME AS
+        GROUPNAME,
+        USER_USER.`NICKNAME`
+        FROM `EDU_TASK`
+        LEFT JOIN
+        `EDU_TASK_MIDDLE_USER`
+        ON
+        EDU_TASK_MIDDLE_USER.`TASK_ID`=EDU_TASK.`ID`
+        LEFT JOIN `EDU_TASK_EXAM`
+        ON EDU_TASK_EXAM.`TASK_ID`=EDU_TASK.`ID`
+        LEFT
+        JOIN
+        `EDU_TASK_MIDDLE_GROUP` ON
+        EDU_TASK_MIDDLE_GROUP.`TASK_ID`=EDU_TASK.`ID`
+        LEFT JOIN USER_GROUP ON
+        USER_GROUP.`ID`=EDU_TASK_MIDDLE_GROUP.`USER_GROUP_ID`
+        LEFT JOIN
+        USER_USER ON USER_USER.`ID`=EDU_TASK_MIDDLE_USER.`USER_ID`
+        <where>
+            <if test="e.id!=null and e.id!=0">
+                edu_task.id=#{e.id}
+            </if>
+        </where>
+    </select>
+    <!-- 后台xml结束 -->
+
+    <!-- 前台xml开始 -->
+
+    <!-- 我的任务 -->
+    <select id="myTaskForWeb" resultMap="TaskNewResult"
+            parameterType="java.util.Map">
+        SELECT
+        <include refid="edu_task_columns"/>
+        ,
+        EDU_TASK_MIDDLE_USER.`group_id` as userGroupId,
+        EDU_TASK_EXAM.`exampaper_id` as examIds
+        FROM `EDU_TASK`
+        LEFT JOIN `EDU_TASK_MIDDLE_USER` ON EDU_TASK_MIDDLE_USER.`TASK_ID`=EDU_TASK.`ID`
+        LEFT JOIN `EDU_TASK_EXAM` ON EDU_TASK_EXAM.`TASK_ID`=EDU_TASK.`ID`
+        WHERE
+        EDU_TASK.TYPE=#{e.type}
+        AND
+        EDU_TASK_MIDDLE_USER.`USER_ID`=#{e.userId}
+        <include refid="publicMapper.pageEnd"/>
+    </select>
+    <select id="myTaskForWebCount" resultType="int" parameterType="java.util.Map">
+        SELECT
+        COUNT(1)
+        FROM `EDU_TASK`
+        LEFT JOIN `EDU_TASK_MIDDLE_USER` ON
+        EDU_TASK_MIDDLE_USER.`TASK_ID`=EDU_TASK.`ID`
+        LEFT JOIN `EDU_TASK_EXAM` ON EDU_TASK_EXAM.`TASK_ID`=EDU_TASK.`ID`
+        WHERE
+        EDU_TASK.TYPE=#{e.type}
+        AND EDU_TASK_MIDDLE_USER.`USER_ID`=#{e.userId}
+    </select>
+    <!-- 我的部门任务 -->
+    <select id="myGroupTaskFroweb" resultMap="TaskNewResult"
+            parameterType="java.util.Map">
+        SELECT
+        <include refid="edu_task_columns"/>
+        ,
+        edu_task_exam.exampaper_name,
+        user_group.name as groupName,
+        user_group.`id` as userGroupId,
+        edu_task_exam.`exampaper_id` as examIds
+        FROM
+        `edu_task`
+        LEFT JOIN
+        `edu_task_middle_group` ON
+        edu_task_middle_group.`task_id`=edu_task.`id`
+        LEFT JOIN user_group ON
+        user_group.`id`=edu_task_middle_group.`user_group_id`
+        LEFT JOIN
+        `edu_task_exam` ON edu_task_exam.`task_id`=edu_task.`id`
+        WHERE
+        EDU_TASK.TYPE=#{e.type}
+        AND
+        EDU_TASK_MIDDLE_GROUP.USER_GROUP_ID=#{e.userGroupId}
+        <include refid="publicMapper.pageEnd"/>
+    </select>
+    <select id="myGroupTaskFrowebCount" resultType="int"
+            parameterType="java.util.Map">
+        SELECT
+        COUNT(1)
+        ,
+        edu_task_exam.exampaper_name,
+        user_group.name as groupName,
+        user_group.`id` as userGroupId
+        FROM
+        `edu_task`
+        LEFT JOIN
+        `edu_task_middle_group` ON
+        edu_task_middle_group.`task_id`=edu_task.`id`
+        LEFT JOIN user_group ON
+        user_group.`id`=edu_task_middle_group.`user_group_id`
+        LEFT JOIN
+        `edu_task_exam` ON edu_task_exam.`task_id`=edu_task.`id`
+        WHERE
+        EDU_TASK.TYPE=#{e.type}
+        AND
+        EDU_TASK_MIDDLE_GROUP.USER_GROUP_ID=#{e.userGroupId}
+    </select>
+    <!-- 前台xml结束 -->
+</mapper>

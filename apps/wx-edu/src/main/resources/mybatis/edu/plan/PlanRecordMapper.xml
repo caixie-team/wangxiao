@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PlanRecordMapper">
+
+    <resultMap id="PlanRecordResult" type="PlanRecord">
+        <result property="id" column="id"/>
+        <result property="planId" column="plan_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="totalTime" column="total_time"/>
+        <result property="completeTime" column="complete_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="finishTime" column="finish_time"/>
+        <result property="courseId" column="course_id"/>
+
+        <result property="userName" column="userName"/>
+        <result property="avatar" column="avatar"/>
+
+        <result property="planName" column="planName"/>
+        <result property="releaseTime" column="releaseTime"/>
+        <result property="endTime" column="endTime"/>
+        <result property="peopleNum" column="peopleNum"/>
+        <result property="completeNum" column="completeNum"/>
+    </resultMap>
+    <sql id="edu_plan_record_columns">
+        edu_plan_record.id,
+        edu_plan_record.plan_id,
+        edu_plan_record.user_id,
+        edu_plan_record.total_time,
+        edu_plan_record.complete_time,
+        edu_plan_record.update_time,
+        edu_plan_record.finish_time,
+        edu_plan_record.course_id
+    </sql>
+
+    <sql id="edu_plan_record_properties">
+        #{id},
+        #{planId},
+        #{userId},
+        #{totalTime},
+        #{completeTime},
+        #{updateTime},
+        #{finishTime},
+        #{courseId}
+    </sql>
+
+    <!-- 批量添加用户计划记录 -->
+    <insert id="addPlanRecordBatch" parameterType="list">
+        INSERT INTO edu_plan_record(<include refid="edu_plan_record_columns"/> )VALUE
+        <foreach collection="list" separator="," item="item">
+            (#{item.id},
+            #{item.planId},
+            #{item.userId},
+            #{item.totalTime},
+            #{item.completeTime},
+            #{item.updateTime},
+            #{item.finishTime},
+            #{item.courseId})
+        </foreach>
+    </insert>
+
+    <update id="updatePlanRecord" parameterType="PlanRecord">
+        UPDATE edu_plan_record SET
+        edu_plan_record.plan_id = #{planId},
+        edu_plan_record.user_id =#{userId} ,
+        edu_plan_record.total_time = #{totalTime},
+        edu_plan_record.complete_time = #{completeTime},
+        edu_plan_record.update_time = #{updateTime},
+        edu_plan_record.finish_time = #{finishTime},
+        edu_plan_record.course_id = #{courseId}
+        WHERE edu_plan_record.id = #{id}
+    </update>
+
+
+    <select id="getPlanRecord" parameterType="PlanRecord" resultMap="PlanRecordResult">
+        SELECT <include refid="edu_plan_record_columns"/>
+        FROM edu_plan_record
+        <where>
+            <if test="planId!=null and planId!=0">
+                AND edu_plan_record.plan_id = #{planId}
+            </if>
+            <if test="userId!=null and userId!=0">
+                AND edu_plan_record.user_id = #{userId}
+            </if>
+        </where>
+    </select>
+    <!-- 获取用户计划记录 -->
+    <select id="getPlanRecordList" parameterType="PlanRecord" resultMap="PlanRecordResult">
+        SELECT <include refid="edu_plan_record_columns"/>,
+        user_user.nickname as userName,
+        user_expand.avatar as avatar,
+        edu_plan.name as planName,
+        edu_plan.release_time as releaseTime,
+        edu_plan.end_time as endTime,
+        edu_plan.people_num as peopleNum,
+        edu_plan.complete_num as completeNum
+        FROM edu_plan_record
+        LEFT JOIN edu_plan on edu_plan_record.plan_id = edu_plan.id
+        LEFT JOIN user_user on edu_plan_record.user_id = user_user.id
+        LEFT JOIN user_expand on edu_plan_record.user_id = user_expand.user_id
+        <where>
+            <if test="planId!=null and planId!=0">
+                AND edu_plan_record.plan_id = #{planId}
+            </if>
+            <if test="userId!=null and userId!=0">
+                AND edu_plan_record.user_id = #{userId}
+            </if>
+        </where>
+    </select>
+    <!-- 获取用户计划记录分页 -->
+    <select id="getPlanRecordListPage" parameterType="java.util.HashMap" resultMap="PlanRecordResult">
+        SELECT <include refid="edu_plan_record_columns"/>,
+        user_user.nickname as userName,
+        user_expand.avatar as avatar,
+        edu_plan.name as planName,
+        edu_plan.release_time as releaseTime,
+        edu_plan.end_time as endTime,
+        edu_plan.people_num as peopleNum,
+        edu_plan.complete_num as completeNum
+        FROM edu_plan_record
+        LEFT JOIN edu_plan on edu_plan_record.plan_id = edu_plan.id
+        LEFT JOIN user_user on edu_plan_record.user_id = user_user.id
+        LEFT JOIN user_expand on edu_plan_record.user_id = user_expand.user_id
+        <where>
+            <if test="e.planId!=null and e.planId!=0">
+                AND edu_plan_record.plan_id = #{e.planId}
+            </if>
+            <if test="e.userId!=null and e.userId!=0">
+                AND edu_plan_record.user_id = #{e.userId}
+            </if>
+        </where>
+        <include refid="publicMapper.pageEnd" />
+    </select>
+    <select id="getPlanRecordListPageCount" parameterType="java.util.HashMap" resultType="int">
+        SELECT count(1)
+        FROM edu_plan_record
+        <where>
+            <if test="e.planId!=null and e.planId!=0">
+                AND edu_plan_record.plan_id = #{e.planId}
+            </if>
+            <if test="e.userId!=null and e.userId!=0">
+                AND edu_plan_record.user_id = #{e.userId}
+            </if>
+        </where>
+    </select>
+</mapper>

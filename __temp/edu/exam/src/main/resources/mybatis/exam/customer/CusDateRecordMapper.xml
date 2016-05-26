@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CusDateRecordMapper" >
+
+<resultMap id="CusDateRecordResult" type="cusdaterecord">
+		<result property="id" column="id"/>
+		<result property="errorQstNum" column="error_qst_num"/>
+		<result property="cusId" column="cus_id"/>
+		<result property="rightQstNum" column="right_qst_num"/>
+		<result property="qstNum" column="qst_num"/>
+		<result property="averageScore" column="average_score"/>
+		<result property="subjectId" column="subject_id"/>
+	</resultMap>
+	
+<sql id="exam_cus_date_record_columns">
+		exam_cus_date_record.id,
+		exam_cus_date_record.error_qst_num,
+		exam_cus_date_record.cus_id,
+		exam_cus_date_record.right_qst_num,
+		exam_cus_date_record.qst_num,
+		exam_cus_date_record.average_score,
+		exam_cus_date_record.subject_id
+	</sql>
+	
+	<sql id="exam_cus_date_record_properties">
+		#{id},
+		#{errorQstNum},
+		#{cusId},
+		#{rightQstNum},
+		#{qstNum},
+		#{averageScore},
+		#{subjectId}
+	</sql>
+	
+ <insert id="createCusDateRecord" parameterType="cusdaterecord" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO exam_cus_date_record (<include refid="exam_cus_date_record_columns"/>) VALUES (<include
+            refid="exam_cus_date_record_properties"/>)
+    </insert>	
+    
+ <select id="getCusDateRecordByCusIdAndSubjectId" parameterType="java.util.HashMap" resultMap="CusDateRecordResult">
+	select <include refid="exam_cus_date_record_columns"/>
+	from exam_cus_date_record 
+	<where>
+	exam_cus_date_record.cus_id=#{cusId} 
+	and exam_cus_date_record.subject_id = #{subjectId}
+	</where>
+	</select>
+	
+	<update id="updateCusDateRecordById" parameterType="java.util.HashMap" >
+ 		update exam_cus_date_record set 
+ 		error_qst_num=error_qst_num+#{errorQstNum},right_qst_num=right_qst_num+#{rightQstNum},
+ 		qst_num=qst_num+#{qstNum},average_score=#{averageScore} 
+ 		where id=#{id,jdbcType=INTEGER}
+	</update>
+	
+	<select id="queryCusDateRecordAverageScoreRanking" resultType="int" parameterType="java.util.HashMap">
+	SELECT count(1) FROM `exam_cus_date_record` WHERE 
+	subject_id =#{subjectId}
+	AND <![CDATA[ average_score >=#{averageScore} ]]>
+	order by average_score desc
+	</select>    
+	
+</mapper>

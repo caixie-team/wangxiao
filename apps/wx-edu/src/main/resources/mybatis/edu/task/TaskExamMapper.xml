@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TaskExamMapper">
+
+	<resultMap id="TaskExamResult" type="TaskExam">
+		<result property="id" column="id" />
+		<result property="taskId" column="task_id" />
+		<result property="exampaperId" column="exampaper_id" />
+		<result property="exampaperName" column="exampaper_name" />
+		<result property="replyTime" column="reply_time" />
+		<result property="exampaperLevel" column="exampaper_level" />
+		<result property="joinNum" column="join_num" />
+		<result property="avgscore" column="avgscore" />
+	</resultMap>
+
+	<sql id="edu_task_exam_columns">
+		edu_task_exam.id,
+		edu_task_exam.task_id,
+		edu_task_exam.exampaper_id,
+		edu_task_exam.exampaper_name
+		<!-- edu_task_exam.reply_time, edu_task_exam.exampaper_level, edu_task_exam.join_num, 
+			edu_task_exam.avgscore -->
+	</sql>
+
+	<sql id="edu_task_exam_properties">
+		#{id},
+		#{taskId},
+		#{exampaperId},
+		#{exampaperName}
+		<!-- #{replyTime}, #{exampaperLevel}, #{joinNum}, #{avgscore} -->
+	</sql>
+
+	<insert id="createTaskExam" parameterType="TaskExam" keyColumn="id"
+		keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_task_exam (
+		<include refid="edu_task_exam_columns" />
+		) VALUES (
+		<include refid="edu_task_exam_properties" />
+		)
+	</insert>
+	<!-- 批量添加试卷 -->
+	<insert id="batchAddTaskExam" parameterType="list">
+		insert into edu_task_exam(
+		<include refid="edu_task_exam_columns" />
+		) values
+		<foreach item="item" index="index" collection="list"
+			separator=",">
+			(
+			#{item.id},
+			#{item.taskId},
+			#{item.exampaperId},
+			#{item.exampaperName}
+			)
+		</foreach>
+
+	</insert>
+	<!-- 删除任务下的试卷 -->
+	<delete id="deleteTaskExamById" parameterType="Long">
+		delete from
+		edu_task_exam
+		where edu_task_exam.task_id=#{value}
+	</delete>
+
+	<select id="getTaskExamById" resultMap="TaskExamResult"
+		parameterType="Long">
+		select
+		<include refid="edu_task_exam_columns" />
+		from edu_task_exam
+	</select>
+
+	<select id="getTaskExamList" resultMap="TaskExamResult"
+		parameterType="TaskExam">
+		select
+		<include refid="edu_task_exam_columns" />
+		from edu_task_exam
+	</select>
+	<!-- 任务下的试卷 -->
+	<select id="getTaskExamByIds" resultMap="TaskExamResult"
+		parameterType="TaskExam">
+		SELECT
+		<include refid="edu_task_exam_columns" />
+		FROM `edu_task_exam` 
+		<where>
+			<if test="taskId!=null and taskId!=0">
+				edu_task_exam.`task_id`=#{taskId}
+			</if>
+		</where>
+	</select>
+</mapper>

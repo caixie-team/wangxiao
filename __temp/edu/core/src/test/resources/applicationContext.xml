@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jdbc="http://www.springframework.org/schema/jdbc" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd"
+		default-lazy-init="true" >
+           
+    <!-- 扫描，无需写配置文件实例化service和dao -->
+	<context:component-scan base-package="com.atdld.open">
+			<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+			<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
+	</context:component-scan>
+	
+	<import resource="applicationContext-t1-read.xml" />
+	<import resource="applicationContext-crm-read.xml" />
+	
+	<!-- 配置文件加载 -->
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<!-- <value>classpath:/jdbc-mysql.properties</value> -->
+				<value>classpath:/project.properties</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="parentDataSource" class="${jdbc.driverClassName}" init-method="init" destroy-method="close">
+	      <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+	      <property name="url" value="${jdbc.url}"/>
+	      <property name="username" value="${jdbc.username}"/>
+	      <property name="password" value="${jdbc.password}"/>
+		 <!-- 配置初始化大小、最小、最大 -->
+		   <property name="initialSize" value="${jdbc.initialPoolSize}" />
+		   <property name="minIdle" value="${jdbc.minPoolSize}" />
+		   <property name="maxActive" value="${jdbc.maxPoolSize}" />
+		   <!-- 配置获取连接等待超时的时间 -->
+		   <property name="maxWait" value="60000" />
+		   <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->
+		   <property name="timeBetweenEvictionRunsMillis" value="60000" />
+		   <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->
+		   <property name="minEvictableIdleTimeMillis" value="300000" />
+		   <property name="validationQuery" value="SELECT 'x'" />
+		   <property name="testWhileIdle" value="true" />
+		   <property name="testOnBorrow" value="false" />
+		   <property name="testOnReturn" value="false" />
+		   <!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->
+		  <!--  <property name="poolPreparedStatements" value="false" /> -->
+		  <!--  <property name="maxPoolPreparedStatementPerConnectionSize" value="20" /> -->
+		   <!-- 配置监控统计拦截的filters -->
+		   <property name="filters" value="stat" />
+	   </bean>
+	   
+	   
+	<bean id="write" parent="parentDataSource"></bean>
+
+	<bean id="read01" destroy-method="close" parent="parentDataSource">
+		<property name="url" value="${jdbc.read01.url}"/>
+	     <property name="username" value="${jdbc.read01.username}"/>
+	    <property name="password" value="${jdbc.read01.password}"/>
+	</bean>
+	<bean id="read02" destroy-method="close" parent="parentDataSource">
+		<property name="url" value="${jdbc.read02.url}"/>
+	     <property name="username" value="${jdbc.read02.username}"/>
+	    <property name="password" value="${jdbc.read02.password}"/>
+	</bean>
+	
+	
+	<bean id="dataSource" class="com.atdld.open.core.datasource.FKRoutingDataSource">
+		<property name="targetDataSources">
+			<map key-type="java.lang.String">
+				<entry key="write" value-ref="write" />
+				<entry key="read01" value-ref="read01" />
+				<entry key="read02" value-ref="read02" />
+			</map>
+		</property>
+		<property name="defaultTargetDataSource" ref="write" />
+		<property name="dataSourceKeyControl">
+			<ref local="dataSourceKeyControl" />
+		</property>
+	</bean>
+
+	<bean id="dataSourceKeyControl" class="com.atdld.open.core.datasource.DataSourceKeyControlImpl">
+		<property name="readDateSourceMap">
+			<map key-type="java.lang.String">
+				<entry key="write" value="write" />
+				<entry key="read01" value-ref="read01" />
+				<entry key="read02" value-ref="read02" />
+			</map>
+		</property>
+		<property name="writeKey">
+			<value>write</value>
+		</property>
+	</bean>
+	<!-- 事务配置 -->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	<!-- 事务管理拦截器 -->
+	<bean id="transactionInterceptor"
+		class="org.springframework.transaction.interceptor.TransactionInterceptor">
+		<property name="transactionManager" ref="transactionManager" />
+		<property name="transactionAttributes">
+			<props>
+				<!-- 读操作 -->
+				<prop key="query*">PROPAGATION_SUPPORTS,-Exception</prop>
+				<prop key="find*">PROPAGATION_SUPPORTS,-Exception</prop>
+				<prop key="get*">PROPAGATION_SUPPORTS,-Exception</prop>
+				<prop key="load*">PROPAGATION_SUPPORTS,-Exception</prop>
+				<prop key="count*">PROPAGATION_SUPPORTS,-Exception</prop>
+				<prop key="list*">PROPAGATION_SUPPORTS,-Exception</prop>
+				<prop key="check*">PROPAGATION_SUPPORTS,-Exception</prop>
+				<prop key="qry*">PROPAGATION_SUPPORTS,-Exception</prop>
+				<prop key="select*">PROPAGATION_SUPPORTS,-Exception</prop>
+				<!-- 写操作 -->
+				<prop key="save*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="del*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="add*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="upd*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="insert*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="creat*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="edit*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="remove*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="gain*">PROPAGATION_REQUIRED,-Exception</prop>
+				<prop key="*">PROPAGATION_SUPPORTS,-Exception</prop>
+
+			</props>
+		</property>
+	</bean>
+
+	<!-- 动态数据源拦截器 -->
+	<bean id="dataSourceInterceptor" class="com.atdld.open.core.datasource.DataSourceInterceptor">
+		<property name="attributes">
+			<props>
+				<!-- 读操作 -->
+				<prop key="query*">read</prop>
+				<prop key="find*">read</prop>
+				<prop key="get*">read</prop>
+				<prop key="load*">read</prop>
+				<prop key="count*">read</prop>
+				<prop key="list*">read</prop>
+				<prop key="check*">read</prop>
+				<prop key="qry*">read</prop>
+				<prop key="select*">read</prop>
+				<!-- 写操作 -->
+				<prop key="save*">write</prop>
+				<prop key="upd*">write</prop>
+				<prop key="del*">write</prop>
+				<prop key="add*">write</prop>
+				<prop key="insert*">write</prop>
+				<prop key="creat*">write</prop>
+				<prop key="edit*">write</prop>
+				<prop key="remove*">write</prop>
+				<prop key="gain*">write</prop>
+				<prop key="*">read</prop>
+			</props>
+		</property>
+		<property name="dataSourceKeyControl">
+			<ref bean="dataSourceKeyControl" />
+		</property>
+	</bean>
+
+	<!-- 根据Name匹配拦截器 -->
+	<bean
+		class="org.springframework.aop.framework.autoproxy.BeanNameAutoProxyCreator">
+		<property name="beanNames">
+			<list>
+				<value>*Service</value>
+			</list>
+		</property>
+		<property name="interceptorNames">
+			<list>
+				<!-- 指定获取数据源的Interceptor -->
+				<value>dataSourceInterceptor</value>
+				<!-- 事务管理的Interceptor -->
+				<value>transactionInterceptor</value>
+				<!-- other db -->
+				<value>transactionInterceptor_read_online</value>
+				<value>transactionInterceptor_crm_read_online</value>
+			</list>
+		</property>
+	</bean>
+	
+   <!-- 本项目数据源代码-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<!-- 显式指定Mapper文件位置 -->
+    	 <property name="configLocation"  value="classpath:/SqlMapConfig.xml"/>
+    	 <!-- 通配符指定Mapper.xml -->
+		<property name="mapperLocations" value="classpath:/mybatis/**/*Mapper.xml" />
+		<!-- 自动扫描entity目录, 省掉Configuration.xml里的手工配置 -->
+		 <property name="typeAliasesPackage" value="com.atdld.open.entity" />
+	</bean>
+	<bean id="sqlSessionMain" class="org.mybatis.spring.SqlSessionTemplate">  
+    	<constructor-arg index="0" ref="sqlSessionFactory"/>  
+	</bean>
+    
+</beans>

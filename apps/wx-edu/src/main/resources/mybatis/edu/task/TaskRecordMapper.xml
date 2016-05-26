@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TaskRecordMapper">
+
+	<resultMap id="TaskRecordResult" type="TaskRecord">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id"/>
+		<result property="taskId" column="task_id"/>
+		<result property="userGroupId" column="user_group_id"/>
+		<result property="exampaperId" column="exampaper_id"/>
+		<result property="exampaperName" column="exampaper_name"/>
+		<result property="score" column="score"/>
+		<result property="isComplete" column="is_complete"/>
+		<result property="submitTime" column="submit_time"/>
+	</resultMap>	
+	
+	<sql id="edu_task_record_columns">
+		edu_task_record.id,
+		edu_task_record.user_id,
+		edu_task_record.task_id,
+		edu_task_record.user_group_id,
+		edu_task_record.exampaper_id,
+		edu_task_record.exampaper_name,
+		edu_task_record.score,
+		edu_task_record.is_complete,
+		edu_task_record.submit_time
+	</sql>
+
+	<sql id="edu_task_record_properties">
+		#{id},
+		#{userId},
+		#{taskId},
+		#{userGroupId},
+		#{exampaperId},
+		#{exampaperName},
+		#{score},
+		#{isComplete},
+		#{submitTime}
+	</sql>
+	
+	<insert id="addTaskRecord" parameterType="TaskRecord" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+	   insert into edu_task_record(<include refid="edu_task_record_columns"/>)
+		values (<include refid="edu_task_record_properties"/>)
+	</insert>
+	
+	<select id="getTaskRecorduserId" resultMap="TaskRecordResult" parameterType="TaskRecord">
+		 select (<include refid="edu_task_record_columns"/>)
+		  from
+		 edu_task_record 
+		 where 
+		 edu_task_record.user_id = #{value} 
+		 order by
+ 		 edu_task_record.submit_time
+	</select>
+	
+	
+ </mapper>

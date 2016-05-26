@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ArrangeRecordMapper">
+
+	<resultMap id="ArrangeRecordResult" type="ArrangeRecord">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="arrangeId" column="arrange_id" />
+		<result property="exampaperId" column="exampaper_id" />
+		<result property="exampaperName" column="exampaper_name" />
+		<result property="score" column="score" />
+		<result property="isComplete" column="is_complete" />
+		<result property="submitTime" column="submit_time" />
+		<result property="examRecordId" column="exam_record_id" />
+	</resultMap>
+	
+	
+	
+	<resultMap id="ArrangeResult" type="Arrange">
+		<result property="arrangename" column="arrangename" />		
+	</resultMap>
+	
+	<resultMap id="UserResult" type="User" extends="ArrangeResult">
+		<result property="nickname" column="nickname" />
+	</resultMap>
+	
+	<resultMap type="UserGroup" id="UserGroupResult" extends="UserResult">
+		<result column="groupname" property="groupname" />
+	</resultMap>
+	
+	<resultMap id="ArrangeRecordGroudUsers" type="ArrangeRecord" extends="UserGroupResult">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="arrangeId" column="arrange_id" />
+		<result property="exampaperId" column="exampaper_id" />
+		<result property="exampaperName" column="exampaper_name" />
+		<result property="score" column="score" />
+		<result property="isComplete" column="is_complete" />
+		<result property="submitTime" column="submit_time" />
+	</resultMap>
+
+	<sql id="edu_arrange_record_columns">
+		edu_arrange_record.id,
+		edu_arrange_record.user_id,
+		edu_arrange_record.arrange_id,
+		edu_arrange_record.exampaper_id,
+		edu_arrange_record.exampaper_name,
+		edu_arrange_record.score,
+		edu_arrange_record.is_complete,
+		edu_arrange_record.submit_time,
+		edu_arrange_record.exam_record_id
+	</sql>
+
+	<sql id="edu_arrange_record_properties">
+		#{id},
+		#{userId},
+		#{arrangeId},
+		#{exampaperId},
+		#{exampaperName},
+		#{score},
+		#{isComplete},
+		#{submitTime},
+		#{examRecordId}
+	</sql>
+
+	<insert id="createArrangeRecord" parameterType="ArrangeRecord"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_arrange_record (
+		<include refid="edu_arrange_record_columns" />
+		) VALUES (
+		<include refid="edu_arrange_record_properties" />
+		)
+	</insert>
+
+	<!-- 批量添加任务记录 -->
+	<insert id="batchAddArrangeTecord" parameterType="list">
+		insert into edu_arrange_record(
+		<include refid="edu_arrange_record_columns" />
+		) values
+		<foreach item="item" index="index" collection="list"
+			separator=",">
+			(
+			#{item.id},
+			#{item.userId},
+			#{item.arrangeId},
+			#{item.exampaperId},
+			#{item.exampaperName},
+			#{item.score},
+			#{item.isComplete},
+			#{item.submitTime},
+			#{item.examRecordId}
+			)
+		</foreach>
+	</insert>
+	<delete id="deleteArrangeRecordById" parameterType="Long">
+		delete from
+		edu_arrange_record
+		where
+		id = #{value}
+	</delete>
+	<!-- 删除任务下的记录 -->
+	<delete id="deleteArrangeRecoredId" parameterType="Long">
+		delete from
+		edu_arrange_record
+		where
+		edu_arrange_record.arrange_id=#{arrangeId}
+	</delete>
+	<update id="updateArrangeRecord" parameterType="ArrangeRecord">
+		update
+		edu_arrange_record SET
+		<if test="id!='' and id!=null">
+		id = #{id},
+		</if>
+		<if test="userId!='' and userId!=null">
+		user_id = #{userId},
+		</if>
+		<if test="arrangeId!='' and arrangeId!=null">
+		arrange_id = #{arrangeId},
+		</if>
+		<if test="exampaperId!='' and exampaperId!=null">
+		exampaper_id = #{exampaperId},
+		</if>
+		<if test="exampaperName!='' and exampaperName!=null">
+		exampaper_name = #{exampaperName},
+		</if>
+		<if test="score!='' and score!=null">
+		score = #{score},
+		</if>
+		<if test="isComplete!='' and isComplete!=null">
+		is_complete =
+		#{isComplete},
+		</if>
+		submit_time = #{submitTime}
+		where
+		id = #{id}
+	</update>
+
+	<select id="getArrangeRecordById" resultMap="ArrangeRecordResult"
+		parameterType="Long">
+		select
+		<include refid="edu_arrange_record_columns" />
+		from edu_arrange_record
+		where
+		id = #{value}
+	</select>
+	<resultMap type="ArrangeRecord" id="ArrangeRecordNewResult"
+		extends="ArrangeRecordResult">
+		<result property="nickname" column="nickname" />
+		<result property="email" column="email" />
+		<result property="arrangeName" column="name" />
+	</resultMap>
+	<!-- 查看 考试情况分页 -->
+	<select id="getArrangeRecordList" resultMap="ArrangeRecordNewResult"
+		parameterType="Map">
+		select
+		<include refid="edu_arrange_record_columns" />
+		,
+		edu_arrange.name,
+		edu_arrange.is_repeat isRepeat,
+		edu_arrange.begin_time beginTime,
+		edu_arrange.end_time endTime,
+		user_user.email,
+		user_user.nickname
+		from edu_arrange_record
+		LEFT JOIN
+		`edu_arrange`
+		ON edu_arrange.`id` = edu_arrange_record.`arrange_id`
+		LEFT JOIN
+		user_user
+		ON user_user.`id` = edu_arrange_record.`user_id`
+		<where>
+			<if test="e.userId!=null and e.userId>0">
+				AND edu_arrange_record.`user_id` = #{e.userId}
+			</if>
+			<if test="e.arrangeId!=null and e.arrangeId!=0">
+				AND edu_arrange_record.`arrange_id` = #{e.arrangeId}
+			</if>
+			<if test="e.arrangeName!=null and e.arrangeName!=''">
+				AND edu_arrange.`name` like CONCAT('%',#{e.arrangeName},'%')
+			</if>
+			<if test="e.isComplete!=null and e.isComplete!=''">
+				AND edu_arrange_record.`is_complete` = #{e.isComplete}
+			</if>
+			<if test="e.nickname!=null and e.nickname!=''">
+				AND user_user.`nickname` like CONCAT('%',#{e.nickname},'%')
+			</if>
+			<if test="e.email!=null and e.email!=''">
+				AND user_user.`email` like CONCAT('%',#{e.email},'%')
+			</if>
+		</where>
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getArrangeRecordListCount" resultType="int"
+		parameterType="Map">
+		SELECT
+		COUNT(1)
+		FROM EDU_ARRANGE_RECORD
+		LEFT JOIN
+		`EDU_ARRANGE`
+		ON EDU_ARRANGE.`ID`
+		= EDU_ARRANGE_RECORD.`ARRANGE_ID`
+		LEFT JOIN
+		USER_USER
+		ON USER_USER.`ID` =
+		EDU_ARRANGE_RECORD.`USER_ID`
+		<where>
+			<if test="e.userId!=null and e.userId>0">
+				AND edu_arrange_record.`user_id` = #{e.userId}
+			</if>
+			<if test="e.arrangeId!=null and e.arrangeId!=0">
+				AND edu_arrange_record.`arrange_id` = #{e.arrangeId}
+			</if>
+			<if test="e.arrangeName!=null and e.arrangeName!=''">
+				AND edu_arrange.`name` like CONCAT('%',#{e.arrangeName},'%')
+			</if>
+			<if test="e.isComplete!=null and e.isComplete!=''">
+				AND edu_arrange_record.`is_complete` = #{e.isComplete}
+			</if>
+			<if test="e.nickname!=null and e.nickname!=''">
+				AND user_user.`nickname` like CONCAT('%',#{e.nickname},'%')
+			</if>
+			<if test="e.email!=null and e.email!=''">
+				AND user_user.`email` like CONCAT('%',#{e.email},'%')
+			</if>
+		</where>
+	</select>
+
+
+	
+	<insert id="addArrangeRecord" parameterType="ArrangeRecord" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+	   insert into edu_arrange_record(<include refid="edu_arrange_record_columns"/>)
+		values (<include refid="edu_arrange_record_properties"/>)
+	</insert>
+	
+	<select id="getArrangeRecorduserId" resultMap="ArrangeRecordResult" parameterType="ArrangeRecord">
+		 select <include refid="edu_arrange_record_columns"/>
+		 from
+		 edu_arrange_record 
+		 where 
+		 edu_arrange_record.user_id = #{value} 
+		 and
+         edu_arrange_record.`is_complete` = 1
+		 order by
+ 		 edu_arrange_record.submit_time
+ 		 
+	</select>
+	
+	<select id="getGroudArrange" resultMap="ArrangeRecordResult" parameterType="ArrangeRecord">
+		 select <include refid="edu_arrange_record_columns"/>
+		 from
+		 edu_arrange_record
+		 <if test="userId!=0 and userId!=null">
+		 ,
+		 user_user
+		 </if> 
+		 where 
+		 edu_arrange_record.arrange_id = #{arrangeId}
+		 <if test="userId!=0 and userId!=null">
+		 and
+		 edu_arrange_record.user_id = user_user.id
+		 </if> 
+		 and
+         edu_arrange_record.`is_complete` = 1
+	</select>
+	
+	
+	<select id="getArrangeRecordGroudUsers" resultMap="ArrangeRecordResult" parameterType="ArrangeRecord">
+		 SELECT 
+		   <include refid="edu_arrange_record_columns"/>,
+		   user_user.`nickname`,
+		   edu_arrange.`name` AS arrangename,
+		   user_group.`name` AS groupname
+		 FROM
+		   edu_arrange_record 
+		 LEFT JOIN 
+		   edu_arrange
+		 ON
+		   edu_arrange.`id` = edu_arrange_record.`arrange_id` 
+		 LEFT JOIN
+		   edu_arrange_middle_group
+		 ON
+		   edu_arrange_middle_group.`arrange_id` = edu_arrange.`id`
+		 LEFT JOIN
+		   user_group
+		 ON
+		   user_group.`id` = edu_arrange_middle_group.`user_group_id`
+		 LEFT JOIN
+		    group_middle_user
+		 ON
+		    group_middle_user.`group_id` = user_group.`id`
+		 LEFT JOIN
+		    user_user
+		 ON
+		    user_user.`id` = group_middle_user.`user_id`
+		 WHERE
+		   edu_arrange_record.`arrange_id` = ${arrangeId} 
+		 AND
+		   edu_arrange_record.`user_id` = user_user.`id`
+		 AND
+           edu_arrange_record.`is_complete` = 1
+	</select>
+	
+	<!-- 根据taskid和userid查出id-->
+	<select id="getuserArrangeid" resultMap="ArrangeRecordResult"
+		parameterType="ArrangeRecord">
+	   SELECT  id
+	   FROM edu_arrange_record
+	   WHERE edu_arrange_record.`arrange_id`  = #{arrangeId}
+	   AND   edu_arrange_record.`user_id`  = #{userId}
+	</select>
+	
+	<select id="getGrouduserid" resultMap="ArrangeRecordResult" parameterType="ArrangeRecord">
+		 select <include refid="edu_arrange_record_columns"/>
+		 from
+		 edu_arrange_record
+		 where 		
+         edu_arrange_record.`user_id` = #{userId}
+	</select>
+	
+	<select id="getcountgruopArrange" resultType="Long" parameterType="Long">
+	     SELECT  COUNT(1)
+		 FROM
+		   edu_arrange_record AS c
+		 WHERE
+		   c.`user_group_id` = #{value}
+	</select>
+	
+	<select id="getgruopArrange" resultType="Long" parameterType="Long">
+	     SELECT  COUNT(1)
+		 FROM
+		   edu_arrange_record AS c
+		 WHERE
+		   c.`user_group_id` = #{value}
+		   AND 
+		   c.`is_complete` = 1
+	</select>
+	
+	<select id="getIscompleteArrange" resultType="Long" parameterType="Long">
+	     SELECT c.is_complete
+		 FROM
+		   edu_arrange_record AS c
+		 WHERE
+		   c.`arrange_id` = #{value}
+	</select>
+	<!-- 批量修改状态 -->
+	<update id="updateArrangeRecordStatusBatch" parameterType="list">
+		update edu_arrange_record
+		set is_complete=1
+		where
+		arrange_id in 
+		<foreach collection="list" open="(" separator="," close=")" item="item">
+			item.id
+		</foreach>
+	</update>
+	<!-- 提交考试安排修改考试记录信息 -->
+	<update id="updateArrangeRecordBySubmit" parameterType="ArrangeRecord">
+		update edu_arrange_record
+		set 
+		is_complete=#{isComplete},
+		score=#{score},
+		submit_time=#{submitTime},
+		exam_record_id=#{examRecordId}
+		where
+		id=#{id}
+	</update>
+	<select id="getArrangeRecordAndArrangeById" parameterType="Long" resultMap="ArrangeRecordResult">
+		select <include refid="edu_arrange_record_columns"/>,
+		edu_arrange.is_repeat isRepeat
+		from edu_arrange_record
+		left join edu_arrange on edu_arrange_record.arrange_id = edu_arrange.id
+		where edu_arrange_record.id = #{value}
+	</select>
+	
+</mapper>

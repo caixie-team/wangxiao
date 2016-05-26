@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <jmxConfigurator />
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%-70(%c{15}.%M[%date{yyyy-MM-dd HH:mm:ss}]) : %m%ex%n</Pattern>
+            <!-- <Pattern>%-50(%c{15}.%M\(%F:%L\)) : %m%ex%n</Pattern> -->
+        </layout>
+    </appender>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="rollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/Anbi.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/Bluepx.%d{yyyy-MM-dd}.log</fileNamePattern>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="businessLogFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/business.log</file>
+        <!-- 按每小时滚动文件，如果一个小时内达到10M也会滚动文件, 滚动文件将会压缩成zip格式 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>logs/business-%d{yyyy-MM-dd_HH}.%i.zip</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+        </rollingPolicy>
+        <!-- 独立的pattern -->
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS},%msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- project default level -->
+    <!--<logger name="com.edu" level="INFO" />-->
+    <logger name="co.bluepx.edu" level="INFO" />
+
+    <!-- business log 使用独立的appender，不继承Root的appender -->
+    <logger name="business" level="INFO" additivity="false">
+        <appender-ref ref="businessLogFile" />
+    </logger>
+    <!--<logger name="org.mybatis" level="DEBUG" />-->
+    <!--<logger name="com.mybatis" level="INFO">-->
+        <!--<appender-ref ref="STDOUT" />-->
+    <!--</logger>-->
+    <!--log4jdbc -->
+    <!--<logger name="jdbc.sqltiming" level="INFO"/>-->
+    <!---->
+    <!--<logger name="java.sql" level="DEBUG" additivity="false" />-->
+    <!--<logger name="org.springframework" level="DEBUG" />-->
+    <!--<logger name="org.mybatis" level="DEBUG" />--><!--
+    <logger name="java.sql.Connection">
+        <level value="DEBUG" />
+    </logger>
+    -->
+    <!--<logger name="java.sql.Statement">-->
+        <!--<level value="DEBUG" />-->
+    <!--</logger>-->
+    <!--<logger name="java.sql" level="DEBUG">-->
+        <!--<appender-ref ref="STDOUT" />-->
+    <!--</logger>-->
+    <!--<logger name="com.mybatis" level="DEBUG">-->
+        <!--<appender-ref ref="STDOUT" />-->
+    <!--</logger>-->
+    <!--<logger name="org.mybatis">-->
+        <!--<level value="DEBUG" />-->
+    <!--</logger>-->
+    <!--<logger name="org.apache.ibatis">-->
+        <!--<level value="DEBUG" />-->
+    <!--</logger>-->
+    <!--<logger name="org.apache.ibatis.jdbc.ScriptRunner">-->
+        <!--<level value="DEBUG" />-->
+    <!--</logger>-->
+    <!--<logger name="org.apache.ibatis.jdbc.SqlBuilder">-->
+        <!--<level value="DEBUG" />-->
+    <!--</logger>-->
+    <!--<logger name="org.apache.ibatis.jdbc.SqlRunner">-->
+        <!--<level value="DEBUG" />-->
+    <!--</logger>-->
+    <!--<logger name="org.apache.ibatis.jdbc.SQL">-->
+        <!--<level value="DEBUG" />-->
+    <!--</logger>-->
+    <!--&ndash;&gt;	&lt;!&ndash; root &ndash;&gt;-->
+    <!--<root level="DEBUG">-->
+        <!--<appender-ref ref="console" />-->
+        <!--<appender-ref ref="STDOUT" />-->
+        <!--<appender-ref ref="rollingFile" />-->
+    <!--</root>-->
+</configuration>

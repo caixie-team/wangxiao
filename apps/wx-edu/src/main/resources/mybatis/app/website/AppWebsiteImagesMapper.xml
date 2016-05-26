@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AppWebsiteImagesMapper">
+	<resultMap type="AppWebsiteImages" id="ImagesResult">
+		<result property="id" column="ID"/>
+		<result property="imagesUrl" column="IMAGE_URL"/>
+		<result property="courseId" column="course_id"/>
+		<result property="title" column="TITLE"/>
+		<result property="keyWord" column="KEYWORD"/>
+		<result property="seriesNumber" column="SERIES_NUMBER"/>
+		<result property="color" column="COLOR"/>
+		<result property="previewUrl" column="PREVIEW_URL"/>
+	</resultMap>
+    <resultMap type="AppWebsiteImages" id="ImagesCourseResult" extends="ImagesResult" >
+        <result property="name" column="name"/>
+    </resultMap>
+	<sql id="edu_website_images_columns">
+		app_website_images.ID,
+		app_website_images.IMAGE_URL,
+		app_website_images.course_id,
+		app_website_images.TITLE,
+		app_website_images.KEYWORD,
+		app_website_images.SERIES_NUMBER,
+		app_website_images.COLOR,
+		app_website_images.PREVIEW_URL
+	</sql>
+  
+	<sql id="edu_website_images_properties">
+		#{id},
+		#{imagesUrl},
+		#{courseId},
+		#{title},
+		#{keyWord},
+		#{seriesNumber},
+		#{color},
+		#{previewUrl}
+	</sql>
+	<select id="getIndexPageBanner" parameterType="java.util.Map" resultMap="ImagesResult">
+		SELECT <include refid="edu_website_images_columns"/>
+		FROM APP_WEBSITE_IMAGES 
+		where APP_WEBSITE_IMAGES.KEYWORD=#{keyWord}
+		
+		ORDER BY SERIES_NUMBER DESC
+		
+		<if test="value>0">
+		LIMIT #{count}
+		</if>
+	</select>
+	<!-- 添加广告图 -->
+	<insert id="createImages" parameterType="AppWebsiteImages">
+		INSERT INTO app_website_images 
+		(<include refid="edu_website_images_columns"/>) 
+		VALUES 
+		(<include refid="edu_website_images_properties"/>)
+	</insert>
+	<!-- 删除广告图 -->
+	<delete id="deleteImg" parameterType="java.lang.String">
+		DELETE FROM app_website_images WHERE ID IN (${value})
+	</delete>
+	<!-- 广告图分页列表 -->
+	<select id="getImgPageList" resultMap="ImagesResult" parameterType="Map">
+		SELECT <include refid="edu_website_images_columns"/>,
+        edu_course.name
+		FROM app_website_images
+        left join edu_course
+        on app_website_images.course_id = edu_course.id
+		<where>
+			<if test="e.imagesUrl!=null and e.imagesUrl!='' ">
+				and app_website_images.IMAGE_URL like CONCAT('%',#{e.imagesUrl},'%')
+			</if>
+			<if test="e.courseId!=null and e.courseId!='' ">
+				and app_website_images.course_id like CONCAT('%',#{e.courseId},'%')
+			</if>
+			<if test="e.title!=null and e.title!='' ">
+				and app_website_images.TITLE like CONCAT('%',#{e.title},'%')
+			</if>
+			<if test="e.keyWord!=null and e.keyWord!='' ">
+				and app_website_images.KEYWORD =#{e.keyWord}
+			</if>
+		</where>
+		ORDER BY app_website_images.SERIES_NUMBER DESC
+		<include refid="publicMapper.pageEnd"/>  
+	</select>
+	<select id="getImgPageListCount" resultType="int" parameterType="Map">
+		SELECT COUNT(1) 
+		FROM app_website_images 
+		<where>
+			<if test="e.imagesUrl!=null and e.imagesUrl!='' ">
+				and app_website_images.IMAGE_URL like CONCAT('%',#{e.imagesUrl},'%')
+			</if>
+			<if test="e.courseId!=null and e.courseId!='' ">
+				and app_website_images.course_id like CONCAT('%',#{e.courseId},'%')
+			</if>
+			<if test="e.title!=null and e.title!='' ">
+				and app_website_images.TITLE like CONCAT('%',#{e.title},'%')
+			</if>
+			<if test="e.keyWord!=null and e.keyWord!='' ">
+				and app_website_images.KEYWORD =#{e.keyWord}
+			</if>
+		</where>
+	</select>
+	<!-- Id查询广告图 -->
+	<select id="getImageseById" parameterType="Long" resultMap="ImagesResult">
+		SELECT <include refid="edu_website_images_columns"/> 
+		FROM app_website_images WHERE app_website_images.ID=#{value}
+	</select>
+	<!-- 更新广告图 -->
+	<update id="updateImages" parameterType="AppWebsiteImages">
+		UPDATE app_website_images SET 
+		app_website_images.IMAGE_URL=#{imagesUrl},
+		app_website_images.course_id=#{courseId},
+		app_website_images.TITLE=#{title},
+		app_website_images.KEYWORD=#{keyWord},
+		app_website_images.SERIES_NUMBER=#{seriesNumber},
+		app_website_images.COLOR =#{color},
+		app_website_images.PREVIEW_URL =#{previewUrl} 
+		WHERE app_website_images.ID =#{id}
+	</update>	
+
+</mapper>

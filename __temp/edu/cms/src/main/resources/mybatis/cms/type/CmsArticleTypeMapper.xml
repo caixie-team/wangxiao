@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CmsArticleTypeMapper">
+
+	<sql id="LINE_ARTICLE_TYPE_column">
+		LINE_ARTICLE_TYPE.TYPE_ID,
+		LINE_ARTICLE_TYPE.TYPE_NAME,
+		LINE_ARTICLE_TYPE.PARENT_ID,
+		LINE_ARTICLE_TYPE.UPDATE_TIME,
+		LINE_ARTICLE_TYPE.ISNAV
+	</sql>
+	<sql id="LINE_COURSE_SUBJECT_property">
+		#{typeId},
+		#{typeName},
+		#{parentId},
+		#{updateTime},
+		#{isnav}
+	</sql>
+	
+	<resultMap type="CmsArticleType" id="CmsArticleTypeResult">
+		<result property="typeId" column="TYPE_ID"/>
+		<result property="typeName" column="TYPE_NAME"/>
+		<result property="parentId" column="PARENT_ID"/>
+		<result property="updateTime" column="UPDATE_TIME"/>
+		<result property="isnav" column="ISNAV"/>
+	</resultMap>
+	
+	<!-- 创建线下资讯分类 -->
+	<insert id="createArticleType" parameterType="CmsArticleType" keyColumn="TYPE_ID" keyProperty="typeId" useGeneratedKeys="true">
+		INSERT INTO LINE_ARTICLE_TYPE(<include refid="LINE_ARTICLE_TYPE_column"/>)
+		VALUE(<include refid="LINE_COURSE_SUBJECT_property"/>)
+	</insert>
+	
+	<!-- 查询所有的线下资讯分类-->
+	<select id="queryAllArticleTypeList" resultMap="CmsArticleTypeMapper.CmsArticleTypeResult">
+		SELECT <include refid="LINE_ARTICLE_TYPE_column"/>
+		FROM LINE_ARTICLE_TYPE 
+	</select>
+	<select id="queryWebLineArticle" resultMap="CmsArticleTypeMapper.CmsArticleTypeResult">
+		SELECT <include refid="LINE_ARTICLE_TYPE_column"/>
+		FROM LINE_ARTICLE_TYPE WHERE PARENT_ID >=-1
+	</select>
+	
+	<!-- 修改线下资讯分类名 -->
+	<update id="updateArticleTypeName" parameterType="CmsArticleType">
+		UPDATE LINE_ARTICLE_TYPE SET TYPE_NAME=#{typeName},UPDATE_TIME=#{updateTime} WHERE TYPE_ID=#{typeId}
+	</update>
+	
+	<update id="updateTypeParentId" parameterType="CmsArticleType">
+		UPDATE LINE_ARTICLE_TYPE SET PARENT_ID=#{parentId},UPDATE_TIME=#{updateTime} WHERE TYPE_ID= #{typeId}
+	</update>
+	
+	<delete id="deleteArticleType" parameterType="String">
+		DELETE FROM LINE_ARTICLE_TYPE WHERE TYPE_ID IN (${value})
+	</delete>
+	<!-- 将分类显示到导航栏 -->
+	<update id="showNav" parameterType="String">
+		UPDATE LINE_ARTICLE_TYPE SET ISNAV=1 WHERE TYPE_ID IN (${value})
+	</update>
+	<!--取消导航栏所有显示-->
+	<update id="hideNav" parameterType="String">
+		UPDATE LINE_ARTICLE_TYPE SET ISNAV=0
+	</update>
+	<select id="queryChildTypeListByParentId" resultType="long" resultMap="CmsArticleTypeMapper.CmsArticleTypeResult">
+		SELECT <include refid="LINE_ARTICLE_TYPE_column"/>
+		FROM LINE_ARTICLE_TYPE WHERE PARENT_ID=#{value}
+	</select>
+</mapper>

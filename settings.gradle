@@ -1,0 +1,32 @@
+//#rootProject.name = 'MyProjects'
+//
+
+// Modules
+//
+include ':modules:wx-commons'
+include ':modules:wx-core'
+include ':modules:wx-course'
+include ':modules:wx-resources'
+
+// APPS
+//
+include ':apps:wx-image'
+include ':apps:wx-edu'
+
+//include ':modules:edu-user'
+//include ':modules:edu-course'
+//include ':modules:edu-website'
+//include ':modules:edu-bookstore'
+//include ':modules:edu-library'
+//include ':modules:edu-cash'
+//include ':modules:edu-order'
+//include ':modules:edu-alipay'
+//include ':modules:edu-article'
+
+// EDU Server
+include ':server:wx-jwt-config'
+include ':server:wx-auth-server'
+include ':server:wx-resources-server'
+//include ':server:edu-resource-server'
+//include ':server:edu-auth-server'
+//include ':server:aggregation-server'

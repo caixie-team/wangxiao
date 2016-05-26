@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="QuestErrorCheckMapper">
+	<resultMap type="QuestErrorCheck" id="QuestErrorCheckResult">
+		<result column="id" property="id"/>
+		<result column="paperId" property="paperId"/>
+		<result column="questionId" property="questionId"/>
+		<result column="content" property="content"/>
+		<result column="addTime" property="addTime"/>
+		<result column="paperName" property="paperName"/>
+		<result column="qstName" property="qstName"/>
+	</resultMap>
+	<insert id="addQuestErrorCheck" parameterType="questErrorCheck">
+		insert into
+		exam_error_check
+		(id,paperId,questionId,content,addTime)
+		values(
+		#{id},
+		#{paperId},
+		#{questionId},
+		#{content},
+		#{addTime}
+		)
+	</insert>
+	<!-- 后台查询纠错列表 -->
+		<select id="queryQuestErrorCheckList" parameterType="java.util.HashMap" resultMap="QuestErrorCheckResult">
+		select
+		exam_error_check.id,
+		exam_error_check.paperId,
+		exam_error_check.questionId,
+		exam_error_check.content,
+		exam_error_check.addTime,
+		exam_exampaper_record.paper_name paperName,
+		exam_question.QST_CONTENT qstName
+		from exam_error_check
+		left join exam_exampaper_record on
+		exam_error_check.paperId=exam_exampaper_record.ep_id
+		left join exam_question on exam_error_check.questionId =exam_question.id
+		<where>
+		<if test="e.questionId!=null and e.questionId!=0">
+		exam_error_check.questionId=#{e.questionId}
+		</if>
+		</where>
+		group by exam_error_check.id
+		order by exam_error_check.id desc
+		<include refid="publicMapper.pageEnd"/>
+	</select>
+	<select id="queryQuestErrorCheckListCount" parameterType="java.util.HashMap" resultType="int">
+		select count(1)
+		from exam_error_check
+		<where>
+		<if test="e.questionId!=null and e.questionId!=0">
+		exam_error_check.questionId=#{e.questionId}
+		</if>
+		</where>
+	</select>
+	<delete id="delQuestErrorCheckById" parameterType="questErrorCheck">
+		delete from 
+		exam_error_check
+		<where>
+		exam_error_check.id=#{id}
+		</where>
+	</delete>
+	</mapper>

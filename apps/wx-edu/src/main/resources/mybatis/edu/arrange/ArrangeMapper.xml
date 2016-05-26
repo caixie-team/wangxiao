@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ArrangeMapper">
+
+	<resultMap id="ArrangeResult" type="Arrange">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="beginTime" column="begin_time" />
+		<result property="endTime" column="end_time" />
+		<result property="releasePeople" column="release_people" />
+		<result property="releaseTime" column="release_time" />
+		<result property="status" column="status" />
+		<result property="isRepeat" column="is_repeat" />
+		<result property="type" column="type" />
+		<result property="createrId" column="creater_id" />
+	</resultMap>
+
+	<sql id="edu_arrange_columns">
+		edu_arrange.id,
+		edu_arrange.name,
+		edu_arrange.begin_time,
+		edu_arrange.end_time,
+		edu_arrange.release_people,
+		edu_arrange.release_time,
+		edu_arrange.status,
+		edu_arrange.is_repeat,
+		edu_arrange.type,
+		edu_arrange.creater_id
+	</sql>
+
+	<sql id="edu_arrange_properties">
+		#{id},
+		#{name},
+		#{beginTime},
+		#{endTime},
+		#{releasePeople},
+		#{releaseTime},
+		#{status},
+		#{isRepeat},
+		#{type},
+		#{createrId}
+	</sql>
+	<!-- 后台xml开始 -->
+	<insert id="createArrange" parameterType="Arrange" keyColumn="id"
+		keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_arrange (
+		<include refid="edu_arrange_columns" />
+		) VALUES (
+		<include refid="edu_arrange_properties" />
+		)
+	</insert>
+
+	<delete id="deleteArrangeById" parameterType="Long">
+		delete from edu_arrange
+	</delete>
+	<!-- 修改任务 -->
+	<update id="updateArrange" parameterType="Arrange">
+		update edu_arrange SET
+		name =
+		#{name},
+		begin_time = #{beginTime},
+		end_time = #{endTime},
+		release_people = #{releasePeople},
+		release_time = #{releaseTime},
+		status = #{status},
+		is_repeat = #{isRepeat},
+		type=#{type}
+		where id=#{id}
+	</update>
+	<!-- 更新任务状态 -->
+	<update id="updateArrangeStatus" parameterType="Arrange">
+		update edu_arrange SET
+		status = #{status}
+		where id=#{id}
+	</update>
+	<!-- 根据id查询任务 -->
+	<select id="getArrangeById" resultMap="ArrangeResult" parameterType="Long">
+		select
+		<include refid="edu_arrange_columns" />
+		from edu_arrange
+		where edu_arrange.id=#{id}
+	</select>
+	<!-- 任务列表 -->
+	<select id="getArrangeList" resultMap="ArrangeResult" parameterType="java.util.Map">
+		select
+		<include refid="edu_arrange_columns" />
+		from edu_arrange
+		<where>
+			edu_arrange.status!='DISUSE'
+			<if test="e.status!=null and e.status!=''">
+				and edu_arrange.status =#{e.status}
+			</if>
+			<if test="e.name!=null and e.name!=''">
+				and edu_arrange.name LIKE CONCAT('%',#{e.name},'%')
+			</if>
+			<if test="e.beginTime!=null">
+				and <![CDATA[ `edu_arrange`.begin_time >=#{e.beginTime}]]>
+			</if>
+			<if test="e.endTime!=null">
+				and <![CDATA[ `edu_arrange`.end_time <=#{e.endTime}]]>
+			</if>
+			<if test="e.type!=null and e.type>-1">
+				and edu_arrange.type =#{e.type}
+			</if>
+			<if test="e.releasePeople!=null and e.releasePeople!=''">
+				and edu_arrange.release_people LIKE CONCAT('%',#{e.releasePeople},'%')
+			</if>
+			<if test="e.isRepeat!=null and e.isRepeat>-1">
+				and edu_arrange.is_repeat =#{e.isRepeat}
+			</if>
+			<if test="e.createrId!=null and e.createrId>0">
+				and edu_arrange.creater_id =#{e.createrId}
+			</if>
+		</where>
+		ORDER BY edu_arrange.id DESC
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getArrangeListCount" resultType="int" parameterType="java.util.Map">
+		select
+		count(1)
+		from edu_arrange
+		<where>
+			edu_arrange.status!='DISUSE'
+			<if test="e.status!=null and e.status!=''">
+				and edu_arrange.status =#{e.status}
+			</if>
+			<if test="e.name!=null and e.name!=''">
+				and edu_arrange.name LIKE CONCAT('%',#{e.name},'%')
+			</if>
+			<if test="e.beginTime!=null">
+				and <![CDATA[ `edu_arrange`.begin_time >=#{e.beginTime}]]>
+			</if>
+			<if test="e.endTime!=null">
+				and <![CDATA[ `edu_arrange`.end_time <=#{e.endTime}]]>
+			</if>
+			<if test="e.type!=null and e.type>-1">
+				and edu_arrange.type =#{e.type}
+			</if>
+			<if test="e.releasePeople!=null and e.releasePeople!=''">
+				and edu_arrange.release_people LIKE CONCAT('%',#{e.releasePeople},'%')
+			</if>
+			<if test="e.isRepeat!=null and e.isRepeat>-1">
+				and edu_arrange.is_repeat =#{e.isRepeat}
+			</if>
+			<if test="e.createrId!=null and e.createrId>0">
+				and edu_arrange.creater_id =#{e.createrId}
+			</if>
+		</where>
+	</select>
+	<resultMap type="Arrange" id="ArrangeNewResult" extends="ArrangeResult">
+		<result property="groupName" column="groupName" />
+		<result property="examIds" column="examIds"/>
+		<result property="exampaperName" column="exampaper_name" />
+		<result property="nickname" column="nickname" />
+		<result property="userGroupId" column="userGroupId" />
+	</resultMap>
+	<!-- 我的部门任务 -->
+	<select id="getGroupArrangeList" resultMap="ArrangeNewResult"
+		parameterType="java.util.Map">
+		SELECT
+		<include refid="edu_arrange_columns" />
+		,
+		edu_arrange_exam.exampaper_name,
+		user_group.name as groupName,
+		user_group.`id` as userGroupId,
+		edu_arrange_record.`is_complete` AS iscomplete
+		FROM
+		`edu_arrange`
+		LEFT JOIN
+		`edu_arrange_middle_group` ON
+		edu_arrange_middle_group.`arrange_id`=edu_arrange.`id`
+		LEFT JOIN user_group ON
+		user_group.`id`=edu_arrange_middle_group.`user_group_id`
+		LEFT JOIN
+		`edu_arrange_exam` ON edu_arrange_exam.`arrange_id`=edu_arrange.`id`
+		LEFT JOIN
+		edu_arrange_record ON edu_arrange_middle_group.`arrange_id` = edu_arrange_record.`arrange_id` AND edu_arrange_middle_group.`user_group_id` = edu_arrange_record.`user_group_id`
+		<where>
+			<if test="e.userGroupId!=null and e.userGroupId!=0">
+				edu_arrange_middle_group.user_group_id=#{e.userGroupId}
+			</if>
+			<if test="e.id!=null and e.id!=0">
+				and edu_arrange.id=#{e.id}
+			</if>
+			<if test="e.name!=null and e.name!=''">
+				and edu_arrange.name like CONCAT('%',#{e.name},'%')
+			</if>
+			<if test="e.createrId!=null and e.createrId>0">
+				and edu_arrange.creater_id =#{e.createrId}
+			</if>
+		</where>
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getGroupArrangeListCount" resultType="int"
+		parameterType="java.util.Map">
+		SELECT
+		COUNT(1),
+		edu_arrange_exam.exampaper_name,
+		user_group.name as
+		groupName
+		FROM `EDU_ARRANGE`
+		LEFT JOIN `EDU_ARRANGE_MIDDLE_GROUP` ON
+		EDU_ARRANGE_MIDDLE_GROUP.`ARRANGE_ID`=EDU_ARRANGE.`ID`
+		LEFT JOIN USER_GROUP ON
+		USER_GROUP.`ID`=EDU_ARRANGE_MIDDLE_GROUP.`USER_GROUP_ID`
+		LEFT JOIN
+		`EDU_ARRANGE_EXAM` ON EDU_ARRANGE_EXAM.`ARRANGE_ID`=EDU_ARRANGE.`ID`
+		<where>
+			<if test="e.userGroupId!=null and e.userGroupId!=0">
+				edu_arrange_middle_group.user_group_id=#{e.userGroupId}
+			</if>
+			<if test="e.id!=null and e.id!=0">
+				and edu_arrange.id=#{e.id}
+			</if>
+			<if test="e.name!=null and e.name!=''">
+				and edu_arrange.name like CONCAT('%',#{e.name},'%')
+			</if>
+			<if test="e.createrId!=null and e.createrId>0">
+				and edu_arrange.creater_id =#{e.createrId}
+			</if>
+		</where>
+	</select>
+
+	<!-- 任务详情 -->
+	<select id="arrangeDetailsById" resultMap="ArrangeNewResult"
+		parameterType="java.util.Map">
+		SELECT
+		<include refid="edu_arrange_columns" />
+		,
+		EDU_ARRANGE_EXAM.EXAMPAPER_NAME,
+		USER_GROUP.NAME AS GROUPNAME,
+		USER_USER.`NICKNAME`
+		FROM
+		`EDU_ARRANGE`
+		LEFT JOIN `EDU_ARRANGE_MIDDLE_USER`
+		ON
+		EDU_ARRANGE_MIDDLE_USER.`ARRANGE_ID`=EDU_ARRANGE.`ID`
+		LEFT JOIN `EDU_ARRANGE_EXAM`
+		ON EDU_ARRANGE_EXAM.`ARRANGE_ID`=EDU_ARRANGE.`ID`
+		LEFT JOIN
+		`EDU_ARRANGE_MIDDLE_GROUP` ON
+		EDU_ARRANGE_MIDDLE_GROUP.`ARRANGE_ID`=EDU_ARRANGE.`ID`
+		LEFT JOIN USER_GROUP ON
+		USER_GROUP.`ID`=EDU_ARRANGE_MIDDLE_GROUP.`USER_GROUP_ID`
+		LEFT JOIN
+		USER_USER ON USER_USER.`ID`=EDU_ARRANGE_MIDDLE_USER.`USER_ID`
+		<where>
+			<if test="e.id!=null and e.id!=0">
+				edu_arrange.id=#{e.id}
+			</if>
+		</where>
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="arrangeDetailsByIdCount" resultType="int"
+		parameterType="java.util.Map">
+		SELECT COUNT(1),
+		EDU_ARRANGE_EXAM.EXAMPAPER_NAME,
+		USER_GROUP.NAME AS
+		GROUPNAME,
+		USER_USER.`NICKNAME`
+		FROM `EDU_ARRANGE`
+		LEFT JOIN
+		`EDU_ARRANGE_MIDDLE_USER`
+		ON
+		EDU_ARRANGE_MIDDLE_USER.`ARRANGE_ID`=EDU_ARRANGE.`ID`
+		LEFT JOIN `EDU_ARRANGE_EXAM`
+		ON EDU_ARRANGE_EXAM.`ARRANGE_ID`=EDU_ARRANGE.`ID`
+		LEFT
+		JOIN
+		`EDU_ARRANGE_MIDDLE_GROUP` ON
+		EDU_ARRANGE_MIDDLE_GROUP.`ARRANGE_ID`=EDU_ARRANGE.`ID`
+		LEFT JOIN USER_GROUP ON
+		USER_GROUP.`ID`=EDU_ARRANGE_MIDDLE_GROUP.`USER_GROUP_ID`
+		LEFT JOIN
+		USER_USER ON USER_USER.`ID`=EDU_ARRANGE_MIDDLE_USER.`USER_ID`
+		<where>
+			<if test="e.id!=null and e.id!=0">
+				edu_arrange.id=#{e.id}
+			</if>
+		</where>
+	</select>
+	<!-- 后台xml结束 -->
+
+
+	<!-- 前台xml开始 -->
+
+	<!-- 我的任务 -->
+	<select id="myArrangeForWeb" resultMap="ArrangeNewResult"
+		parameterType="java.util.Map">
+		SELECT
+		<include refid="edu_arrange_columns" />
+		,
+		EDU_ARRANGE_MIDDLE_USER.`group_id` as userGroupId,
+		EDU_ARRANGE_EXAM.`exampaper_id` as examIds
+		FROM `EDU_ARRANGE`
+		LEFT JOIN `EDU_ARRANGE_MIDDLE_USER` ON EDU_ARRANGE_MIDDLE_USER.`ARRANGE_ID`=EDU_ARRANGE.`ID`
+		LEFT JOIN `EDU_ARRANGE_EXAM` ON EDU_ARRANGE_EXAM.`ARRANGE_ID`=EDU_ARRANGE.`ID`
+		WHERE
+		EDU_ARRANGE.TYPE=#{e.type}
+		AND
+		EDU_ARRANGE_MIDDLE_USER.`USER_ID`=#{e.userId}
+		AND
+		EDU_ARRANGE.`STATUS`= 1
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="myArrangeForWebCount" resultType="int" parameterType="java.util.Map">
+		SELECT
+		COUNT(1)
+		FROM `EDU_ARRANGE`
+		LEFT JOIN `EDU_ARRANGE_MIDDLE_USER` ON
+		EDU_ARRANGE_MIDDLE_USER.`ARRANGE_ID`=EDU_ARRANGE.`ID`
+		LEFT JOIN `EDU_ARRANGE_EXAM` ON EDU_ARRANGE_EXAM.`ARRANGE_ID`=EDU_ARRANGE.`ID`
+		WHERE
+		EDU_ARRANGE.TYPE=#{e.type}
+		AND EDU_ARRANGE_MIDDLE_USER.`USER_ID`=#{e.userId}
+	</select>
+	<!-- 我的部门任务 -->
+	<select id="myGroupArrangeFroweb" resultMap="ArrangeNewResult"
+		parameterType="java.util.Map">
+		SELECT
+		<include refid="edu_arrange_columns" />
+		,
+		edu_arrange_exam.exampaper_name,
+		user_group.name as groupName,
+		user_group.`id` as userGroupId,
+		edu_arrange_exam.`exampaper_id` as examIds
+		FROM
+		`edu_arrange`
+		LEFT JOIN
+		`edu_arrange_middle_group` ON
+		edu_arrange_middle_group.`arrange_id`=edu_arrange.`id`
+		LEFT JOIN user_group ON
+		user_group.`id`=edu_arrange_middle_group.`user_group_id`
+		LEFT JOIN
+		`edu_arrange_exam` ON edu_arrange_exam.`arrange_id`=edu_arrange.`id`
+		WHERE
+		EDU_ARRANGE.TYPE=#{e.type}
+		AND
+		EDU_ARRANGE_MIDDLE_GROUP.USER_GROUP_ID=#{e.userGroupId}
+		AND
+		EDU_ARRANGE.`STATUS`= 1
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="myGroupArrangeFrowebCount" resultType="int"
+		parameterType="java.util.Map">
+		SELECT
+		COUNT(1)
+		,
+		edu_arrange_exam.exampaper_name,
+		user_group.name as groupName,
+		user_group.`id` as userGroupId
+		FROM
+		`edu_arrange`
+		LEFT JOIN
+		`edu_arrange_middle_group` ON
+		edu_arrange_middle_group.`arrange_id`=edu_arrange.`id`
+		LEFT JOIN user_group ON
+		user_group.`id`=edu_arrange_middle_group.`user_group_id`
+		LEFT JOIN
+		`edu_arrange_exam` ON edu_arrange_exam.`arrange_id`=edu_arrange.`id`
+		WHERE
+		EDU_ARRANGE.TYPE=#{e.type}
+		AND
+		EDU_ARRANGE_MIDDLE_GROUP.USER_GROUP_ID=#{e.userGroupId}
+	</select>
+	<select id="getArrangeListByTime" parameterType="Date">
+		select 
+		<include refid="edu_arrange_columns" />
+		from edu_arrange
+		where
+		<![CDATA[ `edu_arrange`.end_time <=#{value}]]>
+		and
+		edu_arrange.status='RELEASE'
+	</select>
+	<!-- 批量修改时间到的考试任务 -->
+	<update id="updateArrangeListByTime" parameterType="Date">
+		update 
+		from edu_arrange
+		set
+		edu_arrange.status='END'
+		where
+		<![CDATA[ `edu_arrange`.end_time <=#{value}]]>
+		and
+		edu_arrange.status='RELEASE'
+	</update>
+	
+	<!-- 前台xml结束 -->
+</mapper>

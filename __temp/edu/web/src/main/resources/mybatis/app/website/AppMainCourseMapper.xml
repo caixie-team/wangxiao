@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AppMainCourseMapper">
+	
+	<!-- 查询课程返回结果 -->
+	<resultMap type="AppCourse" id="AppMainCourseResult">
+		<result property="mainId" column="MAIN_ID"/>
+		<result property="courseId" column="COURSE_ID"/>
+	</resultMap>
+	<!-- 查询课程返回结果 -->
+	<resultMap type="AppCourseDto" id="AppMainCourseDtoResult" extends="AppMainCourseResult">
+		<result property="courseName" column="NAME"/>
+		<result property="lessionnum" column="LESSIONNUM"/>
+		<result property="addTime" column="ADDTIME"/>
+		<result property="isavaliable" column="ISAVALIABLE"/>
+	</resultMap>
+	<sql id="app_course_columns">
+		APP_MAIN_COURSE.MAIN_ID,
+		APP_MAIN_COURSE.COURSE_ID,
+		EDU_COURSE.NAME,
+		EDU_COURSE.LESSIONNUM,
+		EDU_COURSE.ADDTIME,
+		EDU_COURSE.ISAVALIABLE
+	</sql>
+	<insert id="createAppMainCourse" parameterType="AppCourse" keyColumn="MAIN_ID"
+		keyProperty="mainId" useGeneratedKeys="true">
+		INSERT INTO APP_MAIN_COURSE (
+		APP_MAIN_COURSE.COURSE_ID
+		) VALUES(#{courseId})
+	</insert>
+	<!-- 查询课程是否被重复选取 -->
+	<select id="getAppCourseById" resultType="int"
+		parameterType="Long">
+		SELECT
+		COUNT(1)
+		FROM APP_MAIN_COURSE
+		WHERE
+		COURSE_ID = #{value}
+	</select>
+	<!-- App查询课程列表 ，开始-->
+    <select id="queryAppMainCourse" parameterType="java.util.Map" resultMap="AppMainCourseDtoResult">
+        SELECT
+        <include refid="app_course_columns"/>
+        FROM APP_MAIN_COURSE
+        LEFT JOIN EDU_COURSE ON APP_MAIN_COURSE.COURSE_ID=EDU_COURSE.ID
+        WHERE 1=1
+        <if test="e.courseName!=null and e.courseName!=''">
+        	AND EDU_COURSE.NAME LIKE CONCAT('%',#{e.courseName},'%')
+        </if>
+        <if test="e.isavaliable!=0">
+        	AND EDU_COURSE.ISAVALIABLE =#{e.isavaliable}
+        </if>
+        ORDER BY MAIN_ID DESC
+        <include refid="publicMapper.pageEnd" />
+    </select>
+    <select id="queryAppMainCourseCount"  parameterType="java.util.Map" resultType="int">
+        SELECT
+       	COUNT(1)
+        FROM APP_MAIN_COURSE
+        LEFT JOIN EDU_COURSE ON APP_MAIN_COURSE.COURSE_ID=EDU_COURSE.ID
+        WHERE 1=1
+        <if test="e.courseName!=null and e.courseName!=''">
+        	AND EDU_COURSE.NAME LIKE CONCAT('%',#{e.courseName},'%')
+        </if>
+        <if test="e.isavaliable!=0">
+        	AND EDU_COURSE.ISAVALIABLE =#{e.isavaliable}
+        </if>
+    </select>
+   <delete id="delAppCourseById" parameterType="Long">
+		DELETE FROM APP_MAIN_COURSE WHERE MAIN_ID = #{value}
+	</delete>
+    <!-- App查询课程列表 ，结束-->
+    
+    
+    <!-- 批量删除 -->
+	<delete id="delAppCourseBatch" parameterType="String">
+		DELETE FROM APP_MAIN_COURSE WHERE COURSE_ID in (${value})
+	</delete>
+    
+</mapper>

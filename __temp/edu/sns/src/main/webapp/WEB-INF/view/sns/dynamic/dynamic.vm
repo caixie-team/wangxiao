@@ -1,0 +1,55 @@
+#foreach( $dynamic in $dynamicWebList)
+<article class="DT-detail-wrap">
+	<aside class="DT-face DT-buu">
+		#if($dynamic.avatar&&$dynamic.avatar!="" ) 
+		<a href="$contextPath/p/$dynamic.cusId/home" target="_blank" title="$dynamic.cusName"><img src="$uploadStaticUrl$!dynamic.avatar" class="dis" width="50" height="50" alt=""></a>
+                    　　#else 
+		<a href="$contextPath/p/$dynamic.cusId/home" target="_blank" title="$dynamic.cusName"><img src="$imagesPath/static/common/images/user_default.jpg" class="dis" width="50" height="50" alt=""></a>				
+                    　　#end 
+         #if(!$dynamic.cusAttentionId&&$loginCusId!=$dynamic.cusId ) 
+         <span class="c-blue attention$dynamic.cusId" onclick="attention('$dynamic.cusId',this)">关注</span>
+         #end 
+        
+	</aside>
+	<div class="DT-detail">
+			<section class="DT-name"> 
+				<a href="/p/$dynamic.cusId/home" title="$dynamic.cusName" class="c-333 dt-xm">$dynamic.cusName</a>
+				<span class="c-888"></span><span class="c-555">
+					#if($dynamic.type!=7)
+					$dynamic.description：
+					#end
+				</span>
+			</section>
+			<section class="mt10 
+			#if($dynamic.type==7||$dynamic.type==1||$dynamic.type==0||$dynamic.type==4)
+			undis
+			#end
+			"> <a href="
+					#if($dynamic.type==13)
+						http://exam.268xue.com
+					#end
+					$dynamic.modelUrl
+				" title="$!{dynamic.title}" target="_blank" class="c-blue fsize14">$!{dynamic.title}</a>
+			</section>
+			<section class="DT-text">
+			#if( $dynamic.type==0 ||$dynamic.type==4)
+			<a href="/dis/info/$dynamic.assistId" class="c-blue fsize14" target="_blank">$dynamic.title</a>
+			#elseif($dynamic.type==7||$dynamic.type==1)
+			$dynamic.description<a href="/p/$dynamic.bizId/home" target="_blank" class="c-blue">$dynamic.content</a>$!{dynamic.title}
+			#else
+			$dynamic.content
+			#end
+			</section>
+			<section class="mt10">
+				<div class="clearfix">
+					#if( $dynamic.type==2 )
+					<section class="fr"><a href="javascript: void(0)" class="DT-comment-btn c-blue">评论</a></section>
+					#else 
+					#end 
+					<section class="c-b-green" title="$dateformat.format("yyyy-MM-dd HH:mm:ss", $dynamic.addTime)">$dynamic.modelStr</section>
+				</div>
+			</section>
+			<div class="DT-comment-wrap pingl undis" weiboid="$dynamic.bizId"></div>
+	</div>
+</article>
+#end

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TaskMiddleUserMapper">
+
+	<resultMap id="TaskMiddleUserResult" type="TaskMiddleUser">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="taskId" column="task_id" />
+		<result property="groupId" column="group_id" />
+	</resultMap>
+
+	<sql id="edu_task_middle_user_columns">
+		edu_task_middle_user.id,
+		edu_task_middle_user.user_id,
+		edu_task_middle_user.task_id,
+		edu_task_middle_user.group_id
+	</sql>
+
+	<sql id="edu_task_middle_user_properties">
+		#{id},
+		#{userId},
+		#{taskId},
+		#{groupId}
+	</sql>
+
+	<insert id="createTaskMiddleUser" parameterType="TaskMiddleUser"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_task_middle_user (
+		<include refid="edu_task_middle_user_columns" />
+		) VALUES (
+		<include refid="edu_task_middle_user_properties" />
+		)
+	</insert>
+	<!-- 批量添加员工 -->
+	<insert id="batchAddTaskMiddleUser" parameterType="list">
+		insert INTO edu_task_middle_user (
+		<include refid="edu_task_middle_user_columns" />
+		) VALUES
+		<foreach collection="list" item="itme" index="index"
+			separator=",">
+			(#{itme.id},#{itme.userId},#{itme.taskId},#{itme.groupId})
+		</foreach>
+	</insert>
+	<!-- 删除任务下的员工 -->
+	<delete id="deleteTaskMiddleUserById" parameterType="Long">
+		delete from
+		edu_task_middle_user
+		where edu_task_middle_user.task_id=#{taskId}
+	</delete>
+
+	<update id="updateTaskMiddleUser" parameterType="TaskMiddleUser">
+		update
+		edu_task_middle_user SET
+		id = #{id},
+		user_id = #{userId},
+		task_id =
+		#{taskId},
+		group_id = #{groupId}
+	</update>
+
+	<select id="getTaskMiddleUserById" resultMap="TaskMiddleUserResult"
+		parameterType="Long">
+		select
+		<include refid="edu_task_middle_user_columns" />
+		from edu_task_middle_user
+	</select>
+
+	<select id="getTaskMiddleUserList" resultMap="TaskMiddleUserResult"
+		parameterType="TaskMiddleUser">
+		select
+		<include refid="edu_task_middle_user_columns" />
+		from edu_task_middle_user
+	</select>
+	<!-- 查询任务下的员工 -->
+	<select id="getTaakUserById" parameterType="TaskMiddleUser" resultMap="TaskMiddleUserResult">
+		SELECT
+		<include refid="edu_task_middle_user_columns" />
+		FROM
+		`EDU_TASK_MIDDLE_USER` 
+		<where>
+			<if test="taskId!=null and taskId!=0">
+				edu_task_middle_user.task_id=#{taskId}
+			</if>
+		</where>
+	</select>
+</mapper>

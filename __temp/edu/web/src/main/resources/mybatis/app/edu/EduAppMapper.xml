@@ -1,0 +1,550 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="EduAppMapper">
+	
+	<!-- 查询课程返回结果 -->
+	<resultMap type="java.util.Map" id="AppCourseResult">
+		<result property="courseId" column="COURSE_ID"/>
+		<result property="name" column="NAME"/>
+		<result property="title" column="TITLE"/>
+		<result property="logo" column="LOGO"/>
+		<result property="currentPrice" column="currentPrice"/>
+		<result property="sourcePrice" column="sourcePrice"/>
+		<collection property="teacherList" column="COURSE_ID" javaType="ArrayList" select="EduAppMapper.queryTeahcerNameByCourseId"/>
+		<collection property="subjectList" column="COURSE_ID" javaType="ArrayList" select="EduAppMapper.querySubjectNameByCourseId"/>
+	</resultMap>
+	
+	<!-- 查询用户信息返回结果 -->
+	<resultMap type="java.util.Map" id="AppUserResult">
+		<result property="id" column="ID"/>
+		<result property="nickname" column="NICKNAME"/>
+		<result property="email" column="EMAIL"/>
+		<result property="emailIsavalible" column="EMAIL_ISAVALIBLE"/>
+		<result property="mobile" column="MOBILE"/>
+		<result property="mobileIsavalible" column="MOBILE_ISAVALIBLE"/>
+		<result property="password" column="PASSWORD"/>
+		<result property="isavalible" column="ISAVALIBLE"/>
+		<result property="customerkey" column="CUSTOMERKEY"/>
+		<result property="createdate" column="CREATEDATE"/>
+		<result property="userip" column="USERIP"/>
+	</resultMap>
+	
+	<!--查询资讯信息返回结果  -->
+	<resultMap id="ArticleResult" type="java.util.Map">
+		<result property="id" column="id" />
+		<result property="title" column="title" />
+		<result property="meta" column="meta" />
+		<result property="description" column="description" />
+		<result property="content" column="content" />
+		<result property="picture" column="picture" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="author" column="author" />
+		<result property="clickTimes" column="click_times" />
+		<result property="type" column="type" />
+	</resultMap>
+	
+	<!-- 查询收藏课程列表 -->
+	<resultMap id="CourseFavoritesResult" type="java.util.Map">
+		<result property="favouriteId" column="favouriteId" />
+		<result property="name" column="name" />
+		<result property="title" column="title" />
+		<result property="loseAbsTime" column="loseAbsTime" />
+		<result property="logo" column="logo" />
+		<result property="courseId" column="course_id" />
+	</resultMap>
+	
+	<!-- 查询学习记录 -->
+	<resultMap id="CourseStudyhistoryResult" type="java.util.Map">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="courseId" column="course_id" />
+		<result property="kpointId" column="kpoint_id" />
+		<result property="playercount" column="playercount" />
+		<result property="courseName" column="course_name" />
+		<result property="kpointName" column="kpoint_name" />
+		<result property="databak" column="databak" />
+		<result property="updateTime" column="update_time" />
+		<result property="teacherName" column="name" />
+		<result property="logo" column="logo" />
+		<result property="videourl" column="videourl" />
+		<result property="videoType" column="videotype" />
+	</resultMap>
+	
+	<!-- 视频 -->
+	<resultMap id="CourseKpointResult" type="java.util.Map">
+		<result property="id" column="id" />
+		<result property="courseId" column="course_id" />
+		<result property="name" column="name" />
+		<result property="parentId" column="parentId" />
+		<result property="type" column="type" />
+		<result property="status" column="status" />
+		<result property="addTime" column="add_time" />
+		<result property="sort" column="sort" />
+		<result property="playcount" column="playcount" />
+		<result property="isfree" column="isfree" />
+		<result property="videotype" column="videotype" />
+		<result property="videourl" column="videourl" />
+		<result property="videojson" column="videojson" />
+		<result property="teacherId" column="teacher_id" />
+		<result property="courseMinutes" column="course_minutes" />
+		<result property="courseSeconds" column="course_seconds" />
+	</resultMap>
+	<!-- 反馈信息 -->
+	<resultMap id="UserFeedbackResult" type="java.util.Map">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="content" column="content" />
+		<result property="qq" column="qq" />
+		<result property="mobile" column="mobile" />
+		<result property="email" column="email" />
+		<result property="name" column="name" />
+		<result property="createTime" column="create_time" />
+	</resultMap>
+	<!-- 推荐课程 -->
+	<resultMap id="AppWebsiteCourseDetailResult" type="java.util.Map">
+		<result property="id" column="id" />
+		<result property="recommendId" column="recommendId" />
+		<result property="courseId" column="course_id" />
+		<result property="orderNum" column="ordernum" />
+		<result property="isavaliable" column="isavaliable" />
+		<result property="recommendName" column="recommendName" />
+		<result property="courseName" column="courseName" />
+		<result property="logo" column="LOGO"/>
+	</resultMap>
+	
+	<!-- 用户 -->
+	<sql id="user_columns">
+		user_user.id,
+		user_user.nickname,
+		user_user.email,
+		user_user.email_isavalible,
+		user_user.mobile,
+		user_user.mobile_isavalible,
+		user_user.password,
+		user_user.isavalible,
+		user_user.customerkey,
+		user_user.createdate,
+		user_user.userip
+	</sql>
+	<!-- 资讯-->
+	<sql id="edu_article_columns">
+		edu_article.id,
+		edu_article.title,
+		edu_article.meta,
+		edu_article.description,
+		edu_article.content,
+		edu_article.picture,
+		edu_article.create_time,
+		edu_article.update_time,
+		edu_article.author,
+		edu_article.click_times,
+		edu_article.type
+	</sql>
+	<!-- 学习记录-->
+	<sql id="edu_course_studyhistory_columns">
+		edu_course_studyhistory.id,
+		edu_course_studyhistory.user_id,
+		edu_course_studyhistory.course_id,
+		edu_course_studyhistory.kpoint_id,
+		edu_course_studyhistory.playercount,
+		edu_course_studyhistory.course_name,
+		edu_course_studyhistory.kpoint_name,
+		edu_course_studyhistory.databak,
+		edu_course_studyhistory.update_time,
+		edu_teacher.name,
+		edu_course.logo
+	</sql>
+	<!-- 视频 -->
+	<sql id="edu_course_kpoint_columns">
+		edu_course_kpoint.id,
+		edu_course_kpoint.course_id,
+		edu_course_kpoint.name,
+		edu_course_kpoint.parentId,
+		edu_course_kpoint.type,
+		edu_course_kpoint.status,
+		edu_course_kpoint.add_time,
+		edu_course_kpoint.sort,
+		edu_course_kpoint.playcount,
+		edu_course_kpoint.isfree,
+		edu_course_kpoint.videotype,
+		edu_course_kpoint.videourl,
+		edu_course_kpoint.videojson,
+		edu_course_kpoint.teacher_id,
+		edu_course_kpoint.course_minutes,
+		edu_course_kpoint.course_seconds
+	</sql>
+	<!-- 反馈信息 -->
+	<sql id="edu_user_feedback_columns">
+		edu_user_feedback.id,
+		edu_user_feedback.user_id,
+		edu_user_feedback.content,
+		edu_user_feedback.mobile,
+		edu_user_feedback.email,
+		edu_user_feedback.name,
+		edu_user_feedback.create_time
+	</sql>
+	<!-- 统计用户使用记录 -->
+	<sql id="app_webstie_use_columns">
+		app_webstie_use.id,
+		app_webstie_use.ip,
+		app_webstie_use.brand,
+		app_webstie_use.type,
+		app_webstie_use.size,
+		app_webstie_use.create_time,
+		app_webstie_use.user_id,
+		app_webstie_use.begin_time,
+		app_webstie_use.end_time
+	</sql>
+  
+	<sql id="app_webstie_use_properties">
+		#{id},
+		#{ip},
+		#{brand},
+		#{type},
+		#{size},
+		#{createTime},
+		#{userId},
+		#{beginTime},
+		#{endTime}
+	</sql>
+	<sql id="edu_user_feedback_properties">
+		#{id},
+		#{userId},
+		#{content},
+		#{mobile},
+		#{email},
+		#{nickname},
+		#{createTimr}
+	</sql>
+	<!-- 推荐课程 -->
+	<sql id="app_website_course_detail_columns">
+		app_website_course_detail.id,
+		app_website_course_detail.recommendId,
+		app_website_course_detail.course_id,
+		app_website_course_detail.orderNum
+	</sql>
+	
+	
+	<!-- 根据课程ID，查询老师名列表 -->
+	<select id="queryTeahcerNameByCourseId" parameterType="int" resultType="String">
+		SELECT EDU_TEACHER.NAME FROM EDU_TEACHER
+		LEFT JOIN EDU_COURSE_TEACHER ON EDU_COURSE_TEACHER.TEACHER_ID = EDU_TEACHER.ID
+		WHERE EDU_COURSE_TEACHER.COURSE_ID=#{value}
+	</select>
+	<!-- 根据课程ID，查询专业名列表 -->
+ 	<select id="querySubjectNameByCourseId" parameterType="int" resultType="String">
+ 		SELECT SYS_SUBJECT.SUBJECT_NAME FROM SYS_SUBJECT
+		LEFT JOIN EDU_COURSE_SUBJECT ON EDU_COURSE_SUBJECT.SUBJECT_ID = SYS_SUBJECT.SUBJECT_ID
+		WHERE EDU_COURSE_SUBJECT.COURSE_ID=#{value}
+ 	</select>
+ 	<!-- App查询课程列表 ，开始-->
+    <select id="queryAppAllCourse" parameterType="java.util.Map" resultMap="AppCourseResult">
+        SELECT
+        EDU_COURSE.ID AS COURSE_ID,
+        EDU_COURSE.NAME,
+        EDU_COURSE.TITLE,
+        EDU_COURSE.LOGO
+       	FROM APP_MAIN_COURSE
+		LEFT JOIN EDU_COURSE ON EDU_COURSE.ID=APP_MAIN_COURSE.COURSE_ID
+        LEFT JOIN EDU_COURSE_SUBJECT ON EDU_COURSE_SUBJECT.COURSE_ID = EDU_COURSE.ID
+        LEFT JOIN edu_course_profile ON EDU_COURSE.ID=edu_course_profile.course_id
+        WHERE ISAVALIABLE=0 
+        <if test="e.subjectId!=null and e.subjectId>0">
+            AND EDU_COURSE_SUBJECT.SUBJECT_ID=#{e.subjectId}
+        </if>
+        <if test="e.courseName!=null and e.courseName!=''">
+            AND EDU_COURSE.NAME LIKE CONCAT('%',#{e.courseName},'%')
+        </if>
+        <if test="e.freeCourse!=null and e.freeCourse!=''">
+            AND EDU_COURSE.is_pay=0
+        </if>
+        <if test="e.order=='new'">
+            ORDER BY EDU_COURSE.ADDTIME DESC
+        </if>
+        <if test="e.order=='time'">
+            ORDER BY EDU_COURSE.ADDTIME ASC
+        </if>
+        <if test="e.order=='hot'">
+            ORDER BY EDU_COURSE_PROFILE.viewcount ASC
+        </if>
+        <include refid="publicMapper.pageEnd" />
+    </select>
+    <select id="queryAppAllCourseCount"  parameterType="java.util.Map" resultType="int">
+        SELECT COUNT(1) 
+		FROM APP_MAIN_COURSE
+		LEFT JOIN EDU_COURSE ON EDU_COURSE.ID=APP_MAIN_COURSE.COURSE_ID
+        LEFT JOIN EDU_COURSE_SUBJECT ON EDU_COURSE_SUBJECT.COURSE_ID = EDU_COURSE.ID
+        LEFT JOIN edu_course_profile ON EDU_COURSE.ID=edu_course_profile.course_id
+        WHERE
+        ISAVALIABLE=0
+        <if test="e.subjectId!=null and e.subjectId>0">
+            AND EDU_COURSE_SUBJECT.SUBJECT_ID=#{e.subjectId}
+        </if>
+        <if test="e.courseName!=null and e.courseName!=''">
+            AND EDU_COURSE.NAME LIKE CONCAT('%',#{e.courseName},'%')
+        </if>
+        <if test="e.freeCourse!=null and e.freeCourse!=''">
+            AND EDU_COURSE.is_pay=0
+        </if>
+    </select>
+    <select id="getCourseById" resultMap="AppCourseResult" parameterType="Long">
+		SELECT
+		EDU_COURSE.ID AS COURSE_ID,
+		EDU_COURSE.NAME,
+        EDU_COURSE.TITLE,
+        EDU_COURSE.LOGO
+		FROM APP_MAIN_COURSE
+		LEFT JOIN EDU_COURSE ON EDU_COURSE.ID=APP_MAIN_COURSE.COURSE_ID
+		WHERE
+		ID = #{value}
+	</select>
+    
+    <!-- App查询课程列表 ，结束-->
+    
+    <!-- /////////////////////////////////////// -->
+    <select id="getUserListForLogin" resultMap="AppUserResult" parameterType="java.util.Map">
+		select
+			<include refid="user_columns" />
+		from user_user
+		<where>
+			email = #{email} and isavalible= 0
+		</where>
+	</select>
+	
+	<select id="getUserListForTelLogin" resultMap="AppUserResult" parameterType="java.util.Map">
+		select
+			<include refid="user_columns" />
+		from user_user
+		<where>
+			mobile = #{email} and isavalible= 0
+		</where>
+	</select>
+	
+	<select id="getUserList" resultMap="AppUserResult" parameterType="java.util.Map">
+		select
+		<include refid="user_columns" />
+		from user_user
+		where user_user.email = #{email}
+	</select>
+	
+		<!-- 手机验证 -->
+	<select id="getUserByMobile" parameterType="java.util.Map" resultType="int">
+		select count(1)
+		from user_user
+		where user_user.mobile =#{mobile}
+	</select>
+	
+	<select id="queryArticleListPage" resultMap="ArticleResult" parameterType="java.util.Map">
+		select
+		edu_article.id,
+		edu_article.title,
+		edu_article.meta,
+		edu_article.description,
+		edu_article.picture,
+		edu_article.create_time,
+		edu_article.update_time,
+		edu_article.author,
+		edu_article.click_times,
+		edu_article.type
+		from edu_article
+		<where>
+			<if test="e.type!=null and e.type!=0">
+				edu_article.type=#{e.type}
+			</if>
+			<if test="e.title!=null and e.title!=''">
+				and edu_article.title like CONCAT('%',#{e.title},'%')
+			</if>
+		</where>
+		order by id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	
+	<select id="queryArticleListPageCount" resultType="int" parameterType="java.util.Map">
+		select
+		count(1)
+		from edu_article
+		<where>
+			<if test="e.type!=null and e.type!=0">
+				edu_article.type=#{e.type}
+			</if>
+			<if test="e.title!=null and e.title!=''">
+				and edu_article.title like CONCAT('%',#{e.title},'%')
+			</if>
+		</where>
+	</select>
+	
+	<select id="getArticleById" resultMap="ArticleResult" parameterType="Long">
+		select
+		<include refid="edu_article_columns" />
+		from edu_article
+		where
+		id = #{value}
+	</select>
+	
+	<select id="queryArticleUpOrDown" parameterType="java.util.Map"
+		resultMap="ArticleResult">
+		select
+		<include refid="edu_article_columns" />
+		from edu_article
+		<where>
+			<if test="type==1">
+			<![CDATA[id < #{id}  ]]>
+				order  by   id   desc
+			</if>
+			<if test="type==2">
+				<![CDATA[id > #{id}   ]]>
+				order  by   id   asc
+			</if>
+		</where>
+		limit 1 
+	</select>
+	
+	<select id="getCourseFavoritesByUserId" parameterType="java.util.Map"
+		resultMap="CourseFavoritesResult">
+		SELECT
+		edu_course.`name` as name,
+		edu_course.`title` as title,
+		edu_course.`lose_abs_time` as  loseAbsTime,
+		edu_course.logo as logo,
+		edu_course.`id`as courseId,
+		EDU_COURSE_FAVORITES.Id  as favouriteId
+		FROM APP_MAIN_COURSE
+		LEFT JOIN EDU_COURSE ON EDU_COURSE.ID=APP_MAIN_COURSE.COURSE_ID
+		LEFT JOIN EDU_COURSE_FAVORITES
+		ON
+		edu_course_favorites.`course_id`=edu_course.`id`
+		<where>
+				edu_course_favorites.`user_id` = #{e.userId}
+		</where>
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getCourseFavoritesByUserIdCount" parameterType="java.util.Map"
+		resultType="int">
+		SELECT
+		count(1)
+		FROM APP_MAIN_COURSE
+		LEFT JOIN EDU_COURSE ON EDU_COURSE.ID=APP_MAIN_COURSE.COURSE_ID
+		LEFT JOIN EDU_COURSE_FAVORITES
+		ON
+		edu_course_favorites.`course_id`=edu_course.`id`
+		<where>
+			edu_course_favorites.`user_id` = #{e.userId}
+		</where>
+	</select>
+	
+	<select id="getCourseStudyhistoryListByCondition" resultMap="CourseStudyhistoryResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="edu_course_studyhistory_columns" />,
+		EDU_COURSE_KPOINT.videourl,
+		EDU_COURSE_KPOINT.videotype
+        FROM EDU_COURSE_STUDYHISTORY
+        LEFT JOIN EDU_COURSE ON EDU_COURSE.ID = EDU_COURSE_STUDYHISTORY.COURSE_ID
+        LEFT JOIN EDU_COURSE_KPOINT ON EDU_COURSE_STUDYHISTORY.KPOINT_ID= EDU_COURSE_KPOINT.ID
+        LEFT JOIN EDU_TEACHER ON EDU_TEACHER.ID = EDU_COURSE_KPOINT.TEACHER_ID
+		WHERE EDU_COURSE.SELL_TYPE!='LIVE'
+		<if test="e.userId!=null and e.userId!=''">
+			AND EDU_COURSE_STUDYHISTORY.USER_ID = #{e.userId}
+		</if>
+        ORDER BY EDU_COURSE_STUDYHISTORY.ID DESC
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	
+	<select id="getCourseStudyhistoryListByConditionCount" resultType="int" parameterType="java.util.HashMap">
+		select COUNT(1) FROM EDU_COURSE_STUDYHISTORy
+        LEFT JOIN EDU_COURSE ON EDU_COURSE.ID = EDU_COURSE_STUDYHISTORY.COURSE_ID
+        LEFT JOIN EDU_COURSE_KPOINT ON EDU_COURSE_STUDYHISTORY.KPOINT_ID= EDU_COURSE_KPOINT.ID
+        LEFT JOIN EDU_TEACHER ON EDU_TEACHER.ID = EDU_COURSE_KPOINT.TEACHER_ID
+		WHERE EDU_COURSE.SELL_TYPE!='LIVE'
+		<if test="e.userId!=null and e.userId!=''">
+			AND EDU_COURSE_STUDYHISTORY.USER_ID = #{e.userId}
+		</if>
+	</select>
+	
+	<select id="getCourseKpointById" resultMap="CourseKpointResult" parameterType="Long">
+		select
+		<include refid="edu_course_kpoint_columns" />
+		from edu_course_kpoint
+		where
+		id = #{value}
+	</select>
+	
+	<select id="getUserById" resultMap="AppUserResult" parameterType="Long">
+		select
+		<include refid="user_columns" />
+		from user_user
+		where
+		id = #{value}
+	</select>
+	<insert id="createUserFeedback" parameterType="java.util.Map"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_user_feedback (
+		<include refid="edu_user_feedback_columns" />
+		) VALUES (
+		<include refid="edu_user_feedback_properties" />
+		)
+	</insert>
+	
+	<!-- 所有未下架的推荐课程 -->
+	<select id="getWebWebsiteCourseDetails" parameterType="java.util.Map" resultMap="AppWebsiteCourseDetailResult">
+		select <include refid="app_website_course_detail_columns" />,
+		EDU_COURSE.NAME as courseName,
+		EDU_COURSE.LOGO
+		from app_website_course_detail
+		left join edu_course on app_website_course_detail.course_id =edu_course.ID
+		where edu_course.isavaliable=0 and app_website_course_detail.recommendId=#{recommendId}
+		order by orderNum
+		<if test="count>0">
+		limit #{count}
+		</if>
+	</select>
+	
+	 <insert id="insertWebsiteUse" parameterType="java.util.Map">
+        INSERT INTO app_webstie_use
+        (<include refid="app_webstie_use_columns"/>)
+        VALUES
+        (<include refid="app_webstie_use_properties"/>)
+    </insert>
+    
+     <update id="updateWebsiteUseForEndtime" parameterType="java.util.Map">
+        update app_webstie_use SET
+        end_time = #{endTime}
+        where
+        brand = #{brand}
+        and type = #{type}
+        and size = #{size}
+        and user_id = #{userId}
+        and end_time is null
+    </update>
+    
+	 <select id="queryAppSubjectCourse" parameterType="java.util.Map" resultMap="AppCourseResult">
+        SELECT
+        EDU_COURSE.ID AS courseId,
+        EDU_COURSE.ID AS id,
+        EDU_COURSE.NAME as name,
+        EDU_COURSE.LOGO as logo,
+        EDU_COURSE.sourcePrice as sourcePrice,
+        EDU_COURSE.currentPrice as currentPrice,
+        EDU_COURSE.LESSIONNUM as lessionnum,
+        EDU_COURSE.PAGE_VIEWCOUNT as pageViewcount
+       	FROM APP_MAIN_COURSE
+		LEFT JOIN EDU_COURSE ON EDU_COURSE.ID=APP_MAIN_COURSE.COURSE_ID
+        LEFT JOIN EDU_COURSE_SUBJECT ON EDU_COURSE_SUBJECT.COURSE_ID = EDU_COURSE.ID
+        WHERE ISAVALIABLE=0 
+        <if test="subjectId!=null and subjectId>0">
+            AND EDU_COURSE_SUBJECT.SUBJECT_ID=#{subjectId}
+        </if>
+        <if test="courseId!=null and courseId>0">
+            AND EDU_COURSE.ID!=#{courseId}
+        </if>
+         <if test="num!=null and num>0">
+           limit #{num}
+        </if>
+    </select>
+    <!-- 删除播放记录 -->
+    <delete id="deletePlayRecord" parameterType="java.lang.String">
+    	DELETE FROM EDU_COURSE_STUDYHISTORY WHERE ID IN (${value})
+    </delete>
+</mapper>

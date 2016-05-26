@@ -1,0 +1,389 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="WeiBoMapper">
+
+	<resultMap id="WeiBoResult" type="WeiBo">
+		<result property="id" column="id" />
+		<result property="cusId" column="cus_id" />
+		<result property="addTime" column="add_TIME" />
+		<result property="updateTime" column="UPDATE_TIME" />
+		<result property="content" column="content" />
+		<result property="praiseNum" column="praise_num" />
+		<result property="commentNum" column="comment_num" />
+		<result property="showname" column="showname" />
+		<result property="status" column="status" />
+		<result property="forwardId" column="forward_id" />
+		<result property="forwardNum" column="forward_num" />
+	</resultMap>
+	<resultMap id="QueryWeiBoResult" type="QueryWeiBo" extends="WeiBoResult">
+		<result property="cusAttentionId" column="cusAttentionId" />
+		<result property="friendId" column="friendId" />
+		<result property="weiBoNum" column="weiBoNum" />
+		<result property="maxWeiBoId" column="maxWeiBoId" />
+	</resultMap>
+	<sql id="sns_weibo_columns">
+		sns_weibo.id,
+		sns_weibo.cus_id,
+		sns_weibo.add_Time,
+		sns_weibo.update_Time,
+		sns_weibo.content,
+		sns_weibo.praise_num,
+		sns_weibo.comment_num,
+		sns_weibo.top,
+		sns_weibo.showname,
+		sns_weibo.status,
+		sns_weibo.forward_id,
+		sns_weibo.forward_num
+	</sql>
+
+	<sql id="sns_weibo_properties">
+		#{id},
+		#{cusId},
+		#{addTime},
+		#{updateTime},
+		#{content},
+		#{praiseNum},
+		#{commentNum},
+		#{top},
+		#{showname},
+		#{status},
+		#{forwardId},
+		#{forwardNum}
+	</sql>
+
+	<insert id="addWeiBo" parameterType="WeiBo" useGeneratedKeys="true"
+		keyColumn="id" keyProperty="id">
+		INSERT INTO sns_weibo (
+		<include refid="sns_weibo_columns" />
+		) VALUES (
+		<include refid="sns_weibo_properties" />
+		)
+	</insert>
+
+	<select id="queryMyWeiBo" parameterType="java.util.HashMap"
+		resultMap="QueryWeiBoResult">
+		select
+		<include refid="sns_weibo_columns" />
+		from
+		sns_weibo
+		<where>
+			<if test="e.status==1">
+				and sns_weibo.status = 0
+			</if>
+			and sns_weibo.cus_id = #{e.cusId}
+		</where>
+		order by sns_weibo.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<!-- 查询改用户是否转发过该微博 -->
+	<select id="queryIsForwardWeiBo" parameterType="java.util.HashMap"
+		resultMap="WeiBoResult">
+		select
+		<include refid="sns_weibo_columns" />
+		from
+		sns_weibo
+		<where>
+			sns_weibo.cus_id = #{cusId}
+			and sns_weibo.forward_id =
+			#{forwardId}
+		</where>
+	</select>
+	<select id="queryMyWeiBoCount" parameterType="java.util.HashMap"
+		resultType="int">
+		select count(1)
+		from sns_weibo
+		<where>
+			<if test="e.status==1">
+				and sns_weibo.status = 0
+			</if>
+			and sns_weibo.cus_id = #{e.cusId}
+		</where>
+	</select>
+
+	<select id="queryAttentionWeiBo" parameterType="java.util.HashMap"
+		resultMap="QueryWeiBoResult">
+		select
+		<include refid="sns_weibo_columns" />
+		,
+		sns_cus_friend.id cusAttentionId
+		FROM
+		sns_cus_friend
+		LEFT JOIN
+		sns_weibo ON sns_weibo.cus_id =
+		sns_cus_friend.cus_friend_id
+		WHERE
+		status = 0 and
+		sns_cus_friend.cus_id = #{e.cusId}
+		ORDER BY
+		sns_weibo.id DESC
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="queryAttentionWeiBoCount" parameterType="java.util.HashMap"
+		resultType="int">
+		select count(1)
+		FROM
+		sns_cus_friend
+		LEFT JOIN
+		sns_weibo ON
+		sns_weibo.cus_id =
+		sns_cus_friend.cus_friend_id
+		WHERE
+		status = 0 and
+		sns_cus_friend.cus_id = #{e.cusId}
+	</select>
+
+	<update id="updateWeiBoPraiseNumAddOne" parameterType="java.util.HashMap">
+		update
+		sns_weibo set praise_num=praise_num+1 where
+		id=#{id,jdbcType=INTEGER}
+	</update>
+
+	<update id="updateWeiBoPraiseNumSubtractionOne" parameterType="java.util.HashMap">
+		update sns_weibo set praise_num=praise_num-1 where
+		id=#{id,jdbcType=INTEGER} and
+		praise_num>0
+	</update>
+
+	<select id="queryHotWeiBo" parameterType="java.util.HashMap"
+		resultMap="QueryWeiBoResult">
+		select
+		<include refid="sns_weibo_columns" />
+		from sns_weibo
+		where
+		status = 0 and 
+	<![CDATA[DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(sns_weibo.add_time) ]]>
+		order by sns_weibo.comment_num desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="queryHotWeiBoCount" parameterType="java.util.HashMap"
+		resultType="int">
+		select count(1)
+		from sns_weibo
+		where
+		status = 0 and 
+	<![CDATA[DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(sns_weibo.add_time) ]]>
+	</select>
+
+	<select id="queryCommentMostWeiBo" parameterType="java.util.HashMap"
+		resultMap="QueryWeiBoResult">
+		select
+		<include refid="sns_weibo_columns" />
+		from sns_weibo
+		where status = 0
+		order by
+		sns_weibo.comment_num
+		desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="queryCommentMostWeiBoCount" parameterType="java.util.HashMap"
+		resultType="int">
+		select count(1)
+		from sns_weibo
+		where status = 0
+	</select>
+
+
+	<update id="updateWeiBoCommentNumAddCount" parameterType="java.util.HashMap">
+		update
+		sns_weibo set comment_num=comment_num+#{count} where
+		id=#{id,jdbcType=INTEGER}
+	</update>
+
+	<update id="updateWeiBoCommentNumSubtractCount" parameterType="java.util.HashMap">
+		update
+		sns_weibo set comment_num=comment_num-1 where
+		id=#{weiboId,jdbcType=INTEGER}
+	</update>
+
+	<select id="queryAllWeiBo" parameterType="java.util.HashMap"
+		resultMap="QueryWeiBoResult">
+		select
+		<include refid="sns_weibo_columns" />
+		from
+		sns_weibo
+		where status = 0
+		order by sns_weibo.top
+		desc,sns_weibo.id
+		desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="queryAllWeiBoCount" parameterType="java.util.HashMap"
+		resultType="int">
+		select count(1)
+		from sns_weibo
+		where status = 0
+	</select>
+
+	<delete id="delWeiBo">
+		DELETE FROM sns_weibo WHERE id=#{id} and cus_id =
+		#{cusId}
+	</delete>
+
+	<update id="updateWeiBoForTop" parameterType="java.util.HashMap">
+		update sns_weibo
+		set top=1 where id=#{id,jdbcType=INTEGER}
+	</update>
+
+	<update id="updateQuXiaoWeiBoForTop" parameterType="java.util.HashMap">
+		update
+		sns_weibo set top=0 where id=#{id,jdbcType=INTEGER}
+	</update>
+
+	<select id="queryAdminAllWeiBo" parameterType="java.util.HashMap"
+		resultMap="QueryWeiBoResult">
+		select
+		<include refid="sns_weibo_columns" />
+		from sns_weibo
+		<!-- left join user_user on sns_weibo.cus_id =
+		user_user.id -->
+		<where>
+			<if test="e.id != null and e.id != 0">
+				and sns_weibo.id = #{e.id}
+			</if>
+			<if test="e.top != -1">
+				and sns_weibo.top = #{e.top}
+			</if>
+			<if test="e.addTimeStr != null and e.addTimeStr != ''">
+				and substring( sns_weibo.add_time, 1, 10 ) =
+				#{e.addTimeStr}
+			</if>
+			<!-- <if test="e.cusName != null and e.cusName != ''">
+				and user_user.nickname LIKE
+				CONCAT('%',#{e.cusName},'%')
+			</if> -->
+			<if test="e.content!=null and e.content!=''">
+				and sns_weibo.content LIKE CONCAT('%',#{e.content},'%')
+			</if>
+		</where>
+		order by sns_weibo.top desc,sns_weibo.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="queryAdminAllWeiBoCount" parameterType="java.util.HashMap"
+		resultType="int">
+		select count(1)
+		from sns_weibo
+		<where>
+			<if test="e.id != null and e.id != 0">
+				and sns_weibo.id = #{e.id}
+			</if>
+			<if test="e.top != -1">
+				and sns_weibo.top = #{e.top}
+			</if>
+			<if test="e.addTimeStr != null and e.addTimeStr != ''">
+				and substring( sns_weibo.add_time, 1, 10 ) =
+				#{e.addTimeStr}
+			</if>
+			<if test="e.cusName != null and e.cusName != ''">
+				and sns_weibo.showname LIKE CONCAT('%',#{e.cusName},'%')
+			</if>
+			<if test="e.content!=null and e.content!=''">
+				and sns_weibo.content LIKE CONCAT('%',#{e.content},'%')
+			</if>
+		</where>
+	</select>
+
+	<select id="queryWeiBoById" parameterType="java.util.HashMap"
+		resultMap="QueryWeiBoResult">
+		select
+		<include refid="sns_weibo_columns" />
+		from sns_weibo
+		where sns_weibo.id = #{id}
+	</select>
+
+	<select id="getLuceneWeiBoByIds" parameterType="java.util.HashMap"
+		resultMap="QueryWeiBoResult">
+		select
+		<include refid="sns_weibo_columns" />
+		,
+		sns_cus_friend.id cusAttentionId
+		from sns_weibo
+		left join
+		sns_cus_friend on
+		sns_cus_friend.cus_Id = #{cusId}
+		and sns_weibo.cus_id
+		=
+		sns_cus_friend.cus_friend_id
+		where sns_weibo.status=0 and
+		sns_weibo.id
+		in
+		<foreach collection="weiboIds" separator="," item="item" open="("
+			index="index" close=")">
+			#{item}
+		</foreach>
+	</select>
+
+	<select id="getWeiBoCountAfterId" parameterType="java.util.HashMap"
+		resultMap="QueryWeiBoResult">
+		select count(1) weiBoNum,IFNULL(max(id),0) maxWeiBoId
+		from sns_weibo
+		where sns_weibo.status=0 and 
+	<![CDATA[sns_weibo.id >= #{weiBoId} ]]>
+
+	</select>
+
+	<select id="getQuestionByPageQuery" parameterType="java.util.HashMap"
+		resultMap="WeiBoResult">
+		select
+		<include refid="sns_weibo_columns" />
+		from sns_weibo
+		where sns_weibo.status=0 and  <![CDATA[ sns_weibo.id between #{minWeiBoId} and   #{maxWeiBoId} ]]>
+		limit #{beginRow},#{pageSize}
+	</select>
+
+	<select id="queryCustomerForWeiBoNumByWeek" parameterType="java.util.HashMap"
+		resultMap="QueryWeiBoResult">
+		select
+		<include refid="sns_weibo_columns" />,
+		count(sns_weibo.id) weiBoNum
+		from sns_weibo
+		where 
+		<![CDATA[DATE_SUB(CURDATE(), INTERVAL 7 DAY) <= date(sns_weibo.add_time) ]]>
+		group by sns_weibo.cus_id
+		order by weiboNum desc
+		limit 10
+	</select>
+	<!-- 验证微博是不是该用户的 -->
+	<select id="clickMyWeiBo" parameterType="java.util.HashMap"
+		resultType="int">
+		select count(1)
+		from sns_weibo where
+		sns_weibo.cus_id =
+		#{cusId} and sns_weibo.id = #{id}
+	</select>
+	<!-- 他人首页查询微博 -->
+	<select id="queryPersonWeiBoById" parameterType="java.util.HashMap"
+		resultMap="WeiBoResult">
+		select
+		<include refid="sns_weibo_columns" />
+		from sns_weibo
+		<where>
+			<if test="status==1">
+				and sns_weibo.status = 0
+			</if>
+			and sns_weibo.cus_id=#{cusId}
+		</where>
+		order by id desc
+		limit
+		#{num}
+	</select>
+
+	<update id="updateWeiBoForwardNumAddOne" parameterType="java.util.HashMap">
+		update
+		sns_weibo set forward_num=forward_num+1 where
+		id=#{weiBoId,jdbcType=INTEGER}
+	</update>
+	<select id="getWeiBoByIds" parameterType="String" resultMap="QueryWeiBoResult">
+		select
+		<include refid="sns_weibo_columns" />
+		from sns_weibo
+		<where>
+			sns_weibo.id in(${value})
+		</where>
+	</select>
+</mapper>

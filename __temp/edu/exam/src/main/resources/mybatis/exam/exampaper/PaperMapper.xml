@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="PaperMapper">
+	<resultMap id="PaperResult" type="exampaper">
+		<result property="id" column="id"/>
+		<result property="subjectId" column="SUBJECT_ID"/>
+		<result property="name" column="NAME"/>
+		<result property="info" column="INFO"/>
+		<result property="replyTime" column="REPLY_TIME"/>
+		<result property="addTime" column="ADD_TIME"/>
+		<result property="status" column="status"/>
+		<result property="level" column="LEVEL"/>
+		<result property="joinNum" column="JOIN_NUM"/>
+		<result property="avgScore" column="avgscore"/>
+		<result property="type" column="TYPE"/>
+		<result property="qstCount" column="QST_COUNT"/>
+		<result property="author" column="AUTHOR"/>
+		<result property="updateTime" column="updateTime"/>
+		<result property="score" column="exam_exampaper.score"/>
+	</resultMap>
+	<!-- <resultMap type="FavoriteResult" id="Favorite">
+		<result property="id" column="ID"/>
+		<result property="cusId" column="CUS_ID"/>
+		<result property="qstId" column="Qst_id"/>
+		<result property="addDate" column="ADD_DATE"/>
+		<result property="flag" column="FLAG"/>
+	</resultMap> -->
+	<resultMap id="QueryPaperResult" type="QueryPaper" extends="PaperResult">
+		<result property="subjectName" column="subject_name"/>
+		<!-- 用户Id -->
+		<result property="cusId" column="CUS_ID"/>
+		<result property="passNum" column="passNum"/>
+	</resultMap>
+	<sql id="exam_exampaper_columns">
+		exam_exampaper.id,
+		exam_exampaper.SUBJECT_ID,
+		exam_exampaper.NAME,
+		exam_exampaper.INFO,
+		exam_exampaper.REPLY_TIME,
+		exam_exampaper.ADD_TIME,
+		exam_exampaper.status,
+		exam_exampaper.LEVEL,
+		exam_exampaper.JOIN_NUM,
+		exam_exampaper.avgscore,
+		exam_exampaper.TYPE,
+		exam_exampaper.QST_COUNT,
+		exam_exampaper.AUTHOR,
+		exam_exampaper.updateTime,
+		exam_exampaper.score
+	</sql>
+	
+	<sql id="exam_exampaper_properties">
+		#{id},
+		#{subjectId},
+		#{name},
+		#{info},
+		#{replyTime},
+		#{addTime},
+		#{status},
+		#{level},
+		#{joinNum},
+		#{avgScore},
+		#{type},
+		#{qstCount},
+		#{author},
+		#{updateTime},
+		#{score}
+	</sql>
+	
+	 <insert id="createPaper" parameterType="exampaper" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        INSERT INTO exam_exampaper (<include refid="exam_exampaper_columns"/>) VALUES (<include
+            refid="exam_exampaper_properties"/>)
+    </insert>
+    
+     <insert id="createPaperBatch" parameterType="java.util.HashMap">
+        INSERT INTO exam_exampaper (<include refid="exam_exampaper_columns"/>) VALUES 
+         <foreach collection="paperList" index="index" item="item" separator="," >
+        	   (#{item.id},
+				#{item.subjectId},
+				#{item.name},
+				#{item.info},
+				#{item.replyTime},
+				#{item.addTime},
+				#{item.status},
+				#{item.level},
+				#{item.joinNum},
+				#{item.avgScore},
+				#{item.type},
+				#{item.qstCount},
+				#{item.author},
+				#{item.updateTime},
+				#{item.score})
+        </foreach>
+    </insert>
+    
+    <select id="getPaperList" parameterType="java.util.HashMap" resultMap="PaperResult">
+	select <include refid="exam_exampaper_columns"/>
+	from exam_exampaper 
+	<where>
+	exam_exampaper.id=#{id}
+	</where>
+	</select>
+	
+	<select id="getAllPaperList" resultMap="QueryPaperResult" parameterType="java.util.HashMap">
+			SELECT
+			<include refid="exam_exampaper_columns"/>,
+			exam_subject.SUBJECT_NAME
+			FROM exam_exampaper 
+			left join exam_subject on exam_subject.subject_id = exam_exampaper.subject_id
+			<where>
+				exam_exampaper.status=0 and TYPE!=0 <!-- 0为随机出的专项只能练习的试卷不能搜出 -->
+				<if test="e.subjectId!=null and e.subjectId!=0">
+           		 and exam_exampaper.SUBJECT_ID = #{e.subjectId}
+           		 </if>
+			    <if test="e.id!=null and e.id!=0">
+           		 and exam_exampaper.id = #{e.id}
+            	</if>
+				<if test="e.level!=0">
+            	and exam_exampaper.LEVEL = #{e.level}
+            	</if>
+            	<if test="e.type!=0">
+            	and exam_exampaper.TYPE = #{e.type}
+            	</if>
+			</where>
+			order by exam_exampaper.ADD_TIME desc
+			<include refid="publicMapper.pageEnd"/>
+		</select>
+		<select id="getAllPaperListCount" resultType="int" parameterType="java.util.HashMap">
+			SELECT COUNT(1)
+			FROM exam_exampaper
+			<where>
+				exam_exampaper.status=0 and TYPE!=0
+           		<if test="e.subjectId!=null and e.subjectId!=0">
+           		 and exam_exampaper.SUBJECT_ID = #{e.subjectId}
+           		 </if>
+			    <if test="e.id!=null and e.id!=0">
+           		 and exam_exampaper.id = #{e.id}
+            	</if>
+				<if test="e.level!=0">
+            	and exam_exampaper.LEVEL = #{e.level}
+            	</if>
+            	<if test="e.type!=0">
+            	and exam_exampaper.TYPE = #{e.type}
+            	</if>
+			</where>
+		</select>
+		<!-- 查询收藏的试卷 -->
+		
+	<update id="updateExamPaperById" parameterType="ExamPaper" >
+ 		update exam_exampaper set NAME=#{name},INFO=#{info},REPLY_TIME=#{replyTime},LEVEL=#{level},
+ 		TYPE=#{type},QST_COUNT=#{qstCount},score=#{score},subject_Id=#{subjectId}
+ 		 where id=#{id,jdbcType=INTEGER}
+	</update>
+		
+		<!--  批量删除 -->
+ 	<delete id="deletePaperByidBatch">
+ 		update exam_exampaper set STATUS = 2 
+        WHERE
+        id in 
+        <foreach collection="array" item="item" open="(" close=")" separator="," >
+        	#{item}
+        </foreach>
+    </delete>
+    
+    <select id="queryExamPaperByType" resultMap="QueryPaperResult" parameterType="java.util.HashMap">
+		SELECT
+		<include refid="exam_exampaper_columns"/>
+		FROM exam_exampaper 
+		<where>
+			exam_exampaper.type =#{type} 
+			and exam_exampaper.SUBJECT_ID = #{subjectId}
+		</where>
+		order by exam_exampaper.ADD_TIME desc
+	</select>
+    <update id="updateExamPaperByJoinNumAndAvgscore" parameterType="java.util.HashMap" >
+ 		update exam_exampaper set JOIN_NUM=#{joinNum},avgscore=#{avgScore}
+ 		where id=#{id,jdbcType=INTEGER}
+	</update>
+	
+	<select id="getPaperAllListForFront" resultMap="QueryPaperResult" parameterType="java.util.HashMap">
+		SELECT
+		<include refid="exam_exampaper_columns"/>,
+		count(exam_exampaper_record.id) passNum
+		FROM exam_exampaper 
+		left join exam_exampaper_record USE INDEX(EP_id)
+		on exam_exampaper_record.cus_id = #{e.cusId} 
+		and exam_exampaper.id = exam_exampaper_record.ep_id
+		<where> exam_exampaper.subject_id = #{e.subjectId} 
+			and exam_exampaper.status=0 and exam_exampaper.TYPE!=0 <!-- 0为随机出的专项只能练习的试卷不能搜出 -->
+			<if test="e.type!=0">
+          	 	and exam_exampaper.TYPE = #{e.type}
+           	</if>
+		</where>
+		group by exam_exampaper.id
+		order by exam_exampaper.ADD_TIME desc
+		<include refid="publicMapper.pageEnd"/>
+	</select>
+	<select id="getPaperAllListForFrontCount" resultType="int" parameterType="java.util.HashMap">
+		SELECT
+		COUNT(1)
+		FROM exam_exampaper 
+		<where> exam_exampaper.subject_id = #{e.subjectId} 
+			and exam_exampaper.status=0 and exam_exampaper.TYPE!=0 <!-- 0为随机出的专项只能练习的试卷不能搜出 -->
+			<if test="e.type!=0">
+          	 	and exam_exampaper.TYPE = #{e.type}
+           	</if>
+		</where>
+	</select>
+</mapper>

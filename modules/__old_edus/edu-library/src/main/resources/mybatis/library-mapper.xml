@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.wangxiao.library.dao.LibraryDao">
+        
+		<sql id="edu_library_columns">
+			edu_library.ID,
+			edu_library.subject_id,
+			edu_library.name,
+			edu_library.type,
+			edu_library.browse_num,
+			edu_library.intro,
+			edu_library.pdf_url,
+			edu_library.img_url,
+			edu_library.add_time
+		</sql>
+		<sql id="edu_library_properties">
+			#{id},
+			#{subjectId},
+			#{name},
+			#{type},
+			#{browseNum},
+			#{intro},
+			#{pdfUrl},
+			#{imgUrl},
+			#{addTime}
+		</sql>
+		
+		<sql id="edu_library_images_columns">
+			edu_library_images.ID,
+			edu_library_images.library_id,
+			edu_library_images.img_url
+		</sql>
+		
+		<resultMap type="io.wangxiao.library.entity.Library" id="LibraryResult">
+			<result property="id" column="ID"/>
+			<result property="subjectId" column="subject_id"/>
+			<result property="name" column="name"/>
+			<result property="type" column="type"/>
+			<result property="browseNum" column="browse_num"/>
+			<result property="intro" column="intro"/>
+			<result property="pdfUrl" column="pdf_url"/>
+			<result property="imgUrl" column="img_url"/>
+			<result property="addTime" column="add_time"/>
+		</resultMap>
+		<resultMap type="io.wangxiao.library.entity.LibraryDTO" id="LibraryDTOResult" extends="LibraryResult">
+			<result property="subjectName" column="subject_name"/>
+		</resultMap>
+
+		
+		<!-- 文库分页 -->
+		<select id="findLibraryDTOList" parameterType="io.wangxiao.library.entity.QueryLibrary" resultMap="LibraryDTOResult">
+			select <include refid="edu_library_columns"/>,
+			sys_subject.subject_name
+			from edu_library
+			left join sys_subject on edu_library.subject_id=sys_subject.subject_id
+			<where>
+				<if test="e.name!=null and e.name!='' ">
+					and edu_library.name like CONCAT('%',#{e.name},'%')
+				</if>
+           		<if test="e.subjectId!=null and e.subjectId>0">
+           			and (edu_library.subject_id=#{e.subjectId} or sys_subject.parent_Id=#{e.subjectId})
+           		</if>
+           	</where>
+           	<if test="e.orderNum!=null and e.orderNum==1">
+        		order by edu_library.browse_num DESC
+        	</if>
+			<if test="e.orderNum==0 or e.orderNum==2 or e.orderNum==null">
+        		order by edu_library.ID DESC
+        	</if>
+		</select>
+
+
+
+        
+        <!-- 热门文库 -->
+		<select id="hotLibraries" parameterType="int" resultMap="LibraryResult">
+			select <include refid="edu_library_columns"/>
+			from edu_library
+           	order by edu_library.browse_num DESC
+        	limit 0,#{value}
+		</select>
+		
+
+
+</mapper>

@@ -1,0 +1,772 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DisGroupMapper">
+
+	<resultMap type="DisGroup" id="DisGroupResult">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="content" column="nontent" />
+		<result property="imageUrl" column="image_Url" />
+		<result property="createTime" column="createTime" />
+		<result property="articleCounts" column="articleCounts" />
+		<result property="status" column="status" />
+		<result property="sort" column="sort" />
+		<result property="disclasstiy" column="disclassifyname" />
+		<result property="disNumber" column="dis_number" />
+		<result property="cusId" column="cus_id" />
+		<result property="memberNum" column="memberNum" />
+		<result property="type" column="type" />
+		<result property="showName" column="showname" />
+		<result property="transferId" column="transferId"/>
+	</resultMap>
+
+	<resultMap type="DisGroupClassify" id="DisGroupListResult">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="status" column="status" />
+		<result property="sort" column="sort" />
+		<result property="groupNum" column="groupNum" />
+		<result property="code" column="code" />
+	</resultMap>
+	<resultMap type="DisGroup" id="QueryDisGroupResult" extends="DisGroupResult">
+		<result property="imageOriginal" column="image_original" />
+		<result property="imageLittle" column="image_little" />
+	</resultMap>
+	<sql id="sns_dis_group_properties">
+
+		#{id},
+		#{name},
+		#{introduction},
+		#{imageUrl},
+		#{createTime},
+		#{cusId},
+		#{memberNum},
+		#{disclassifyId},
+		#{status},
+		#{disNumber},
+		#{showName}
+	</sql>
+	<sql id="sns_dis_group_columns">
+		sns_dis_group.id,
+		sns_dis_group.name,
+		sns_dis_group.introduction,
+		sns_dis_group.image_Url,
+		sns_dis_group.createTime,
+		sns_dis_group.cus_id,
+		sns_dis_group.memberNum,
+		sns_dis_group.showname,
+		sns_dis_group.disclassifyId,
+		sns_dis_group.status,
+		sns_dis_group.activity,
+		sns_dis_group.articleCounts,
+		sns_dis_group.sort
+	</sql>
+	<!--创建群 -->
+	<insert id="addDisGroup" parameterType="DisGroup"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		INSERT INTO
+		sns_dis_group
+		(id,
+		name,
+		introduction,
+		image_Url,
+		createTime,
+		cus_id,
+		memberNum,
+		disclassifyId,
+		status,
+		dis_number,
+		showname
+		) VALUES(
+		<include refid="sns_dis_group_properties" />
+		)
+	</insert>
+	<!--Admin 后台分页查询所有群 -->
+	<select id="queryAdminDisGroupList" resultMap="DisGroupMapper.DisGroupResult"
+		parameterType="java.util.HashMap">
+		SELECT
+		sns_dis_group.id,
+		sns_dis_group.name,
+		sns_dis_group.showname,
+		sns_dis_group.introduction,
+		sns_dis_group.image_Url,
+		sns_dis_group.createTime,
+		sns_dis_group.cus_id,
+		sns_dis_group.memberNum,
+		sns_dis_group.disclassifyId,
+		sns_dis_group.status,
+		sns_dis_group.activity,
+		sns_dis_group.articleCounts,
+		sns_dis_group.dis_number,
+		sns_dis_group_classify.name disclassifyname,
+		sns_dis_group.sort
+		FROM
+		sns_dis_group
+		LEFT
+		JOIN
+		sns_dis_group_classify ON
+		sns_dis_group.disclassifyId=sns_dis_group_classify.id
+		<where>
+		sns_dis_group_classify.status=0
+			<if test="e.name!=null and e.name!=''">
+				and sns_dis_group.name like CONCAT('%',#{e.name},'%')
+			</if>
+			<if test="e.disclassifyId!=null and e.disclassifyId!=''">
+				and sns_dis_group.disclassifyId=#{e.disclassifyId}
+			</if>
+			<if test="e.status!=-1">
+				and sns_dis_group.status=#{e.status}
+			</if>
+			<if test="e.showName!=null and e.showName!=''">
+				and sns_dis_group.showname=#{e.showName}
+			</if>
+		</where>
+		ORDER BY
+		sns_dis_group.sort desc,sns_dis_group.id DESC
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryAdminDisGroupListCount" resultType="int"
+		parameterType="java.util.HashMap">
+		SELECT COUNT(1)
+		FROM sns_dis_group
+		LEFT
+		JOIN
+		sns_dis_group_classify ON
+		sns_dis_group.disclassifyId=sns_dis_group_classify.id
+		<where>
+		sns_dis_group_classify.status=0
+			<if test="e.name!=null and e.name!=''">
+				and sns_dis_group.name like CONCAT('%',#{e.name},'%')
+			</if>
+			<if test="e.disclassifyId!=null and e.disclassifyId!=''">
+				and sns_dis_group.disclassifyId=#{e.disclassifyId}
+			</if>
+			<if test="e.status!=-1">
+				and sns_dis_group.status=#{e.status}
+			</if>
+				<if test="e.showName!=null and e.showName!=''">
+				and sns_dis_group.showname=#{e.showName}
+			</if>
+		</where>
+	</select>
+	<!-- 分页查询所有群 -->
+	<select id="queryDisGroupALLList" resultMap="DisGroupMapper.DisGroupResult"
+		parameterType="java.util.HashMap">
+		SELECT
+		sns_dis_group.id,
+		sns_dis_group.name,
+		sns_dis_group.introduction,
+		sns_dis_group.image_Url,
+		sns_dis_group.createTime,
+		sns_dis_group.cus_id,
+		sns_dis_group.showname,
+		sns_dis_group.memberNum,
+		sns_dis_group.disclassifyId,
+		sns_dis_group.status,
+		sns_dis_group.activity,
+		sns_dis_group.articleCounts,
+		sns_dis_group.dis_number,
+		sns_dis_group.sort,
+		sns_dis_group_classify.name disclassifyname
+		FROM
+		sns_dis_group
+		LEFT JOIN
+		sns_dis_group_classify ON
+		sns_dis_group.disclassifyId=sns_dis_group_classify.id
+		where
+		sns_dis_group_classify.status=0 
+		ORDER BY
+		sns_dis_group.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryDisGroupALLListCount" resultType="int"
+		parameterType="java.util.HashMap">
+		SELECT COUNT(1)
+		FROM sns_dis_group
+		LEFT JOIN
+		sns_dis_group_classify ON
+		sns_dis_group.disclassifyId=sns_dis_group_classify.id
+		where
+		sns_dis_group_classify.status=0 
+	</select>
+	<!-- 分页查询热门群 -->
+	<select id="queryHotDisGroupList" resultMap="DisGroupMapper.DisGroupResult"
+		parameterType="java.util.HashMap">
+		SELECT
+		sns_dis_group.id,
+		sns_dis_group.name,
+		sns_dis_group.introduction,
+		sns_dis_group.image_Url,
+		sns_dis_group.createTime,
+		sns_dis_group.cus_id,
+		sns_dis_group.showname,
+		sns_dis_group.memberNum,
+		sns_dis_group.disclassifyId,
+		sns_dis_group.status,
+		sns_dis_group.activity,
+		sns_dis_group.dis_number,
+		sns_dis_group.articleCounts
+		FROM
+		sns_dis_group
+		left join sns_dis_group_classify  on sns_dis_group.disclassifyId=sns_dis_group_classify.id
+		where
+		sns_dis_group_classify.status=0
+		ORDER BY
+		sns_dis_group.activity DESC
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryHotDisGroupListCount" resultType="int"
+		parameterType="java.util.HashMap">
+		SELECT COUNT(1)
+		FROM sns_dis_group
+		left join sns_dis_group_classify  on sns_dis_group.disclassifyId=sns_dis_group_classify.id
+		where
+		sns_dis_group_classify.status=0
+	</select>
+	<!-- 查询我创建的群 -->
+	<select id="queryMyDisGroupList" resultMap="DisGroupMapper.DisGroupResult"
+		parameterType="java.lang.Long">
+		SELECT
+		<include refid="sns_dis_group_columns" />,
+		sns_dis_member.transferId
+		FROM
+		sns_dis_group
+		left join sns_dis_member on sns_dis_member.cus_id =#{cus_id} and sns_dis_group.id=sns_dis_member.dis_groupid
+		left join sns_dis_group_classify  on sns_dis_group.disclassifyId=sns_dis_group_classify.id
+		WHERE
+		sns_dis_group.cus_id=#{cus_id} and sns_dis_group_classify.status=0
+		group by sns_dis_group.id
+	</select>
+	<!-- 查询我加入的群 -->
+	<select id="queryMyJoinDisGroupList" resultMap="DisGroupMapper.DisGroupResult"
+		parameterType="java.util.HashMap">
+		SELECT
+		sns_dis_group.id,
+		sns_dis_group.name,
+		sns_dis_group.introduction,
+		sns_dis_group.image_Url,
+		sns_dis_group.createTime,
+		sns_dis_group.cus_id,
+		sns_dis_group.showname,
+		sns_dis_group.memberNum,
+		sns_dis_group.disclassifyId,
+		sns_dis_group.status,
+		sns_dis_group.activity,
+		sns_dis_group.articleCounts,
+		sns_dis_member.type,
+		sns_dis_member.transferId
+		FROM
+		sns_dis_member
+		LEFT JOIN
+		sns_dis_group ON
+		sns_dis_member.dis_groupid=sns_dis_group.id
+		left join sns_dis_group_classify  on sns_dis_group.disclassifyId=sns_dis_group_classify.id
+		WHERE
+		sns_dis_member.cus_id=#{e.cusId} and sns_dis_group_classify.status=0
+		
+		order by sns_dis_member.type desc,sns_dis_group.createTime desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryMyJoinDisGroupListCount" resultType="int"
+		parameterType="java.util.HashMap">
+		SELECT COUNT(1)
+		FROM sns_dis_member
+		LEFT JOIN
+		sns_dis_group ON
+		sns_dis_member.dis_groupid=sns_dis_group.id
+		left join sns_dis_group_classify  on sns_dis_group.disclassifyId=sns_dis_group_classify.id
+		WHERE
+		sns_dis_member.cus_id=#{e.cusId} and sns_dis_group_classify.status=0
+	</select>
+	<!-- 根据群的id查询群的信息 -->
+	<select id="queryDisGroupById" resultMap="DisGroupMapper.DisGroupResult"
+		parameterType="long">
+		SELECT
+		sns_dis_group.id,
+		sns_dis_group.name,
+		sns_dis_group.introduction,
+		sns_dis_group.image_Url,
+		sns_dis_group.createTime,
+		sns_dis_group.cus_id,
+		sns_dis_group.showname,
+		sns_dis_group.memberNum,
+		sns_dis_group.disclassifyId,
+		sns_dis_group.status,
+		sns_dis_group.activity,
+		sns_dis_group.articleCounts,
+		sns_dis_group.sort,
+		sns_dis_group.dis_number,
+		sns_dis_group_classify.name disclassifyname
+		FROM
+		sns_dis_group
+		LEFT JOIN
+		sns_dis_group_classify ON
+		sns_dis_group.disclassifyId=sns_dis_group_classify.id
+		WHERE
+		sns_dis_group.id=#{id}
+	</select>
+	<!-- 编辑时候查询群分类 -->
+	<select id="queryDisGroupDetailById" resultMap="DisGroupMapper.QueryDisGroupResult"
+		parameterType="long">
+		SELECT
+		sns_dis_group.id,
+		sns_dis_group.name,
+		sns_dis_group.introduction,
+		sns_dis_group.image_url,
+		sns_dis_group.image_little,
+		sns_dis_group.image_original,
+		sns_dis_group.createTime,
+		sns_dis_group.cus_id,
+		sns_dis_group.showname,
+		sns_dis_group.memberNum,
+		sns_dis_group.disclassifyId,
+		sns_dis_group.status,
+		sns_dis_group.activity,
+		sns_dis_group.articleCounts,
+		sns_dis_group.sort,
+		sns_dis_group.dis_number,
+		sns_dis_group_classify.name disclassifyname
+		FROM
+		sns_dis_group
+		LEFT JOIN
+		sns_dis_group_classify ON
+		sns_dis_group.disclassifyId=sns_dis_group_classify.id
+		WHERE
+		sns_dis_group.id=#{id}
+	</select>
+	<update id="updateDisGroupDetailById" parameterType="DisGroup">
+		update
+		sns_dis_group
+		set sns_dis_group.name=#{name},
+		sns_dis_group.introduction=#{introduction},
+		sns_dis_group.image_Url=#{imageUrl},
+		sns_dis_group.createTime=#{createTime}
+		where sns_dis_group.id=#{id}
+	</update>
+	<!-- 查找群分类 -->
+	<select id="querydisGroupList" resultMap="DisGroupMapper.DisGroupListResult">
+	SELECT
+		sns_dis_group_classify.id,
+		sns_dis_group_classify.name,
+		sns_dis_group_classify.status,
+		sns_dis_group_classify.sort,
+		sns_dis_group_classify.code,
+		count(sns_dis_group.disclassifyId)
+		groupNum
+		FROM
+		sns_dis_group_classify
+		left join
+		sns_dis_group on 
+		sns_dis_group_classify.id=sns_dis_group.disclassifyId
+		where
+		sns_dis_group_classify.status=0 
+		GROUP by
+		sns_dis_group_classify.id
+		ORDER BY
+		sns_dis_group_classify.sort DESC
+	</select>
+	<!-- 根据用户创建限制不的超过10个提示 -->
+	<select id="queryMyDisGroupByCusId" resultType="int"
+		parameterType="DisGroup">
+		SELECT COUNT(1)
+		FROM
+		sns_dis_group
+		left join sns_dis_group_classify  on sns_dis_group.disclassifyId=sns_dis_group_classify.id
+		WHERE sns_dis_group.cus_id=#{cusId} and sns_dis_group_classify.status=0
+	</select>
+	<!-- 设置置顶群 -->
+	<select id="queryDisGroupTop" resultMap="DisGroupMapper.DisGroupResult"
+		parameterType="java.util.HashMap">
+		SELECT
+		sns_dis_group.id,
+		sns_dis_group.name,
+		sns_dis_group.introduction,
+		sns_dis_group.image_Url,
+		sns_dis_group.createTime,
+		sns_dis_group.cus_id,
+		sns_dis_group.showname,
+		sns_dis_group.memberNum,
+		sns_dis_group.disclassifyId,
+		sns_dis_group.status,
+		sns_dis_group.top,
+		sns_dis_group.activity,
+		sns_dis_group.dis_number,
+		sns_dis_group.articleCounts
+		FROM
+		sns_dis_group
+		ORDER BY
+		sns_dis_group.top DESC
+	</select>
+	<select id="queryDisGroupTopCount" resultType="int">
+		SELECT COUNT(1)
+		FROM
+		sns_dis_group
+		ORDER BY sns_dis_group.top DESC
+	</select>
+	<update id="updateDisGroupTop" parameterType="disGroup">
+		UPDATE
+		sns_dis_group
+		SET
+		sns_dis_group.top=#{top}
+		WHERE
+		sns_dis_group.cus_id=#{cus_id}
+	</update>
+	<!-- 转让群 -->
+	<update id="updateDisGroupTransfer" parameterType="DisMember">
+		UPDATE
+		sns_dis_member
+		SET sns_dis_member.transferId=#{transferId}
+		WHERE
+		sns_dis_member.cus_id=#{cus_id}
+	</update>
+	<!-- 更新活跃度，根据成员数+1，文章数+1，回复数+1 -->
+	<update id="updateDisGroupActivity" parameterType="disGroup">
+		UPDATE
+		sns_dis_group
+		SET
+		sns_dis_group.activity=sns_dis_group.activity+#{activity}
+		WHERE
+		sns_dis_group.id=#{id}
+	</update>
+	<!-- 群首页按照推荐来排行 -->
+	<select id="queryHomePageDisGroup" resultMap="DisGroupMapper.DisGroupResult">
+		SELECT
+		sns_dis_group.id,
+		sns_dis_group.name,
+		sns_dis_group.introduction,
+		sns_dis_group.image_Url,
+		sns_dis_group.createTime,
+		sns_dis_group.cus_id,
+		sns_dis_group.showname,
+		sns_dis_group.memberNum,
+		sns_dis_group.disclassifyId,
+		sns_dis_group.status,
+		sns_dis_group.activity,
+		sns_dis_group.articleCounts,
+		sns_dis_group.dis_number,
+		sns_dis_group.sort
+		FROM sns_dis_group
+		ORDER BY
+		sns_dis_group.sort desc
+	</select>
+	<update id="updateArticleCountsReduce" parameterType="java.lang.Long">
+		UPDATE
+		sns_dis_group
+		SET
+		sns_dis_group.articleCounts=sns_dis_group.articleCounts-1
+		WHERE
+		sns_dis_group.id=#{id}
+	</update>
+	<update id="updateArticleCount" parameterType="java.util.HashMap">
+		UPDATE
+		sns_dis_group
+		SET
+		sns_dis_group.articleCounts=sns_dis_group.articleCounts+#{count}
+		WHERE
+		sns_dis_group.id=#{groupId}
+	</update>
+	<!-- 判断用户是否加入群 -->
+	<select id="queryIsJoin" resultType="int">
+		SELECT COUNT(1)
+		FROM
+		sns_dis_member
+		WHERE sns_dis_member.cus_id=#{cusId} AND
+		sns_dis_member.dis_groupid=#{groupId}
+	</select>
+	<!-- 后台添加群分类 -->
+	<insert id="addDisGroupClassify" parameterType="DisGroupClassify"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		INSERT INTO
+		sns_dis_group_classify
+		(id,
+		name,
+		status,
+		code)
+		VALUES(
+		#{id},
+		#{name},
+		#{status},
+		#{code})
+	</insert>
+	<!-- 后台删除群分类 -->
+	<update id="deleteDisGroupClassify" parameterType="java.lang.Long">
+		UPDATE
+		sns_dis_group_classify
+		SET
+		sns_dis_group_classify.status=1
+		WHERE
+		sns_dis_group_classify.id=#{id}
+	</update>
+	<!-- 后台根据id查询群分类 -->
+	<select id="queryDisGroupClassifyById" parameterType="long"
+		resultMap="DisGroupMapper.DisGroupListResult">
+		SELECT sns_dis_group_classify.id,
+		sns_dis_group_classify.name,
+		sns_dis_group_classify.status,
+		sns_dis_group_classify.sort,
+		sns_dis_group_classify.code
+		FROM
+		sns_dis_group_classify
+		WHERE
+		sns_dis_group_classify.id=#{id}
+	</select>
+	<!-- 修改群分类 -->
+	<update id="updateDisGroupClassify" parameterType="DisGroupClassify">
+		UPDATE
+		sns_dis_group_classify
+		SET
+		sns_dis_group_classify.name=#{name},
+		sns_dis_group_classify.sort=#{sort},
+		sns_dis_group_classify.code=#{code}
+		WHERE
+		sns_dis_group_classify.id=#{id}
+	</update>
+	<!-- 后台很据名字查询 -->
+	<select id="queryDisGroupListByName" parameterType="java.lang.String"
+		resultMap="DisGroupMapper.DisGroupResult">
+		SELECT
+		sns_dis_group.id,
+		sns_dis_group.name,
+		sns_dis_group.introduction,
+		sns_dis_group.image_Url,
+		sns_dis_group.createTime,
+		sns_dis_group.cus_id,
+		sns_dis_group.showname,
+		sns_dis_group.memberNum,
+		sns_dis_group.disclassifyId,
+		sns_dis_group.status,
+		sns_dis_group.activity,
+		sns_dis_group.dis_number,
+		sns_dis_group.articleCounts
+		FROM
+		sns_dis_group
+		WHERE
+		sns_dis_group.name=#{name}
+		ORDER BY
+		sns_dis_group.id,sns_dis_group.memberNum DESC
+	</select>
+	<!-- 后台根据id删除群 -->
+	<delete id="deleteDisGroupById" parameterType="java.lang.Long">
+		DELETE FROM
+		sns_dis_group
+		WHERE
+		sns_dis_group.id=#{id}
+	</delete>
+	<!-- 群审核通过 -->
+	<update id="updateDisGroupStatus" parameterType="java.lang.Long">
+		UPDATE
+		sns_dis_group
+		SET sns_dis_group.status=1
+		WHERE sns_dis_group.id=#{id}
+	</update>
+	<!-- 群的开启关闭 -->
+	<update id="updateOpenDisGroupStatus" parameterType="long">
+		UPDATE
+		sns_dis_group
+		SET sns_dis_group.status=2
+		WHERE sns_dis_group.id=#{id}
+	</update>
+	<update id="updateCloseDisGroupStatus" parameterType="long">
+		UPDATE
+		sns_dis_group
+		SET sns_dis_group.status=1
+		WHERE sns_dis_group.id=#{id}
+	</update>
+	<!-- 后台修改群信息 -->
+	<update id="updateDisGroupById" parameterType="disGroup">
+		UPDATE
+		sns_dis_group
+		SET
+		sns_dis_group.name=#{name},
+		sns_dis_group.disclassifyId=#{disclassifyId},
+		sns_dis_group.introduction=#{introduction},
+		sns_dis_group.sort=#{sort}
+		WHERE
+		sns_dis_group.id=#{id}
+	</update>
+	<!-- 群搜索 -->
+	<select id="queryDisGroupByCondition" resultMap="DisGroupMapper.DisGroupResult"
+		parameterType="DisGroup">
+		SELECT
+		sns_dis_group.id,
+		sns_dis_group.name,
+		sns_dis_group.introduction,
+		sns_dis_group.image_Url,
+		sns_dis_group.createTime,
+		sns_dis_group.cus_id,
+		sns_dis_group.showname,
+		sns_dis_group.memberNum,
+		sns_dis_group.disclassifyId,
+		sns_dis_group.status,
+		sns_dis_group.activity,
+		sns_dis_group.articleCounts,
+		sns_dis_group.sort,
+		sns_dis_group.dis_number,
+		sns_dis_group_classify.name disclassifyname
+		FROM sns_dis_group
+		LEFT JOIN
+		sns_dis_group_classify ON
+		sns_dis_group.disclassifyId=sns_dis_group_classify.id
+		where
+		1=1 
+		<if test="e.name!=null and e.name!='' ">
+			AND	sns_dis_group.name LIKE	CONCAT('%',#{e.name,jdbcType=VARCHAR},'%')
+		</if>
+		<if test="e.showName!=null and e.showName!='' ">
+			AND sns_dis_group.showName=#{e.showName,jdbcType=VARCHAR}
+		</if>
+		<if test="e.disclassifyId!=null and e.disclassifyId!=0">
+			AND
+			sns_dis_group.disclassifyId=#{e.disclassifyId,jdbcType=INTEGER}
+		</if>
+		<choose>
+		<when test="e.flag==1">
+		order by sns_dis_group.activity desc 
+		</when>
+		<when test="e.flag==2">
+		order by sns_dis_group.articleCounts desc
+		</when>
+		<when test="e.flag==3">
+		order by sns_dis_group.memberNum desc
+		</when>
+		<otherwise>
+		order by sns_dis_group.id desc
+		</otherwise>
+		</choose>
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryDisGroupByConditionCount" resultType="int"
+		parameterType="DisGroup">
+		SELECT
+		count(1)
+		FROM sns_dis_group
+		where
+		1=1 
+		<if test="e.name!=null and e.name!='' ">
+			AND	sns_dis_group.name LIKE	CONCAT('%',#{e.name,jdbcType=VARCHAR},'%')
+		</if>
+		<if test="e.showName!=null and e.showName!='' ">
+			AND sns_dis_group.showName=#{e.showName,jdbcType=VARCHAR}
+		</if>
+		<if test="e.disclassifyId!=null and e.disclassifyId!=0">
+			AND
+			sns_dis_group.disclassifyId=#{e.disclassifyId,jdbcType=INTEGER}
+		</if>
+	</select>
+	<!-- 判断用户是否创建群 -->
+	<select id="queryIsCreateDisGroup" parameterType="long"
+		resultType="int">
+		select count(1)
+		from sns_dis_group
+		where
+		sns_dis_group.cus_id=#{cusId}
+	</select>
+	<!-- 后台拒绝通过 -->
+	<update id="updaterefuseDisGroupStatus" parameterType="long">
+		update
+		sns_dis_group
+		set sns_dis_group.status=3
+		where
+		sns_dis_group.id=#{id}
+	</update>
+	<!-- 后台判断分类是否存在 -->
+	<select id="queryDisGroupClassifyIsExist" parameterType="DisGroupClassify"
+			resultType="int">
+		select count(1)
+		from sns_dis_group_classify
+		where
+		sns_dis_group_classify.status=0
+		and (sns_dis_group_classify.name=#{name}
+		or sns_dis_group_classify.code=#{code})
+	</select>
+	<select id="queryClassifyDisGroupList" parameterType="java.util.HashMap"
+		resultMap="DisGroupMapper.DisGroupResult">
+		SELECT
+		sns_dis_group.id,
+		sns_dis_group.name,
+		sns_dis_group.introduction,
+		sns_dis_group.image_Url,
+		sns_dis_group.createTime,
+		sns_dis_group.cus_id,
+		sns_dis_group.showname,
+		sns_dis_group.memberNum,
+		sns_dis_group.disclassifyId,
+		sns_dis_group.status,
+		sns_dis_group.activity,
+		sns_dis_group.articleCounts,
+		sns_dis_group.dis_number,
+		sns_dis_group.sort,
+		sns_dis_group_classify.name disclassifyname
+		FROM
+		sns_dis_group
+		LEFT
+		JOIN
+		sns_dis_group_classify ON
+		sns_dis_group.disclassifyId=sns_dis_group_classify.id
+		where
+		sns_dis_group.disclassifyId=#{e}
+		ORDER BY
+		sns_dis_group.id DESC
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryClassifyDisGroupListCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select count(1)
+		from sns_dis_group
+		where
+		sns_dis_group.disclassifyId=#{e}
+	</select>
+	<update id="updateDisgroupCreater" parameterType="DisMember">
+		update
+		sns_dis_group
+		set sns_dis_group.cus_id=#{cusId},
+		sns_dis_group.showname=#{showName}
+		where
+		sns_dis_group.id=#{groupId}
+	</update>
+	<select id="queryPersonDisGroupById" parameterType="java.lang.Long"
+		resultMap="DisGroupMapper.DisGroupResult">
+		SELECT
+		sns_dis_group.id,
+		sns_dis_group.name,
+		sns_dis_group.image_Url
+		FROM
+		sns_dis_member
+		LEFT JOIN
+		sns_dis_group ON
+		sns_dis_member.dis_groupid=sns_dis_group.id
+		LEFT
+		JOIN
+		sns_dis_group_classify ON
+		sns_dis_group.disclassifyId=sns_dis_group_classify.id
+		WHERE
+		sns_dis_member.cus_id=#{cusId} and  sns_dis_group.status=1 and sns_dis_group_classify.status=0
+		limit 6
+	</select>
+	<select id="queryDisGroupByDisNumber" parameterType="java.lang.String"
+		resultMap="DisGroupMapper.DisGroupResult">
+	SELECT
+		sns_dis_group.id,
+		sns_dis_group.name,
+		sns_dis_group.introduction,
+		sns_dis_group.image_Url,
+		sns_dis_group.createTime,
+		sns_dis_group.cus_id,
+		sns_dis_group.showname,
+		sns_dis_group.memberNum,
+		sns_dis_group.disclassifyId,
+		sns_dis_group.status,
+		sns_dis_group.activity,
+		sns_dis_group.articleCounts,
+		sns_dis_group.sort,
+		sns_dis_group.dis_number,
+		sns_dis_group_classify.name disclassifyname
+		FROM
+		sns_dis_group
+		LEFT JOIN
+		sns_dis_group_classify ON
+		sns_dis_group.disclassifyId=sns_dis_group_classify.id
+		WHERE
+		sns_dis_group.dis_number=#{disNumber}
+	</select>
+</mapper>

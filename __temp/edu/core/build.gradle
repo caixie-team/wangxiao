@@ -1,0 +1,59 @@
+//apply plugin: 'java'
+//apply plugin: 'maven'
+//version = '1.0.0'
+
+repositories {
+    maven { url 'http://maven.oschina.net/content/groups/public/' }
+}
+
+dependencies {
+
+//    ext.jarTree = fileTree(dir: 'libs', include: '**/*.jar')
+//    ext.rootProjectLibs = new File(rootProject.rootDir, 'libs').getAbsolutePath()
+//    ext.jarTree += fileTree(dir: rootProjectLibs, include: '**/*.jar')
+
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+//    compile jarTree
+
+    compile(
+            libraries.'servlet-api',
+            libraries.'spring-context',
+            libraries.'spring-context-support',
+            libraries.'spring-web',
+            libraries.'spring-webmvc',
+            libraries.'spring-jdbc',
+            libraries.'commons-io',
+            libraries.'commons-fileupload',
+            libraries.'commons-codec',
+            libraries.'commons-lang',
+            libraries.'commons-beanutils',
+            libraries.'commons-logging',
+            libraries.'hessian',
+            libraries.'mybatis',
+            libraries.'mybatis-spring',
+            libraries.'mail',
+            libraries.'activation',
+            libraries.'commons-httpclient',
+            libraries.'lucene-spatial',
+            libraries.'lucene-queries',
+            libraries.'lucene-core',
+            libraries.'im4java',
+            libraries.'spymemcached',
+//            libraries.'poi',
+            libraries.'gson',
+            libraries.'guava',
+            libraries.'joda-time',
+            libraries.'velocity',
+            libraries.'lombok'
+    )
+    compile(group: 'net.sf.proguard', name: 'proguard-base', version: '4.9')
+    compile(group: 'org.apache.velocity', name: 'velocity-tools', version: '2.0') {
+        exclude(module: 'struts-tiles')
+        exclude(module: 'struts-taglib')
+        exclude(module: 'struts-core')
+        exclude(module: 'sslext')
+        exclude(module: 'oro')
+    }
+
+}

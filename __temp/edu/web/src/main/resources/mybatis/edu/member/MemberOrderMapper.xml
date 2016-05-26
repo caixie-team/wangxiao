@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MemberOrderMapper">
+
+        <resultMap id="MemberOrderResult" type="MemberOrder">
+            <result property="id" column="id"/>
+            <result property="userId" column="user_id"/>
+            <result property="memberId" column="member_id"/>
+            <result property="createTime" column="create_time"/>
+            <result property="payTime" column="pay_time"/>
+            <result property="orderAmount" column="order_amount"/>
+            <result property="couponAmount" column="coupon_amount"/>
+            <result property="amount" column="amount"/>
+            <result property="cashAmount" column="cash_amount"/>
+            <result property="vmAmount" column="vm_amount"/>
+            <result property="couponCodeId" column="couponCode_id"/>
+            <result property="requestId" column="request_id"/>
+            <result property="trxStatus" column="trx_status"/>
+            <result property="payType" column="pay_type"/>
+            <result property="memberDays" column="member_days"/>
+            <result property="memberType" column="member_type"/>
+            <result property="reqChannel" column="req_channel"/>
+            <result property="description" column="description"/>
+            <result property="version" column="version"/>
+            <result property="reqIp" column="req_ip"/>
+            <result property="couponCode" column="coupon_code"/>
+            
+        </resultMap>
+		<resultMap id="MemberOrderDTOResult" type="MemberOrderDTO" extends="MemberOrderResult">
+            <result property="email" column="email"/>
+            <result property="memberTitle" column="title"/>
+        </resultMap>
+        <sql id="edu_member_order_columns">
+            edu_member_order.id,
+            edu_member_order.user_id,
+            edu_member_order.member_id,
+            edu_member_order.create_time,
+            edu_member_order.pay_time,
+            edu_member_order.order_amount,
+            edu_member_order.coupon_amount,
+            edu_member_order.amount,
+            edu_member_order.cash_amount,
+            edu_member_order.vm_amount,
+            edu_member_order.couponCode_id,
+            edu_member_order.request_id,
+            edu_member_order.trx_status,
+            edu_member_order.pay_type,
+            edu_member_order.member_days,
+            edu_member_order.member_type,
+            edu_member_order.req_channel,
+            edu_member_order.description,
+            edu_member_order.version,
+            edu_member_order.req_ip
+        </sql>
+
+        <sql id="edu_member_order_properties">
+            #{id},
+            #{userId},
+            #{memberId},
+            #{createTime},
+            #{payTime},
+            #{orderAmount},
+            #{couponAmount},
+            #{amount},
+            #{cashAmount},
+            #{vmAmount},
+            #{couponCodeId},
+            #{requestId},
+            #{trxStatus},
+            #{payType},
+            #{memberDays},
+            #{memberType},
+            #{reqChannel},
+            #{description},
+            #{version},
+            #{reqIp}
+        </sql>
+
+        <insert id="createMemberOrder" parameterType="MemberOrder" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_member_order (<include refid="edu_member_order_columns"/>) VALUES (<include refid="edu_member_order_properties"/>)
+        </insert>
+
+        <delete id="deleteMemberOrderById" parameterType="Long">
+            delete from edu_member_order
+            where id = #{value}
+        </delete>
+
+        <update id="updateMemberOrder" parameterType="MemberOrder">
+            update edu_member_order SET
+                id = #{id},
+                user_id = #{userId},
+                member_id = #{memberId},
+                create_time = #{createTime},
+                pay_time = #{payTime},
+                order_amount = #{orderAmount},
+                coupon_amount = #{couponAmount},
+                amount = #{amount},
+                cash_amount = #{cashAmount},
+                vm_amount = #{vmAmount},
+                couponCode_id = #{couponCodeId},
+                request_id = #{requestId},
+                trx_status = #{trxStatus},
+                pay_type = #{payType},
+                member_days=#{memberDays},
+                member_type=#{memberType},
+                req_channel = #{reqChannel},
+                description = #{description},
+                version = #{version},
+                req_ip = #{reqIp}
+            where
+                id = #{id}
+        </update>
+
+        <select id="getMemberOrderById" resultMap="MemberOrderResult" parameterType="Long">
+            select
+            <include refid="edu_member_order_columns"/>
+            from edu_member_order
+            where
+                id = #{value}
+        </select>
+        <select id="getMemberOrderDTOById" resultMap="MemberOrderDTOResult" parameterType="Long">
+             select
+            <include refid="edu_member_order_columns"/>,
+            user_user.email,
+            edu_coupon_code.coupon_code
+            from edu_member_order
+			left join user_user on user_user.id=edu_member_order.user_id
+			left join edu_coupon_code on edu_coupon_code.id=edu_member_order.couponCode_id
+			where edu_member_order.id = #{value}
+        </select>
+		<select id="getMemberOrderByRequestId" resultMap="MemberOrderResult" parameterType="String">
+            select
+            <include refid="edu_member_order_columns"/>
+            from edu_member_order
+            where
+                request_id = #{value}
+        </select>
+        <!-- 会员订单列表 -->
+        <select id="getMemberOrderPage" resultMap="MemberOrderDTOResult" parameterType="QueryMemberOrder">
+            select
+            <include refid="edu_member_order_columns"/>,
+            edu_member_type.title,
+            user_user.email
+            from edu_member_order
+			left join user_user on user_user.id=edu_member_order.user_id
+			left join edu_member_type on edu_member_order.member_type=edu_member_type.id
+			<where>
+				<if test="e.email!=null and e.email!='' ">
+					and user_user.email=#{e.email}
+				</if>
+				<if test="e.requestId!=null and e.requestId!='' ">
+					and edu_member_order.request_id=#{e.requestId}
+				</if>
+				<if test="e.memberType!=null and e.memberType>0 ">
+					and edu_member_order.member_type=#{e.memberType}
+				</if>
+				<if test="e.trxStatus!=null and e.trxStatus!='' ">
+					and edu_member_order.trx_status=#{e.trxStatus}
+				</if>
+				<if test="e.startTime!=null and e.startTime!='' ">
+					and <![CDATA[edu_member_order.create_time>=]]>CONCAT(#{e.startTime},'00:00:00')
+				</if>
+				<if test="e.endTime!=null and e.endTime!='' ">
+					and <![CDATA[edu_member_order.create_time<=]]>CONCAT(#{e.endTime},'23:59:59')
+				</if>
+				<if test="e.startPayTime!=null and e.startPayTime!='' ">
+					and <![CDATA[edu_member_order.pay_time>=]]>CONCAT(#{e.startPayTime},'00:00:00')
+				</if>
+				<if test="e.endPayTime!=null and e.endPayTime!='' ">
+					and <![CDATA[edu_member_order.pay_time<=]]>CONCAT(#{e.endPayTime},'23:59:59')
+				</if>
+			</where>
+			order BY edu_member_order.create_time DESC
+			<include refid="publicMapper.pageEnd"/>
+        </select>
+        <select id="getMemberOrderPageCount" resultType="int"  parameterType="QueryMemberOrder">
+            select
+            count(1)
+            from edu_member_order
+			left join user_user on user_user.id=edu_member_order.user_id
+			left join edu_member_type on edu_member_order.member_type=edu_member_type.id
+			<where>
+				<if test="e.email!=null and e.email!='' ">
+					and user_user.email=#{e.email}
+				</if>
+				<if test="e.requestId!=null and e.requestId!='' ">
+					and edu_member_order.request_id=#{e.requestId}
+				</if>
+				<if test="e.memberType!=null and e.memberType>0 ">
+					and edu_member_order.member_type=#{e.memberType}
+				</if>
+				<if test="e.trxStatus!=null and e.trxStatus!='' ">
+					and edu_member_order.trx_status=#{e.trxStatus}
+				</if>
+				<if test="e.startTime!=null and e.startTime!='' ">
+					and <![CDATA[edu_member_order.create_time>=]]>CONCAT(#{e.startTime},'00:00:00')
+				</if>
+				<if test="e.endTime!=null and e.endTime!='' ">
+					and <![CDATA[edu_member_order.create_time<=]]>CONCAT(#{e.endTime},'23:59:59')
+				</if>
+				<if test="e.startPayTime!=null and e.startPayTime!='' ">
+					and <![CDATA[edu_member_order.pay_time>=]]>CONCAT(#{e.startPayTime},'00:00:00')
+				</if>
+				<if test="e.endPayTime!=null and e.endPayTime!='' ">
+					and <![CDATA[edu_member_order.pay_time<=]]>CONCAT(#{e.endPayTime},'23:59:59')
+				</if>
+			</where>
+        </select>
+        <!-- 更新订单状态为成功，网银回调 -->
+		<update id="updateMemberOrderStatusSuccess" parameterType="MemberOrder">
+			update
+			edu_member_order
+			set
+			pay_time = #{payTime},
+			cash_amount = #{cashAmount},
+			vm_amount = #{vmAmount},
+			trx_status = #{trxStatus},
+			pay_type = #{payType},
+			version =version+1
+			where request_id = #{requestId}
+		</update>
+</mapper>
