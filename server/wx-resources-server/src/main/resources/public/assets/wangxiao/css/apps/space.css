@@ -1,0 +1,46 @@
+.app-space .page {
+  margin-top: 30px;
+}
+.app-space .space-wrap {
+  padding-top: 30px;
+}
+.app-space .panel {
+  padding: 10px;
+  margin-bottom: 0;
+}
+.app-space .overlay {
+  margin-bottom: 12px;
+  overflow: visible;
+  border-radius: 4px;
+}
+.app-space .overlay .btn-group {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+}
+.app-space .overlay .btn-icon {
+  color: #bdbdbd;
+}
+.app-space .overlay .btn-icon:hover {
+  color: white;
+}
+.app-space .overlay .dropdown .dropdown-menu > li > a {
+  padding: 6px 8px;
+}
+.app-space .overlay .dropdown:hover .dropdown-toggle {
+  color: #fff;
+}
+.app-space .overlay .dropdown:hover .dropdown-menu {
+  display: block;
+}
+.app-space .overlay .dropdown-menu {
+  min-width: 110px;
+  margin-top: 0;
+  color: #757575;
+}
+.app-space .overlay .dropdown-menu a {
+  text-decoration: none;
+}
+.app-space .overlay-panel {
+  background: rgba(38, 50, 56, .8);
+}

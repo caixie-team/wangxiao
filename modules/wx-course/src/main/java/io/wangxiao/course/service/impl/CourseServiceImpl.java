@@ -12,7 +12,6 @@ import org.beetl.sql.core.SQLManager;
 import org.beetl.sql.core.db.KeyHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -22,7 +21,7 @@ import java.util.*;
  * 课程管理服务实现类
  */
 @Service
-@Transactional
+//@Transactional
 public class CourseServiceImpl implements CourseService {
     @Autowired
     SQLManager sqlManager;

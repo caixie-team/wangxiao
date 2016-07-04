@@ -3,6 +3,7 @@ package io.wangxiao.auth.web.filter;
 import io.wangxiao.auth.web.WebUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 import javax.servlet.FilterChain;
@@ -12,10 +13,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- * 2016/1/30
- *
- * @author Shengzhao Li
+ * IP 记录与过滤
  */
+@Component
 public class CharacterEncodingIPFilter extends CharacterEncodingFilter {
 
     private static final Logger LOG = LoggerFactory.getLogger(CharacterEncodingIPFilter.class);
@@ -24,6 +24,7 @@ public class CharacterEncodingIPFilter extends CharacterEncodingFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         recordIP(request);
+        System.out.println("doit ....");
         super.doFilterInternal(request, response, filterChain);
     }
 

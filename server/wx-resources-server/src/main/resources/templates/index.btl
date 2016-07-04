@@ -1,0 +1,696 @@
+@ layout("/common/_layout.html"){
+
+<div class="page animsition">
+
+    <div class="page-content container-fluid">
+        <!-- Panel Carousel -->
+        <div class="row" data-plugin="matchHeight" data-by-row="true">
+
+            <div class="col-lg-12 ">
+                <div class="panel">
+                    <!-- Example Captions -->
+                    <div class="carousel " id="exampleCarouselCaptions" data-ride="carousel">
+                        <ol class="carousel-indicators carousel-indicators-fillin">
+                            <li class="active" data-slide-to="0" data-target="#exampleCarouselCaptions"></li>
+                            <li class="" data-slide-to="1" data-target="#exampleCarouselCaptions"></li>
+                            <li class="" data-slide-to="2" data-target="#exampleCarouselCaptions"></li>
+                        </ol>
+                        <div class="carousel-inner" role="listbox">
+                            <div class="item slide active">
+                                <img class="" src="${ctxPath}/assets/photos/img-91.jpg" alt="..."/>
+                                <div class="carousel-caption">
+                                    <h3>学习是一种信仰</h3>
+                                    <p>让学习更加有趣，进步变得简单.</p>
+                                </div>
+                            </div>
+                            <div class="item slide">
+                                <img class="" src="${ctxPath}/assets/photos/img-93.jpg" alt="..."/>
+                                <div class="carousel-caption">
+                                    <h3>教学是一种经历</h3>
+                                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="item slide">
+                                <img class="" src="${ctxPath}/assets/photos/img-39.jpg" alt="..."/>
+                                <div class="carousel-caption">
+                                    <h3>活着,更好的生活</h3>
+                                    <p>Praesent commodo cursus magna, vel scelerisque nisl consectetur.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <a class="left carousel-control" href="#exampleCarouselCaptions" role="button"
+                           data-slide="prev">
+                            <span class="icon md-chevron-left" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="right carousel-control" href="#exampleCarouselCaptions" role="button"
+                           data-slide="next">
+                            <span class="icon md-chevron-right" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>
+                    <!-- End Example Captions -->
+                </div>
+            </div>
+        </div>
+
+
+        <ul class="nav-quick nav-quick-bordered row">
+            <li class="col-sm-2 col-xs-4">
+                <a href="javascript:void(0)" class="height-150 padding-35">
+                    <i class="icon md-settings " aria-hidden="true"></i> 职业资格
+                </a>
+            </li>
+            <li class="col-sm-2 col-xs-4">
+                <a href="javascript:void(0)" class="height-150 padding-35">
+                    <i class="icon md-account" aria-hidden="true"></i> 外语考试
+                    <span class="label label-success">8</span>
+                </a>
+            </li>
+            <li class="col-sm-2 col-xs-4">
+                <a href="javascript:void(0)" class="height-150 padding-35">
+                    <i class="icon md-wrench" aria-hidden="true"></i> 老师资格证
+                </a>
+            </li>
+            <li class="col-sm-2 col-xs-4">
+                <a href="javascript:void(0)" class="height-150 padding-35">
+                    <i class="icon md-upload" aria-hidden="true"></i> 公务员
+                    <span class="label label-danger">13</span>
+                </a>
+            </li>
+            <li class="col-sm-2 col-xs-4">
+                <a href="javascript:void(0)" class="height-150 padding-35">
+                    <i class="icon md-lock" aria-hidden="true"></i> IT
+                </a>
+            </li>
+            <li class="col-sm-2 col-xs-4">
+                <a href="javascript:void(0)" class="height-150 padding-35">
+                    <i class="icon md-search" aria-hidden="true"></i> 全部分类
+                </a>
+            </li>
+        </ul>
+
+        <!-- 推荐课程开始 -->
+        <div class="panel ">
+            <div class="panel-heading">
+                <ul class="panel-actions">
+                    <li><a href="#">更多课程</a></li>
+                </ul>
+                <h3 class="panel-title">推荐课程</h3>
+                <!--<small>Panel Description Here..</small></h3>-->
+
+            </div>
+
+            <ul class="nav nav-tabs nav-tabs-line" role="tablist" data-plugin="nav-tabs">
+                <li class="active" role="presentation">
+                    <a href="#exampleList" aria-controls="exampleList" aria-expanded="true" role="tab"
+                       data-toggle="tab" data-filter="*">全部推荐</a>
+                </li>
+                <li role="presentation">
+                    <a href="#exampleList" aria-expanded="false" role="tab" data-toggle="tab"
+                       data-filter="object">UI设计</a>
+                </li>
+                <li role="presentation">
+                    <a href="#exampleList" aria-expanded="false" role="tab" data-toggle="tab"
+                       data-filter="city">计算机基础</a>
+                </li>
+                <li role="presentation">
+                    <a href="#exampleList" aria-expanded="false" role="tab" data-toggle="tab"
+                       data-filter="animal">产品经理</a>
+                </li>
+            </ul>
+
+            <div class="panel-body">
+                <ul class="blocks blocks-100 blocks-xlg-4 blocks-md-3 blocks-sm-2" id="exampleList"
+                    data-filterable="true">
+                    <li data-type="animal">
+                        <div class="widget widget-shadow">
+                            <div class="widget-header cover overlay">
+                                <img class="cover-image height-200" src="${ctxPath}/assets/photos/img-45.jpg" alt="...">
+                                <div class="overlay-panel overlay-background">
+                                    <div class="font-size-16 pull-right"><i class="icon md-pin" aria-hidden="true"></i>
+                                    </div>
+                                    <p class="font-size-20">普通话基础知识讲解（一）</p>
+                                    <p class="margin-bottom-5"> 唐仕伦</p>
+                                </div>
+                            </div>
+                            <div class="widget-footer text-center bg-white height-50 padding-horizontal-10  ">
+                                <div class="row no-space">
+                                    <ul class="list-inline pull-left margin-top-15">
+                                        <li>
+                                            <i class="icon md-calendar"></i> 100 课时
+                                        </li>
+
+                                    </ul>
+
+                                    <ul class="list-inline pull-right margin-top-15">
+                                        <li>
+                                            <i class="icon md-favorite"></i> 598
+                                        </li>
+                                        <li>
+                                            <i class="icon md-thumb-up"></i> 96
+                                        </li>
+                                        <li>
+                                            <i class="icon md-money"></i> 988
+                                        </li>
+                                    </ul>
+
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li data-type="object">
+                        <div class="widget widget-shadow">
+                            <div class="widget-header cover overlay">
+                                <img class="cover-image height-200" src="${ctxPath}/assets/photos/img-51.jpg" alt="...">
+                                <div class="overlay-panel overlay-background">
+                                    <div class="font-size-16 pull-right"><i class="icon md-pin" aria-hidden="true"></i>
+                                    </div>
+                                    <p class="font-size-20">普通话基础知识讲解（一）</p>
+                                    <p class="margin-bottom-5"> 唐仕伦</p>
+                                </div>
+                            </div>
+                            <div class="widget-footer text-center bg-white height-50 padding-horizontal-10  ">
+                                <div class="row no-space">
+                                    <ul class="list-inline pull-left margin-top-15">
+                                        <li>
+                                            <i class="icon md-calendar"></i> 100 课时
+                                        </li>
+
+                                    </ul>
+
+                                    <ul class="list-inline pull-right margin-top-15">
+                                        <li>
+                                            <i class="icon md-favorite"></i> 598
+                                        </li>
+                                        <li>
+                                            <i class="icon md-thumb-up"></i> 96
+                                        </li>
+                                        <li>
+                                            <i class="icon md-money"></i> 988
+                                        </li>
+                                    </ul>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </li>
+                    <li data-type="object">
+                        <div class="widget widget-shadow">
+                            <div class="widget-header cover overlay">
+                                <img class="cover-image height-200" src="${ctxPath}/assets/photos/img-52.jpg" alt="...">
+                                <div class="overlay-panel overlay-background">
+                                    <div class="font-size-16 pull-right"><i class="icon md-pin" aria-hidden="true"></i>
+                                    </div>
+                                    <p class="font-size-20">普通话基础知识讲解（一）</p>
+                                    <p class="margin-bottom-5"> 唐仕伦</p>
+                                </div>
+                            </div>
+                            <div class="widget-footer text-center bg-white height-50 padding-horizontal-10  ">
+                                <div class="row no-space">
+                                    <ul class="list-inline pull-left margin-top-15">
+                                        <li>
+                                            <i class="icon md-calendar"></i> 100 课时
+                                        </li>
+
+                                    </ul>
+
+                                    <ul class="list-inline pull-right margin-top-15">
+                                        <li>
+                                            <i class="icon md-favorite"></i> 598
+                                        </li>
+                                        <li>
+                                            <i class="icon md-thumb-up"></i> 96
+                                        </li>
+                                        <li>
+                                            <i class="icon md-money"></i> 988
+                                        </li>
+                                    </ul>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </li>
+                    <li data-type="city">
+                        <div class="widget widget-shadow">
+                            <div class="widget-header cover overlay">
+                                <img class="cover-image height-200" src="${ctxPath}/assets/photos/img-53.jpg" alt="...">
+                                <div class="overlay-panel overlay-background">
+                                    <div class="font-size-16 pull-right"><i class="icon md-pin" aria-hidden="true"></i>
+                                    </div>
+                                    <p class="font-size-20">普通话基础知识讲解（一）</p>
+                                    <p class="margin-bottom-5"> 唐仕伦</p>
+                                </div>
+                            </div>
+                            <div class="widget-footer text-center bg-white height-50 padding-horizontal-10  ">
+                                <div class="row no-space">
+                                    <ul class="list-inline pull-left margin-top-15">
+                                        <li>
+                                            <i class="icon md-calendar"></i> 100 课时
+                                        </li>
+
+                                    </ul>
+
+                                    <ul class="list-inline pull-right margin-top-15">
+                                        <li>
+                                            <i class="icon md-favorite"></i> 598
+                                        </li>
+                                        <li>
+                                            <i class="icon md-thumb-up"></i> 96
+                                        </li>
+                                        <li>
+                                            <i class="icon md-money"></i> 988
+                                        </li>
+                                    </ul>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </li>
+                    <li data-type="scenery">
+                        <div class="widget widget-shadow">
+                            <div class="widget-header cover overlay">
+                                <img class="cover-image height-200" src="${ctxPath}/assets/photos/img-54.jpg" alt="...">
+                                <div class="overlay-panel overlay-background">
+                                    <div class="font-size-16 pull-right"><i class="icon md-pin" aria-hidden="true"></i>
+                                    </div>
+                                    <p class="font-size-20">普通话基础知识讲解（一）</p>
+                                    <p class="margin-bottom-5"> 唐仕伦</p>
+                                </div>
+                            </div>
+                            <div class="widget-footer text-center bg-white height-50 padding-horizontal-10  ">
+                                <div class="row no-space">
+                                    <ul class="list-inline pull-left margin-top-15">
+                                        <li>
+                                            <i class="icon md-calendar"></i> 100 课时
+                                        </li>
+
+                                    </ul>
+
+                                    <ul class="list-inline pull-right margin-top-15">
+                                        <li>
+                                            <i class="icon md-favorite"></i> 598
+                                        </li>
+                                        <li>
+                                            <i class="icon md-thumb-up"></i> 96
+                                        </li>
+                                        <li>
+                                            <i class="icon md-money"></i> 988
+                                        </li>
+                                    </ul>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </li>
+                    <li data-type="city">
+                        <div class="widget widget-shadow">
+                            <div class="widget-header cover overlay">
+                                <img class="cover-image height-200" src="${ctxPath}/assets/photos/img-55.jpg" alt="...">
+                                <div class="overlay-panel overlay-background">
+                                    <div class="font-size-16 pull-right"><i class="icon md-pin" aria-hidden="true"></i>
+                                    </div>
+                                    <p class="font-size-20">普通话基础知识讲解（一）</p>
+                                    <p class="margin-bottom-5"> 唐仕伦</p>
+                                </div>
+                            </div>
+                            <div class="widget-footer text-center bg-white height-50 padding-horizontal-10  ">
+                                <div class="row no-space">
+                                    <ul class="list-inline pull-left margin-top-15">
+                                        <li>
+                                            <i class="icon md-calendar"></i> 100 课时
+                                        </li>
+
+                                    </ul>
+
+                                    <ul class="list-inline pull-right margin-top-15">
+                                        <li>
+                                            <i class="icon md-favorite"></i> 598
+                                        </li>
+                                        <li>
+                                            <i class="icon md-thumb-up"></i> 96
+                                        </li>
+                                        <li>
+                                            <i class="icon md-money"></i> 988
+                                        </li>
+                                    </ul>
+
+                                </div>
+                            </div>
+                        </div>
+
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+        <!-- 推荐课程结束 -->
+
+        <!-- 广告图 -->
+        <div class="row">
+            <div class="col-xlg-12 col-xs-12">
+
+                <!-- Widget -->
+                <div class="widget widget-shadow weather">
+                    <figure class="overlay overlay-hover animation-hover">
+                        <img class="overlay-figure overlay-scale height-lg-450"
+                             src="${ctxPath}/assets/photos/img-95.jpg"
+                             alt="...">
+                        <figcaption class="overlay-panel overlay-background overlay-fade">
+                            <h3 class="animation-slide-bottom">学习</h3>
+                            <p class="animation-slide-bottom animation-delay-200">是 <a href="javascript:void(0)">ipsum
+                                dolor</a> 一种信仰.</p>
+                        </figcaption>
+                    </figure>
+                </div>
+                <!-- End Widget -->
+            </div>
+        </div>
+        <!-- 广告图结束 -->
+
+        <div class="panel panel-transparent>">
+            <div class="panel-body container-fluid">
+                <div class="row row-lg">
+                    <!-- 轮播课程推荐 -->
+                    <div class="col-lg-12">
+                        <!-- Example Sample Portfolio -->
+                        <div class="example-wrap">
+                            <div class="example margin-bottom-0">
+                                <div class="owl-carousel-portfolio owl-carousel-navOut" data-plugin="owlCarousel"
+                                     data-margin="30">
+
+                                    <div class="item">
+                                        <div class="widget widget-shadow">
+                                            <div class="widget-header cover overlay overlay-hover">
+                                                <img class="cover-image overlay-scale height-200"
+                                                     src="${ctxPath}/assets/photos/img-15.jpg"
+                                                     alt="...">
+                                                <div class="overlay-panel overlay-background">
+                                                    <div class="font-size-16 pull-right"><i class="icon md-pin"
+                                                                                            aria-hidden="true"></i>
+                                                    </div>
+                                                    <p class="font-size-20"><a href="#">普通话基础知识讲解（一）</a></p>
+                                                    <p class="margin-bottom-5"><a href="#">唐仕伦</a></p>
+                                                </div>
+                                            </div>
+                                            <div class="widget-footer text-center bg-white height-50 padding-horizontal-10  ">
+                                                <div class="row no-space">
+                                                    <ul class="list-inline pull-left margin-top-15">
+                                                        <li>
+                                                            <i class="icon md-calendar"></i> 100 课时
+                                                        </li>
+
+                                                    </ul>
+
+                                                    <ul class="list-inline pull-right margin-top-15">
+                                                        <li>
+                                                            <i class="icon md-favorite"></i> 598
+                                                        </li>
+                                                        <li>
+                                                            <i class="icon md-thumb-up"></i> 96
+                                                        </li>
+                                                        <li>
+                                                            <i class="icon md-money"></i> 988
+                                                        </li>
+                                                    </ul>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="item">
+                                        <div class="widget widget-shadow">
+                                            <div class="widget-header cover overlay overlay-hover">
+                                                <img class="cover-image overlay-scale height-200"
+                                                     src="${ctxPath}/assets/photos/img-16.jpg"
+                                                     alt="...">
+                                                <div class="overlay-panel overlay-background">
+                                                    <div class="font-size-16 pull-right"><i class="icon md-pin"
+                                                                                            aria-hidden="true"></i>
+                                                    </div>
+                                                    <p class="font-size-20"><a href="#">普通话基础知识讲解（一）</a></p>
+                                                    <p class="margin-bottom-5"><a href="#">唐仕伦</a></p>
+                                                </div>
+                                            </div>
+                                            <div class="widget-footer text-center bg-white height-50 padding-horizontal-10  ">
+                                                <div class="row no-space">
+                                                    <ul class="list-inline pull-left margin-top-15">
+                                                        <li>
+                                                            <i class="icon md-calendar"></i> 100 课时
+                                                        </li>
+
+                                                    </ul>
+
+                                                    <ul class="list-inline pull-right margin-top-15">
+                                                        <li>
+                                                            <i class="icon md-favorite"></i> 598
+                                                        </li>
+                                                        <li>
+                                                            <i class="icon md-thumb-up"></i> 96
+                                                        </li>
+                                                        <li>
+                                                            <i class="icon md-money"></i> 988
+                                                        </li>
+                                                    </ul>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="item">
+                                        <div class="widget widget-shadow">
+                                            <div class="widget-header cover overlay overlay-hover">
+                                                <img class="cover-image overlay-scale height-200"
+                                                     src="${ctxPath}/assets/photos/img-17.jpg"
+                                                     alt="...">
+                                                <div class="overlay-panel overlay-background">
+                                                    <div class="font-size-16 pull-right"><i class="icon md-pin"
+                                                                                            aria-hidden="true"></i>
+                                                    </div>
+                                                    <p class="font-size-20"><a href="#">普通话基础知识讲解（一）</a></p>
+                                                    <p class="margin-bottom-5"><a href="#">唐仕伦</a></p>
+                                                </div>
+                                            </div>
+                                            <div class="widget-footer text-center bg-white height-50 padding-horizontal-10  ">
+                                                <div class="row no-space">
+                                                    <ul class="list-inline pull-left margin-top-15">
+                                                        <li>
+                                                            <i class="icon md-calendar"></i> 100 课时
+                                                        </li>
+
+                                                    </ul>
+
+                                                    <ul class="list-inline pull-right margin-top-15">
+                                                        <li>
+                                                            <i class="icon md-favorite"></i> 598
+                                                        </li>
+                                                        <li>
+                                                            <i class="icon md-thumb-up"></i> 96
+                                                        </li>
+                                                        <li>
+                                                            <i class="icon md-money"></i> 988
+                                                        </li>
+                                                    </ul>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="item">
+                                        <div class="widget widget-shadow">
+                                            <div class="widget-header cover overlay overlay-hover">
+                                                <img class="cover-image overlay-scale height-200"
+                                                     src="${ctxPath}/assets/photos/img-18.jpg"
+                                                     alt="...">
+                                                <div class="overlay-panel overlay-background">
+                                                    <div class="font-size-16 pull-right"><i class="icon md-pin"
+                                                                                            aria-hidden="true"></i>
+                                                    </div>
+                                                    <p class="font-size-20"><a href="#">普通话基础知识讲解（一）</a></p>
+                                                    <p class="margin-bottom-5"><a href="#">唐仕伦</a></p>
+                                                </div>
+                                            </div>
+                                            <div class="widget-footer text-center bg-white height-50 padding-horizontal-10  ">
+                                                <div class="row no-space">
+                                                    <ul class="list-inline pull-left margin-top-15">
+                                                        <li>
+                                                            <i class="icon md-calendar"></i> 100 课时
+                                                        </li>
+
+                                                    </ul>
+
+                                                    <ul class="list-inline pull-right margin-top-15">
+                                                        <li>
+                                                            <i class="icon md-favorite"></i> 598
+                                                        </li>
+                                                        <li>
+                                                            <i class="icon md-thumb-up"></i> 96
+                                                        </li>
+                                                        <li>
+                                                            <i class="icon md-money"></i> 988
+                                                        </li>
+                                                    </ul>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="item">
+                                        <div class="widget widget-shadow">
+                                            <div class="widget-header cover overlay overlay-hover">
+                                                <img class="cover-image overlay-scale height-200"
+                                                     src="${ctxPath}/assets/photos/img-19.jpg"
+                                                     alt="...">
+                                                <div class="overlay-panel overlay-background">
+                                                    <div class="font-size-16 pull-right"><i class="icon md-pin"
+                                                                                            aria-hidden="true"></i>
+                                                    </div>
+                                                    <p class="font-size-20"><a href="#">普通话基础知识讲解（一）</a></p>
+                                                    <p class="margin-bottom-5"><a href="#">唐仕伦</a></p>
+                                                </div>
+                                            </div>
+                                            <div class="widget-footer text-center bg-white height-50 padding-horizontal-10  ">
+                                                <div class="row no-space">
+                                                    <ul class="list-inline pull-left margin-top-15">
+                                                        <li>
+                                                            <i class="icon md-calendar"></i> 100 课时
+                                                        </li>
+
+                                                    </ul>
+                                                    <ul class="list-inline pull-right margin-top-15">
+                                                        <li>
+                                                            <i class="icon md-favorite"></i> 598
+                                                        </li>
+                                                        <li>
+                                                            <i class="icon md-thumb-up"></i> 96
+                                                        </li>
+                                                        <li>
+                                                            <i class="icon md-money"></i> 988
+                                                        </li>
+                                                    </ul>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="item">
+                                        <div class="widget widget-shadow">
+                                            <div class="widget-header cover overlay overlay-hover">
+                                                <img class="cover-image overlay-scale height-200"
+                                                     src="${ctxPath}/assets/photos/img-20.jpg"
+                                                     alt="...">
+                                                <div class="overlay-panel overlay-background">
+                                                    <div class="font-size-16 pull-right"><i class="icon md-pin"
+                                                                                            aria-hidden="true"></i>
+                                                    </div>
+                                                    <p class="font-size-20"><a href="#">普通话基础知识讲解（一）</a></p>
+                                                    <p class="margin-bottom-5"><a href="#">唐仕伦</a></p>
+                                                </div>
+                                            </div>
+                                            <div class="widget-footer text-center bg-white height-50 padding-horizontal-10  ">
+                                                <div class="row no-space">
+                                                    <ul class="list-inline pull-left margin-top-15">
+                                                        <li>
+                                                            <i class="icon md-calendar"></i> 100 课时
+                                                        </li>
+
+                                                    </ul>
+
+                                                    <ul class="list-inline pull-right margin-top-15">
+                                                        <li>
+                                                            <i class="icon md-favorite"></i> 598
+                                                        </li>
+                                                        <li>
+                                                            <i class="icon md-thumb-up"></i> 96
+                                                        </li>
+                                                        <li>
+                                                            <i class="icon md-money"></i> 988
+                                                        </li>
+                                                    </ul>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Example Sample Portfolio -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel ">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    学员评价
+                    <small>看看他们如何评价我们</small>
+                </h3>
+            </div>
+            <div class="panel-body container-fluid">
+
+                <div class="row row-lg">
+                    <div class="col-sm-12">
+                        <!-- Example Reverse -->
+                        <div class="testimonial ">
+                            <ul class="testimonial-ul row">
+                                <li class="testimonial-item col-sm-4">
+
+                                    <div class="testimonial-content">
+                                        <p>传统学校的教育方式中汲取足够的营养，才能利用互联网技术改善学校的教学方式，最终提高学习效果。 </p>
+                                    </div>
+                                    <div class="testimonial-image">
+                                        <a class="avatar" href="javascript:void(0)">
+                                            <img src="${ctxPath}/assets/portraits/4.jpg" alt="image"/>
+                                        </a>
+                                    </div>
+                                    <span class="testimonial-author">李锦莹</span>
+                                    <span class="testimonial-company">前端工程师</span>
+                                </li>
+                                <li class="testimonial-item col-sm-4">
+
+                                    <div class="testimonial-content">
+                                        <p>在内容上每一门课程讲得很透彻，还经常引用一些生动形象且略带搞笑的比喻，让人觉得学习计算机科学是乐趣十足得事情 </p>
+                                    </div>
+                                    <div class="testimonial-image">
+                                        <a class="avatar" href="javascript:void(0)">
+                                            <img src="${ctxPath}/assets/portraits/5.jpg" alt="image"/>
+                                        </a>
+                                    </div>
+                                    <span class="testimonial-author">王海亮</span>
+                                    <span class="testimonial-company">UI 设计师</span>
+                                </li>
+                                <li class="testimonial-item col-sm-4">
+
+                                    <div class="testimonial-content">
+                                        <p>每年当学弟学妹们开始要学计算机的时候我都会给他们推荐采撷，因为交互式在线编程学习方法在我看来是效率最高的一种方法。</p>
+                                    </div>
+                                    <div class="testimonial-image">
+                                        <a class="avatar" href="javascript:void(0)">
+                                            <img src="${ctxPath}/assets/portraits/6.jpg" alt="image"/>
+                                        </a>
+                                    </div>
+                                    <span class="testimonial-author">刘雪婷</span>
+                                    <span class="testimonial-company">产品经理</span>
+                                </li>
+                            </ul>
+                            <!-- End Example Reverse -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End Panel Carousel -->
+    </div>
+</div>
+<!-- End Page -->
+
+@ }

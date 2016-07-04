@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        maven { url "http://maven.oschina.net/content/groups/public/" }
+        mavenCentral()
         maven { url 'http://repo.spring.io/plugins-release' }
         jcenter()
     }
@@ -20,7 +20,7 @@ apply plugin: 'spring-boot'
 apply plugin: 'docker'
 
 jar {
-    baseName = 'edu-auth-server'
+    baseName = 'wx-auth-server'
 }
 // This is used as the docker image prefix (org)
 group = 'dora.how:5000/bluepx'
@@ -57,10 +57,15 @@ dependencies {
 
 
     compile(
+            libraries.'beetl',
+            libraries.'beetlsql',
+            libraries.'btjson',
+            libraries.'sitemesh',
+            libraries.'commons-lang3',
             libraries.'druid',
             libraries.'mysql',
             libraries.'cors-filter',
-            libraries.'commons-lang'
+//            libraries.'commons-lang'
 
     )
 }

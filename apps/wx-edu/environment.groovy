@@ -7,8 +7,7 @@ def $option = [
         domain   : '.' + $domain,
         memcached: '.' + $memcached + ":11211",
         db_driver: 'com.mysql.jdb.Driver',
-        db_url   : 'jdbc:mysql://192.168.99' +
-                '.100:3308/wx-edu?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull',
+        db_url   : 'jdbc:mysql://192.168.99.100:3308/wx-edu?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull',
         db_user  : 'admin',
         db_pwd   : 'abcd1234',
 //        context  : 'http://' + $domain,

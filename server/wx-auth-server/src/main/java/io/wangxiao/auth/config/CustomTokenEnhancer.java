@@ -1,61 +1,26 @@
 package io.wangxiao.auth.config;
 
-import io.wangxiao.auth.domain.user.User;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetailsService;
+/**
+ * Created by bison on 5/27/16.
+ */
 import org.springframework.security.oauth2.common.DefaultOAuth2AccessToken;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
-import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
+import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
-/**
- * Created by bison on 1/15/16.
- */
-public class CustomTokenEnhancer extends JwtAccessTokenConverter {
-    //    @Autowired
-//    UserRepository userRepository;
-    @Autowired
-    UserDetailsService userDetailsService;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 
+public class CustomTokenEnhancer implements TokenEnhancer {
     @Override
     public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
 
         final Map<String, Object> additionalInfo = new HashMap<>();
-//        additionalInfo.put("user", userDetailsService.getBasicUserInfoForToken(user));
-        //TODO: BasicUserInfo
-        additionalInfo.put("user", user);
-
-        additionalInfo.put("issue_time", System.currentTimeMillis());
-//        additionalInfo.put("user_secret", user.getPasswordUpdatedAt().getTime() + "");
+        additionalInfo.put("organization", authentication.getName() + randomAlphabetic(4));
         ((DefaultOAuth2AccessToken) accessToken).setAdditionalInformation(additionalInfo);
-
-        if (authentication.getOAuth2Request().getRefreshTokenRequest() != null) {
-            Map<String, Object> originalRefreshMap = decoder(accessToken.getRefreshToken().getValue());
-
-            long issueTime = (long) originalRefreshMap.get("issue_time");
-            long currentTime = System.currentTimeMillis();
-
-            long diffTime = currentTime - issueTime;
-            long oneHour = (60 * 60 * 1000);
-
-            if (diffTime > oneHour) {
-                Set scope = new HashSet<>();
-                scope.add("REMEMBERED");
-                ((DefaultOAuth2AccessToken) accessToken).setScope(scope);
-
-                return super.enhance(accessToken, authentication);
-            }
-        }
-        return super.enhance(accessToken, authentication);
+        return accessToken;
     }
 
-    public Map<String, Object> decoder(String token) {
-        return super.decode(token);
-    }
 }

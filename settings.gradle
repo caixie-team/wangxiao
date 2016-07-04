@@ -6,6 +6,7 @@
 include ':modules:wx-commons'
 include ':modules:wx-core'
 include ':modules:wx-course'
+include ':modules:wx-site'
 include ':modules:wx-resources'
 
 // APPS

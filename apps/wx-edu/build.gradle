@@ -79,6 +79,7 @@ dependencies {
             libraries.'beetl',
             libraries.'btjson',
             libraries.'sitemesh',
+            libraries.'sitemesh3',
             libraries.'quartz',
             libraries.'htmlcompressor',
             libraries.'yuicompressor',

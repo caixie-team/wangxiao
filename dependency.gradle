@@ -20,7 +20,7 @@ httpclient: '4.3.1',
 lucene    : '4.10.1',
 jfinal    : '2.0',
 resty     : '1.1.0-SNAPSHOT',
-springfox : '2.3.1'
+springfox : '2.4.0'
 ]
 
 // 各种可能会用到的jar包
@@ -160,7 +160,7 @@ ext.libraries = [
 
         "velocity"                : "org.apache.velocity:velocity:1.7",
         "freemarker"              : "org.freemarker:freemarker:2.3.20",
-        "beetl"                   : "com.ibeetl:beetl:2.2.5",
+        "beetl"                   : "com.ibeetl:beetl:2.4.0",
         "beetlsql"                   : "com.ibeetl:beetlsql:2.3.5",
         "btjson"                  : "com.ibeetl:btjson:0.94",
 
@@ -216,7 +216,7 @@ ext.libraries = [
 
         // Other
         //
-        "gson"                    : "com.google.code.gson:gson:2.4",
+        "gson"                    : "com.google.code.gson:gson:2.6",
         "guava"                   : "com.google.guava:guava:18.0",
         "jaxen"                   : "jaxen:jaxen:1.1.6",
         "swagger-ui"              : "io.springfox:springfox-swagger-ui:${versions.springfox}",
@@ -241,6 +241,7 @@ ext.libraries = [
         "junit"                   : "junit:junit:4.11",
         "yuicompressor"           : "com.yahoo.platform.yui:yuicompressor:2.4.7",
         "sitemesh"                : "opensymphony:sitemesh:2.4.2",
+        "sitemesh3"                : "org.sitemesh:sitemesh:3.0.1",
         "assertj"                 : "org.assertj:assertj-core:1.6.0",
 
         "thumbnailator"           : "net.coobird:thumbnailator:0.4.7",

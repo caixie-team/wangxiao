@@ -51,7 +51,7 @@ subprojects { subproj ->
 
         mavenLocal()
 //        maven { url "https://repository.apache.org/content/repositories/releases/" }
-        maven { url 'http://maven.oschina.net/content/groups/public/' }
+//        maven { url 'http://maven.oschina.net/content/groups/public/' }
 
 //        maven { url "http://mirrors.ibiblio.org/pub/mirrors/maven2" }
         mavenCentral()

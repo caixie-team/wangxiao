@@ -2,10 +2,15 @@ package io.wangxiao.auth.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.*;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.web.servlet.configuration.EnableWebMvcSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
@@ -17,26 +22,63 @@ import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenCo
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
 
+import javax.sql.DataSource;
+import java.util.Arrays;
+
 /**
  * @author Bison
  */
+
 @Configuration
+//@PropertySource({"classpath:persistence.properties"})
 @EnableAuthorizationServer
-@EnableWebMvcSecurity
 public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
+    @Autowired
+    private DataSource dataSource;
+
+    @Autowired
+    private Environment env;
 
     private static final String DUMMY_RESOURCE_ID = "dummy";
 
     @Autowired
-//    @Qualifier("authenticationManager")
+    @Qualifier("authenticationManagerBean")
     private AuthenticationManager authenticationManager;
+
+    //    @Autowired
+//    @Qualifier("authenticationManager")
+//    private AuthenticationManager authenticationManager;
+    @Value("classpath:schema.sql")
+    private Resource schemaScript;
 
     @Autowired
     UserDetailsService userDetailsService;
 
-//    @Value("${default.redirect:http://localhost:8080/tonr2/sparklr/redirect}")
-//    private String defaultRedirectUri;
 
+    // 在令牌端点上定义了安全约束
+    @Override
+    public void configure(final AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
+//        oauthServer.tokenKeyAccess("permitAll()").checkTokenAccess("isAuthenticated()");
+        oauthServer.allowFormAuthenticationForClients();
+    }
+
+    //    @Value("${default.redirect:http://localhost:8080/tonr2/sparklr/redirect}")
+    //    private String defaultRedirectUri;
+    // 定义了授权和令牌端点和令牌服务
+    @Override // [2]
+    public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+        // @formatter:off
+        // Token 过滤增强
+        final TokenEnhancerChain tokenEnhancerChain = new TokenEnhancerChain();
+        tokenEnhancerChain.setTokenEnhancers(Arrays.asList(tokenEnhancer(),accessTokenConverter()));
+        endpoints
+                .tokenServices(tokenServices())
+                .tokenStore(tokenStore())
+                .authenticationManager(authenticationManager)
+                .userDetailsService(userDetailsService)
+                .tokenEnhancer(tokenEnhancerChain);
+        // @formatter:on
+    }
 
     @Bean
     public JwtTokenStore tokenStore() {
@@ -46,37 +88,30 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
     @Bean
     protected JwtAccessTokenConverter accessTokenConverter() {
 
-        JwtAccessTokenConverter converter = new CustomTokenEnhancer();
-        converter.setAccessTokenConverter(getDefaultAccessTokenConverter());
+//        JwtAccessTokenConverter converter = new CustomTokenEnhancer();
+//        converter.setAccessTokenConverter(getDefaultAccessTokenConverter());
+        final JwtAccessTokenConverter converter = new JwtAccessTokenConverter();
 
-        KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(new ClassPathResource("jwt-test.jks"), "testpass".toCharArray());
+        final KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(new ClassPathResource("jwt-test.jks"),
+                "testpass".toCharArray());
         converter.setKeyPair(keyStoreKeyFactory.getKeyPair("jwt-test"));
 
         return converter;
     }
 
-    @Override // [2]
-    public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
-
-        endpoints
-                .tokenServices(tokenServices())
-                .tokenStore(tokenStore())
-                .authenticationManager(authenticationManager)
-                .userDetailsService(userDetailsService)
-                .accessTokenConverter(accessTokenConverter());
+    @Bean
+    public TokenEnhancer tokenEnhancer() {
+        return new CustomTokenEnhancer();
     }
 
-    @Bean
-    public AuthorizationServerTokenServices tokenServices() {
-        CustomDefaultTokenServices defaultTokenServices = new CustomDefaultTokenServices();
-        defaultTokenServices.setTokenStore(tokenStore());
-        defaultTokenServices.setReuseRefreshToken(true);
-        defaultTokenServices.setSupportRefreshToken(true);
-        defaultTokenServices.setSupportRefreshToken(true);
+    // AuthorizationServerTokenServices 接口里定义了 OAuth 2.0 令牌的操作方法
 
-        //same thing
-        defaultTokenServices.setTokenEnhancer(accessTokenConverter());
-        defaultTokenServices.setTokenConverter(accessTokenConverter()); // until there is a getTokenEnhancer
+    @Bean
+    @Primary
+    public AuthorizationServerTokenServices tokenServices() {
+        final DefaultTokenServices defaultTokenServices = new DefaultTokenServices();
+        defaultTokenServices.setTokenStore(tokenStore());
+        defaultTokenServices.setSupportRefreshToken(true);
         return defaultTokenServices;
     }
 
@@ -94,19 +129,63 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
         return new CustomUserAuthenticationConvertor();
     }
 
-    //    .secret(clientSecret)
-//    .accessTokenValiditySeconds(3600)
-//    .refreshTokenValiditySeconds(3600*24*30);
-    @Override // [3]
-    public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        clients.inMemory().
-                withClient("tonr")
+    // 这个configurer定义了客户端细节服务。客户详细信息可以被初始化,或者你可以参考现有的商店。
+    // ClientDetailsServiceConfigurer 类（AuthorizationServerConfigurer类中的一个调用类）可以用来定义一个基于内存的或者JDBC的客户端信息服务。
+    /*clientId：（必须）客户端id。
+
+secret：（对于可信任的客户端是必须的）客户端的私密信息。
+
+scope：客户端的作用域。如果scope未定义或者为空（默认值），则客户端作用域不受限制。
+
+authorizedGrantTypes：授权给客户端使用的权限类型。默认值为空。
+
+authorities：授权给客户端的权限（Spring普通的安全权限）*/
+
+
+    @Override
+    public void configure(final ClientDetailsServiceConfigurer clients) throws Exception {// @formatter:off
+        clients
+                .jdbc(dataSource)
+//               .jdbc(dataSource())
+
+               .inMemory()
+               .withClient("sampleClientId")
                 .resourceIds(DUMMY_RESOURCE_ID)
-                .authorizedGrantTypes("authorization_code", "implicit")
-                .authorities("ROLE_CLIENT")
-                .scopes("read", "write")
-                .secret("secret")
-                .and()
+               .authorizedGrantTypes("implicit")
+               .scopes("read","write","foo","bar")
+               .autoApprove(false)
+               .accessTokenValiditySeconds(3600)
+
+               .and()
+               .withClient("fooClientIdPassword")
+                .resourceIds(DUMMY_RESOURCE_ID)
+               .secret("secret")
+               .authorizedGrantTypes("password","authorization_code", "refresh_token")
+               .scopes("foo","read","write")
+               .accessTokenValiditySeconds(3600) // 1 hour
+               .refreshTokenValiditySeconds(2592000) // 30 days
+
+               .and()
+               .withClient("barClientIdPassword")
+                .resourceIds(DUMMY_RESOURCE_ID)
+               .secret("secret")
+               .authorizedGrantTypes("password","authorization_code", "refresh_token")
+               .scopes("bar","read","write")
+               .accessTokenValiditySeconds(3600) // 1 hour
+               .refreshTokenValiditySeconds(2592000) // 30 days
+               ;
+    } // @formatter:on
+
+//    @Override // [3]
+//    public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+//        clients.inMemory().
+//                withClient("tonr")
+//                .resourceIds(DUMMY_RESOURCE_ID)
+//                .authorizedGrantTypes("authorization_code", "implicit")
+//                .authorities("ROLE_CLIENT")
+//                .scopes("read", "write")
+//                .secret("secret")
+//                .and()
 //                .withClient("tonr-with-redirect")
 //                .resourceIds(DUMMY_RESOURCE_ID)
 //                .authorizedGrantTypes("authorization_code", "implicit")
@@ -115,43 +194,39 @@ public class OAuth2Config extends AuthorizationServerConfigurerAdapter {
 //                .secret("secret")
 //                .redirectUris(defaultRedirectUri)
 //                .and()
-                .withClient("my-client-with-registered-redirect")
-                .resourceIds(DUMMY_RESOURCE_ID)
-                .authorizedGrantTypes("authorization_code", "client_credentials")
-                .authorities("ROLE_CLIENT")
-                .scopes("read", "trust")
-                .redirectUris("http://anywhere?key=value")
-                .and()
-                .withClient("my-trusted-client")
-                .authorizedGrantTypes("password", "authorization_code", "refresh_token", "implicit")
-                .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT")
-                .scopes("read", "write", "trust")
-                .accessTokenValiditySeconds(3600)
-                .refreshTokenValiditySeconds(3600 * 24 * 30)
-                .and()
-                .withClient("my-trusted-client-with-secret")
-                .authorizedGrantTypes("password", "authorization_code", "refresh_token", "implicit", "client_credentials")
-                .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT")
-                .scopes("read", "write", "trust")
-                .secret("somesecret")
-                .and()
-                .withClient("my-less-trusted-client")
-                .authorizedGrantTypes("authorization_code", "implicit")
-                .authorities("ROLE_CLIENT")
-                .scopes("read", "write", "trust")
-                .and()
-                .withClient("my-less-trusted-autoapprove-client")
-                .authorizedGrantTypes("implicit")
-                .authorities("ROLE_CLIENT")
-                .scopes("read", "write", "trust")
-                .autoApprove(true);
-    }
+//                .withClient("my-client-with-registered-redirect")
+//                .resourceIds(DUMMY_RESOURCE_ID)
+//                .authorizedGrantTypes("authorization_code", "client_credentials")
+//                .authorities("ROLE_CLIENT")
+//                .scopes("read", "trust")
+//                .redirectUris("http://anywhere?key=value")
+//                .and()
+//                .withClient("my-trusted-client")
+//                .authorizedGrantTypes("password", "authorization_code", "refresh_token", "implicit")
+//                .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT")
+//                .scopes("read", "write", "trust")
+//                .accessTokenValiditySeconds(3600)
+//                .refreshTokenValiditySeconds(3600 * 24 * 30)
+//                .and()
+//                .withClient("my-trusted-client-with-secret")
+//                .authorizedGrantTypes("password", "authorization_code", "refresh_token", "implicit", "client_credentials")
+//                .authorities("ROLE_CLIENT", "ROLE_TRUSTED_CLIENT")
+//                .scopes("read", "write", "trust")
+//                .secret("somesecret")
+//                .and()
+//                .withClient("my-less-trusted-client")
+//                .authorizedGrantTypes("authorization_code", "implicit")
+//                .authorities("ROLE_CLIENT")
+//                .scopes("read", "write", "trust")
+//                .and()
+//                .withClient("my-less-trusted-autoapprove-client")
+//                .authorizedGrantTypes("implicit")
+//                .authorities("ROLE_CLIENT")
+//                .scopes("read", "write", "trust")
+//                .autoApprove(true);
+//    }
 
 
-    @Override
-    public void configure(AuthorizationServerSecurityConfigurer oauthServer) throws Exception {
-        oauthServer.allowFormAuthenticationForClients();
-    }
 
     /*protected static class Stuff {
 

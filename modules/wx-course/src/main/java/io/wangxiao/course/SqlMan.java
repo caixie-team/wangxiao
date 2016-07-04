@@ -43,10 +43,11 @@ public class SqlMan {
 //        sqlManager.genSQLFile("edu_course_teacher");
 
 //        Teacher
-        sqlManager.genPojoCode("edu_teacher","io.wangxiao.course.model");
-        sqlManager.genSQLFile("edu_teacher");
+//        sqlManager.genPojoCode("edu_teacher","io.wangxiao.course.model");
+        sqlManager.genSQLFile("edu_website_navigate");
+
 //        sqlManager.genPojoCodeToConsole("edu_course");
-//        sqlManager.genSQLTemplateToConsole("edu_course");
+//        sqlManager.genSQLTemplateToConsole("edu_website_navigate");
     }
 
 }

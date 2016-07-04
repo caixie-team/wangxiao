@@ -2,7 +2,7 @@ package io.wangxiao.auth.domain.dto;
 
 import io.wangxiao.auth.domain.oauth.OauthClientDetails;
 import io.wangxiao.auth.infrastructure.DateUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;

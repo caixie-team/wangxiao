@@ -1,0 +1,21 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+dependencies {
+
+    compile(
+            libraries.'beetl',
+            libraries.'beetlsql',
+            libraries.'btjson',
+
+            libraries.'commons-lang3',
+
+//            libraries.'slf4j-api',
+//            libraries.'logback',
+//            libraries.'logback-core',
+
+            libraries.'lombok'
+    )
+
+
+}

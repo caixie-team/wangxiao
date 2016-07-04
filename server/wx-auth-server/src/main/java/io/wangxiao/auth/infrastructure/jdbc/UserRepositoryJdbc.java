@@ -14,7 +14,7 @@ package io.wangxiao.auth.infrastructure.jdbc;
 import io.wangxiao.auth.domain.user.Privilege;
 import io.wangxiao.auth.domain.user.User;
 import io.wangxiao.auth.domain.user.UserRepository;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;

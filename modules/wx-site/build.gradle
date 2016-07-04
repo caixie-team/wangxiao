@@ -1,0 +1,24 @@
+apply plugin: 'java'
+apply plugin: 'maven'
+
+dependencies {
+
+    compile(
+//            project(':modules:wx-commons'),
+//            project(':modules:wx-core'),
+            project(':modules:wx-resources'),
+//            project(':modules:edu-user'),
+//            project(':bluepx:edu-member'),
+    )
+
+    compile(
+            libraries.'commons-lang3',
+            libraries.'beetl',
+            libraries.'beetlsql',
+            libraries.'btjson',
+            libraries.'gson',
+            libraries.'mysql',
+            libraries.'lombok'
+    )
+
+}

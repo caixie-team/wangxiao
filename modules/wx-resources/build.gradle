@@ -19,9 +19,9 @@ dependencies {
 
 //    compile jarTree
 //    compile('commons-logging:commons-logging:1.2')
-    compile(
-            project(':modules:wx-core')
-    )
+//    compile(
+//            project(':modules:wx-core')
+//    )
     compile('commons-logging:commons-logging:1.1.3')
 //    compile('com.ibeetl:beetl:2.2.8')
 //    compile('com.ibeetl:beetlsql:1.7.0')
@@ -30,6 +30,7 @@ dependencies {
             libraries.'druid',
             libraries.'beetl',
             libraries.'beetlsql',
+            libraries.'mysql',
 //            libraries.'servlet-api',
             libraries.'spring-context',
             libraries.'spring-context-support',
@@ -45,40 +46,32 @@ dependencies {
             libraries.'commons-beanutils',
             libraries.'commons-logging',
 
-            libraries.'slf4j-api',
+//            libraries.'slf4j-api',
             libraries.'logback',
             libraries.'logback-core',
 
-            libraries.'hessian',
-            libraries.'mybatis',
-            libraries.'mybatis-spring',
-            libraries.'mail',
-            libraries.'activation',
-            libraries.'commons-httpclient',
-            libraries.'lucene-spatial',
-            libraries.'lucene-queries',
-            libraries.'lucene-core',
-            libraries.'im4java',
-            libraries.'spymemcached',
-            libraries.'poi',
-            libraries.'poi-ooxml',
-            libraries.'validation-api',
-            libraries.'persistence-api',
-            libraries.'gson',
-            libraries.'guava',
-            libraries.'joda-time',
-            libraries.'velocity',
-            libraries.'jackson',
-            libraries.'jackson-databind',
-            libraries.'lombok'
+//            libraries.'hessian',
+//            libraries.'mybatis',
+//            libraries.'mybatis-spring',
+//            libraries.'mail',
+//            libraries.'activation',
+//            libraries.'commons-httpclient',
+//            libraries.'lucene-spatial',
+//            libraries.'lucene-queries',
+//            libraries.'lucene-core',
+//            libraries.'im4java',
+//            libraries.'spymemcached',
+//            libraries.'poi',
+//            libraries.'poi-ooxml',
+//            libraries.'validation-api',
+//            libraries.'persistence-api',
+//            libraries.'gson',
+//            libraries.'guava',
+//            libraries.'joda-time',
+//            libraries.'velocity',
+//            libraries.'jackson',
+//            libraries.'jackson-databind',
+//            libraries.'lombok'
     )
-    compile(group: 'net.sf.proguard', name: 'proguard-base', version: '4.9')
-    compile(group: 'org.apache.velocity', name: 'velocity-tools', version: '2.0') {
-        exclude(module: 'struts-tiles')
-        exclude(module: 'struts-taglib')
-        exclude(module: 'struts-core')
-        exclude(module: 'sslext')
-        exclude(module: 'oro')
-    }
 
 }

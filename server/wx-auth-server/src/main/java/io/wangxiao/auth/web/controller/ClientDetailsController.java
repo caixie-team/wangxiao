@@ -1,8 +1,9 @@
 package io.wangxiao.auth.web.controller;
 
 import io.wangxiao.auth.domain.dto.OauthClientDetailsDto;
+import io.wangxiao.auth.oauth.OauthClientDetailsDtoValidator;
 import io.wangxiao.auth.service.OauthService;
-import io.wangxiao.auth.web.oauth.OauthClientDetailsDtoValidator;
+import org.beetl.json.JsonTool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,6 +35,9 @@ public class ClientDetailsController {
     public String clientDetails(Model model) {
         List<OauthClientDetailsDto> clientDetailsDtoList = oauthService.loadAllOauthClientDetailsDtos();
         model.addAttribute("clientDetailsDtoList", clientDetailsDtoList);
+
+        JsonTool jsonTool = new JsonTool();
+//        System.out.println(jsonTool.serialize(clientDetailsDtoList));
         return "clientdetails/client_details";
     }
 
