@@ -77,14 +77,12 @@ build/
 *.tlb
 *.tli
 *.tlh
-*.tmp
 *.tmp_proj
 *.log
 *.vspscc
 *.vssscc
 .builds
 *.pidb
-*.log
 *.scc
 
 # Visual C++ cache files
@@ -200,7 +198,6 @@ $RECYCLE.BIN/
 # Packages
 *.egg
 *.egg-info
-build/
 classes/
 eggs/
 parts/
